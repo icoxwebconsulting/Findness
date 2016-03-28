@@ -1,0 +1,42 @@
+AppBundle\Entity\Device:
+    type: entity
+    table: device
+    repositoryClass: AppBundle\EntityRepository\DeviceRepository
+    id:
+        id:
+            id: true
+            type: string
+            length: 255
+    fields:
+        os:
+            type: string
+            length: 50
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    manyToOne:
+        customer:
+            targetEntity: Customer
+            joinColumn:
+                name: customer
+                referencedColumnName: id
+            inversedBy: devices
+            cascade: ["persist", "merge"]
+    uniqueConstraints:
+        device_x_customer:
+          columns: [ id, customer ]
+    lifecycleCallbacks: {  }
+    gedmo:
+        soft_deleteable:
+          field_name: deletedAt
+          time_aware: false

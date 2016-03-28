@@ -1,0 +1,45 @@
+# Learn more about services, parameters and containers at
+# http://symfony.com/doc/current/book/service_container.html
+parameters:
+#    parameter_name: value
+
+services:
+    fos_oauth_server.server:
+        class: AppBundle\Services\FindnessOAuthServer
+        arguments:
+            - "@findness.oauth.storage"
+            - "%fos_oauth_server.server.options%"
+
+    findness.oauth.storage:
+        class: AppBundle\Services\FindnessOAuthStorage
+        arguments:
+            - "@fos_oauth_server.client_manager"
+            - "@fos_oauth_server.access_token_manager"
+            - "@fos_oauth_server.refresh_token_manager"
+            - "@fos_oauth_server.auth_code_manager"
+            - "@fos_oauth_server.user_provider"
+            - "@security.encoder_factory"
+        public: false
+
+    findness.rest.security.authentication.provider:
+        class: AppBundle\Security\Authentication\Provider\RestProvider
+        arguments:
+            - ""
+        public: false
+
+    findness.rest.security.authentication.listener:
+        class: AppBundle\Security\Firewall\RestListener
+        arguments:
+            - "@security.token_storage"
+            - "@security.authentication.manager"
+        public: false
+
+    findness.customer.registration:
+        class: AppBundle\Services\CustomerRegistration
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
+    findness.device.registration:
+        class: AppBundle\Services\DeviceRegistration
+        arguments:
+            - "@doctrine.orm.entity_manager"

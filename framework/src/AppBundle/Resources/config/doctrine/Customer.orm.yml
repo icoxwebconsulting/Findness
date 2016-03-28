@@ -1,0 +1,51 @@
+AppBundle\Entity\Customer:
+    type: entity
+    table: customer
+    repositoryClass: AppBundle\EntityRepository\CustomerRepository
+    id:
+        id:
+            id: true
+            type: string
+            length: 255
+    fields:
+        firstName:
+            type: string
+            length: 255
+        lastName:
+            type: string
+            length: 255
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    oneToMany:
+        accessTokens:
+            targetEntity: AccessToken
+            mappedBy: user
+            cascade: ["persist", "merge"]
+        authCodes:
+            targetEntity: AuthCode
+            mappedBy: user
+            cascade: ["persist", "merge"]
+        refreshTokens:
+            targetEntity: RefreshToken
+            mappedBy: user
+            cascade: ["persist", "merge"]
+        devices:
+            targetEntity: Device
+            mappedBy: customer
+            cascade: ["persist", "merge"]
+    lifecycleCallbacks: {  }
+    gedmo:
+        soft_deleteable:
+          field_name: deletedAt
+          time_aware: false

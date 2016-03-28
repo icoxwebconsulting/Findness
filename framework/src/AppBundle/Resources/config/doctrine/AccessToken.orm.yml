@@ -1,0 +1,40 @@
+AppBundle\Entity\AccessToken:
+    type: entity
+    table: access_token
+    id:
+        id:
+            id: true
+            type: string
+            length: 255
+        user:
+            associationKey: true
+    fields:
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    manyToOne:
+        user:
+            targetEntity: Customer
+            joinColumn:
+                name: customer
+                referencedColumnName: id
+            inversedBy: accessTokens
+            cascade: ["persist", "merge"]
+        client:
+            targetEntity: Client
+            joinColumn:
+                name: client
+                referencedColumnName: id
+            inversedBy: accessTokens
+            cascade: ["persist", "merge"]
+    lifecycleCallbacks: {  }

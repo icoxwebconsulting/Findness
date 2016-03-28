@@ -1,0 +1,40 @@
+AppBundle\Entity\Client:
+    type: entity
+    table: client
+    id:
+        id:
+            id: true
+            type: string
+            length: 255
+    fields:
+        name:
+            type: string
+            lenght: 255
+            unique: true
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    oneToMany:
+        accessTokens:
+            targetEntity: AccessToken
+            mappedBy: client
+            cascade: ["persist", "merge"]
+        authCodes:
+            targetEntity: AuthCode
+            mappedBy: client
+            cascade: ["persist", "merge"]
+        refreshTokens:
+            targetEntity: RefreshToken
+            mappedBy: client
+            cascade: ["persist", "merge"]
+    lifecycleCallbacks: {  }

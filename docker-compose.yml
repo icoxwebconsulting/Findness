@@ -1,0 +1,13 @@
+version: '2'
+services:
+  api:
+      image: bitgandtter/mumapi
+      volumes:
+        - .:/var/www
+  mysql:
+      image: mariadb
+      environment:
+          - MYSQL_ROOT_PASSWORD=root
+          - MYSQL_DATABASE=findness
+      volumes:
+          - ./development_tools/mysql_data:/var/lib/mysql
