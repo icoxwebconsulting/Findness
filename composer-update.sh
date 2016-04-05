@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-packages=(Customer framework)
+packages=(Customer MapRoute framework)
 
 for package in ${packages[@]}; do
         echo "composer update ${package}"

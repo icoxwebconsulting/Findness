@@ -1,0 +1,5 @@
+suites:
+    map_route:
+        namespace: MapRoute
+        src_path: %paths.config%/..
+        spec_path: %paths.config%
