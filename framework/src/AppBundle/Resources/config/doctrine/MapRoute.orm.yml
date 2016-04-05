@@ -1,0 +1,46 @@
+AppBundle\Entity\MapRoute:
+    type: entity
+    table: map_route
+    repositoryClass: AppBundle\EntityRepository\MapRouteRepository
+    id:
+        id:
+            id: true
+            type: string
+            length: 255
+    fields:
+        name:
+            type: string
+            length: 255
+        transport:
+            type: string
+            length: 255
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    manyToOne:
+        customer:
+            targetEntity: Customer
+            joinColumn:
+                name: customer
+                referencedColumnName: id
+            cascade: ["persist", "merge"]
+    oneToMany:
+        paths:
+            targetEntity: MapRoutePath
+            mappedBy: mapRoute
+            cascade: ["persist", "merge"]
+    lifecycleCallbacks: {  }
+    gedmo:
+        soft_deleteable:
+          field_name: deletedAt
+          time_aware: false
