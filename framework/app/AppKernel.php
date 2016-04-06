@@ -24,6 +24,7 @@ class AppKernel extends Kernel
             new FOS\OAuthServerBundle\FOSOAuthServerBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new Nelmio\CorsBundle\NelmioCorsBundle(),
+            new BeSimple\SoapBundle\BeSimpleSoapBundle(),
 
             new AppBundle\AppBundle(),
         );

@@ -146,3 +146,11 @@ nelmio_cors:
             allow_headers: ['*']
             allow_methods: ['POST', 'GET']
             max_age: 3600
+
+be_simple_soap:
+    clients:
+        QualitasApi:
+            # required
+            wsdl: https://qualitasws.axesor.es/QualitasWebServices.asmx?wsdl
+            classmap:
+                AtenderPeticionResponse: AppBundle\SOAP\AtenderPeticionResponse
