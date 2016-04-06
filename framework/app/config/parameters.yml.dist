@@ -17,3 +17,6 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:                 ThisTokenIsNotSoSecretChangeIt
+
+    qualitas_username: alvaro535
+    qualitas_password: qkxb4huv

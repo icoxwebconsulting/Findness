@@ -43,3 +43,10 @@ services:
         class: AppBundle\Services\DeviceRegistration
         arguments:
             - "@doctrine.orm.entity_manager"
+
+    findness.qualitas:
+        class: AppBundle\Services\QualitasSOAPApi
+        arguments:
+            - "%qualitas_username%"
+            - "%qualitas_password%"
+            - "@besimple.soap.client.qualitasapi"

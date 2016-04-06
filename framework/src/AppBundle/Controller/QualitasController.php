@@ -33,17 +33,7 @@ class QualitasController extends FOSRestController implements ClassResourceInter
      */
     public function getAction()
     {
-        $xmlRequest = '<SolicitudSegmentacion Id="1">
-                    <Producto>SegmentacionListado</Producto>
-                </SolicitudSegmentacion>';
-        $request = [
-            "nombreUsuario" => "alvaro535",
-            "pwd" => "qkxb4huv",
-            "peticionXml" => $xmlRequest
-        ];
-
-        $client = $this->container->get('besimple.soap.client.qualitasapi');
-        $response = $client->AtenderPeticion($request);
-        return $response->getAtenderPeticionResult();
+        $qualitas = $this->container->get('findness.qualitas');
+        return $qualitas->query();
     }
 }
