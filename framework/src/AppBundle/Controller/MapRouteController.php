@@ -47,15 +47,15 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
      */
     public function postAction(Request $request)
     {
-        $customerForm = $this->createForm(new MapRouteType());
+        $mapRouteForm = $this->createForm(new MapRouteType());
 
-        $customerForm->handleRequest($request);
+        $mapRouteForm->handleRequest($request);
 
-        if ($customerForm->isValid()) {
+        if ($mapRouteForm->isValid()) {
             $mapRoute = new MapRoute();
             $customer = $this->getUser();
-            $name = $customerForm->get('name')->getData();
-            $transport = $customerForm->get('transport')->getData();
+            $name = $mapRouteForm->get('name')->getData();
+            $transport = $mapRouteForm->get('transport')->getData();
             $registrationHandler = $this->get('findness.mapRoute.registration');
             $response = $registrationHandler->register($mapRoute,
                 $name,
@@ -64,7 +64,7 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
             return new MapRouteResponse($response);
         }
 
-        return $customerForm->getErrors();
+        return $mapRouteForm->getErrors();
     }
 
     /**
@@ -110,6 +110,7 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
      *
      * @param MapRoute $mapRoute
      * @return array
+     * @throws HttpException
      *
      * @Security("has_role('ROLE_USER')")
      *
@@ -141,10 +142,59 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
     }
 
     /**
+     * Update MapRoute
+     *
+     * @param MapRoute $mapRoute
+     * @param Request $request
+     * @return MapRoute
+     * @throws HttpException
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @FOSRestBundleAnnotations\Route("/map-routes/{mapRoute}")
+     *
+     * @ApiDoc(
+     *  section="MapRoute",
+     *  description="Update MapRoute",
+     *  input="AppBundle\Form\MapRouteType",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function putAction(Request $request, MapRoute $mapRoute = null)
+    {
+        if (!$mapRoute) {
+            throw new HttpException(500, 'Map Route not found');
+        }
+
+        $mapRouteForm = $this->createForm(new MapRouteType(), null, array('method' => 'PUT'));
+
+        $mapRouteForm->handleRequest($request);
+
+        if ($mapRouteForm->isValid()) {
+            $name = $mapRouteForm->get('name')->getData();
+            $transport = $mapRouteForm->get('transport')->getData();
+            $registrationHandler = $this->get('findness.mapRoute.registration');
+            $response = $registrationHandler->update($mapRoute,
+                $name,
+                $transport);
+            return new MapRouteResponse($response);
+        }
+
+        return $mapRouteForm->getErrors();
+    }
+
+    /**
      * Delete MapRoute
      *
      * @param MapRoute $mapRoute
-     * @return array
+     * @return boolean
+     * @throws HttpException
      *
      * @Security("has_role('ROLE_USER')")
      *

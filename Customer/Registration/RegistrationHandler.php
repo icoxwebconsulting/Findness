@@ -12,7 +12,7 @@ use Customer\Customer\CustomerInterface;
 class RegistrationHandler
 {
     /**
-     * Handle a new customer registration logic
+     * Handle customer registration logic
      *
      * @param CustomerInterface $customer
      * @param string $username

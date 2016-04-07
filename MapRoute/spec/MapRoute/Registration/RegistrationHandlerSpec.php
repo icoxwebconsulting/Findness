@@ -26,4 +26,21 @@ class RegistrationHandlerSpec extends ObjectBehavior
         $mapRoute->getTransport()->shouldBe($transport);
         $mapRoute->getCustomer()->shouldBe($customer);
     }
+
+    public function it_should_update_a_map_route()
+    {
+        $id = uniqid();
+        $mapRoute = new MapRoute($id);
+        $mapRoute->setName('route 1');
+        $mapRoute->setTransport('car');
+        $customer = new Customer($id);
+        $mapRoute->setCustomer($customer);
+
+        $name = 'route 2';
+        $transport = 'public';
+        $mapRoute = $this->updateMapRoute($mapRoute, $name, $transport);
+        $mapRoute->getName()->shouldBe($name);
+        $mapRoute->getTransport()->shouldBe($transport);
+        $mapRoute->getCustomer()->shouldBe($customer);
+    }
 }

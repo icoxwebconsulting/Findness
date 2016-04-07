@@ -2,6 +2,7 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\MapRoute;
 use Customer\Customer\CustomerInterface;
 use Doctrine\ORM\EntityManager;
 use MapRoute\MapRoute\MapRouteInterface;
@@ -31,13 +32,13 @@ class MapRouteRegistration
     }
 
     /**
-     * Register new customer
+     * Register new Map Route
      *
      * @param MapRouteInterface $mapRoute
      * @param string $name
      * @param string $transport
      * @param CustomerInterface $customer
-     * @return mixed
+     * @return MapRoute
      */
     public function register(MapRouteInterface $mapRoute,
                              $name,
@@ -50,6 +51,26 @@ class MapRouteRegistration
             $transport,
             $customer);
         $this->em->persist($mapRoute);
+        $this->em->flush();
+        return $mapRoute;
+    }
+
+    /**
+     * Update a Map Route
+     *
+     * @param MapRouteInterface $mapRoute
+     * @param string $name
+     * @param string $transport
+     * @return MapRoute
+     */
+    public function update(MapRouteInterface $mapRoute,
+                           $name,
+                           $transport)
+    {
+        $handler = new RegistrationHandler();
+        $mapRoute = $handler->updateMapRoute($mapRoute,
+            $name,
+            $transport);
         $this->em->flush();
         return $mapRoute;
     }

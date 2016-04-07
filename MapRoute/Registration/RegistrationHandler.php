@@ -13,7 +13,7 @@ use MapRoute\MapRoute\MapRouteInterface;
 class RegistrationHandler
 {
     /**
-     * Handle a new customer registration logic
+     * Handle map route registration logic
      *
      * @param MapRouteInterface $mapRoute
      * @param string $name
@@ -29,6 +29,23 @@ class RegistrationHandler
         $mapRoute->setName($name);
         $mapRoute->setTransport($transport);
         $mapRoute->setCustomer($customer);
+        return $mapRoute;
+    }
+
+    /**
+     * Handle map route update logic
+     *
+     * @param MapRouteInterface $mapRoute
+     * @param string $name
+     * @param string $transport
+     * @return MapRouteInterface
+     */
+    public function updateMapRoute(MapRouteInterface $mapRoute,
+                                   $name,
+                                   $transport)
+    {
+        $mapRoute->setName($name);
+        $mapRoute->setTransport($transport);
         return $mapRoute;
     }
 }
