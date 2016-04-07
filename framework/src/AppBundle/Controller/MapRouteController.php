@@ -88,7 +88,7 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
      *  }
      * )
      */
-    public function getAction()
+    public function cgetAction()
     {
         $customer = $this->getUser();
         $mapRoutes = $this->getDoctrine()
@@ -103,5 +103,40 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
             ];
         }
         return $routes;
+    }
+
+    /**
+     * Get MapRoute
+     *
+     * @param MapRoute $mapRoute
+     * @return array
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @FOSRestBundleAnnotations\Route("/map-routes/{mapRoute}")
+     *
+     * @ApiDoc(
+     *  section="MapRoute",
+     *  description="Get MapRoute",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getAction(MapRoute $mapRoute = null)
+    {
+        if (!$mapRoute) {
+            throw new HttpException(500, 'Map Route not found');
+        }
+
+        return [
+            "id" => $mapRoute->getId(),
+            "name" => $mapRoute->getName(),
+            "transport" => $mapRoute->getTransport()
+        ];
     }
 }
