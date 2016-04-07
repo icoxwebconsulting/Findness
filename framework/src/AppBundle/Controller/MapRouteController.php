@@ -66,4 +66,42 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
 
         return $customerForm->getErrors();
     }
+
+    /**
+     * Get MapRoute's by customer
+     *
+     * @return array
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @FOSRestBundleAnnotations\Route("/map-routes")
+     *
+     * @ApiDoc(
+     *  section="MapRoute",
+     *  description="Get MapRoute's by Customer",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getAction()
+    {
+        $customer = $this->getUser();
+        $mapRoutes = $this->getDoctrine()
+            ->getRepository("AppBundle:MapRoute")
+            ->findByCustomer($customer);
+        $routes = [];
+        foreach ($mapRoutes as $route) {
+            $routes[] = [
+                "id" => $route->getId(),
+                "name" => $route->getName(),
+                "transport" => $route->getTransport()
+            ];
+        }
+        return $routes;
+    }
 }
