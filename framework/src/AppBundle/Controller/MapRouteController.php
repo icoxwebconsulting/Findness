@@ -139,4 +139,39 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
             "transport" => $mapRoute->getTransport()
         ];
     }
+
+    /**
+     * Delete MapRoute
+     *
+     * @param MapRoute $mapRoute
+     * @return array
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @FOSRestBundleAnnotations\Route("/map-routes/{mapRoute}")
+     *
+     * @ApiDoc(
+     *  section="MapRoute",
+     *  description="Delete MapRoute",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function deleteAction(MapRoute $mapRoute = null)
+    {
+        if (!$mapRoute) {
+            throw new HttpException(500, 'Map Route not found');
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($mapRoute);
+        $em->flush();
+
+        return true;
+    }
 }
