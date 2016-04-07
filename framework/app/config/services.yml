@@ -44,6 +44,11 @@ services:
         arguments:
             - "@doctrine.orm.entity_manager"
 
+    findness.mapRoute.registration:
+        class: AppBundle\Services\MapRouteRegistration
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
     findness.qualitas:
         class: AppBundle\Services\QualitasSOAPApi
         arguments:
