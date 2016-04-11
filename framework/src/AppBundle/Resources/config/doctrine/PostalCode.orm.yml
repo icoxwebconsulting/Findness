@@ -1,0 +1,28 @@
+AppBundle\Entity\PostalCode:
+    type: entity
+    table: postal_code
+    repositoryClass: AppBundle\EntityRepository\PostalCodeRepository
+    id:
+        id:
+            id: true
+            type: string
+            length: 255
+    fields:
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    lifecycleCallbacks: {  }
+    gedmo:
+        soft_deleteable:
+          field_name: deletedAt
+          time_aware: false

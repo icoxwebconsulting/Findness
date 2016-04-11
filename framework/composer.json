@@ -31,7 +31,8 @@
     "friendsofsymfony/oauth-server-bundle": "dev-master",
     "stof/doctrine-extensions-bundle": "^1.2",
     "nelmio/cors-bundle": "^1.4",
-    "besimple/soap": "^0.2.6"
+    "besimple/soap": "^0.2.6",
+    "doctrine/doctrine-fixtures-bundle": "^2.3"
   },
   "require-dev": {
     "sensio/generator-bundle": "~3.0",
