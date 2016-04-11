@@ -36,27 +36,29 @@ class AtenderPeticionResponse
     {
         $result = [];
         $data = $data->ListaEmpresas->Empresa;
-        foreach ($data as $item) {
-            $id = $item->attributes()->IdEmpresa->__toString();
-            $result[$id] = [
-                "CIF" => $item->CIF->__toString(),
-                "RazonSocial" => $item->RazonSocial->__toString(),
-                "ObjetoSocial" => $item->ObjetoSocial->__toString(),
-                "Cnae" => $item->Cnae->__toString(),
-                "CodProvincia" => $item->CodProvincia->__toString(),
-                "CodMunicipio" => $item->CodMunicipio->__toString(),
-                "EjercicioDatosFinancieros" => $item->EjercicioDatosFinancieros->__toString(),
-                "ImporteNetoCifraNegocios" => $item->ImporteNetoCifraNegocios->__toString(),
-                "EBITDA" => $item->EBITDA->__toString(),
-                "EBIT" => $item->EBIT->__toString(),
-                "ResultadoEjercicio" => $item->ResultadoEjercicio->__toString(),
-                "ActivoNoCorriente" => $item->ActivoNoCorriente->__toString(),
-                "ActivoCorriente" => $item->ActivoCorriente->__toString(),
-                "FondosPropios" => $item->FondosPropios->__toString(),
-                "PasivoNoCorriente" => $item->PasivoNoCorriente->__toString(),
-                "Deudas" => $item->Deudas->__toString(),
-                "Empleados" => $item->Empleados->__toString()
-            ];
+        if ($data) {
+            foreach ($data as $item) {
+                $id = $item->attributes()->IdEmpresa->__toString();
+                $result[$id] = [
+                    "CIF" => $item->CIF->__toString(),
+                    "RazonSocial" => $item->RazonSocial->__toString(),
+                    "ObjetoSocial" => $item->ObjetoSocial->__toString(),
+                    "Cnae" => $item->Cnae->__toString(),
+                    "CodProvincia" => $item->CodProvincia->__toString(),
+                    "CodMunicipio" => $item->CodMunicipio->__toString(),
+                    "EjercicioDatosFinancieros" => $item->EjercicioDatosFinancieros->__toString(),
+                    "ImporteNetoCifraNegocios" => $item->ImporteNetoCifraNegocios->__toString(),
+                    "EBITDA" => $item->EBITDA->__toString(),
+                    "EBIT" => $item->EBIT->__toString(),
+                    "ResultadoEjercicio" => $item->ResultadoEjercicio->__toString(),
+                    "ActivoNoCorriente" => $item->ActivoNoCorriente->__toString(),
+                    "ActivoCorriente" => $item->ActivoCorriente->__toString(),
+                    "FondosPropios" => $item->FondosPropios->__toString(),
+                    "PasivoNoCorriente" => $item->PasivoNoCorriente->__toString(),
+                    "Deudas" => $item->Deudas->__toString(),
+                    "Empleados" => $item->Empleados->__toString()
+                ];
+            }
         }
         return $result;
     }

@@ -54,4 +54,5 @@ services:
         arguments:
             - "%qualitas_username%"
             - "%qualitas_password%"
+            - "%qualitas_geo_radio%"
             - "@besimple.soap.client.qualitasapi"
