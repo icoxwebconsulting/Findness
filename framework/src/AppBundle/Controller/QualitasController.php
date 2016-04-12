@@ -128,4 +128,30 @@ class QualitasController extends FOSRestController implements ClassResourceInter
             },
             []);
     }
+
+    /**
+     * Get Qualitas States
+     *
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/qualitas/states")
+     *
+     * @ApiDoc(
+     *  section="Qualitas",
+     *  description="Get Qualitas States",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getStatesAction()
+    {
+        return $this->getDoctrine()
+            ->getRepository("AppBundle:State")
+            ->findAll();
+    }
 }
