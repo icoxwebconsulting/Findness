@@ -212,7 +212,7 @@ class QualitasSOAPApi
                                    array $postalCodes = [],
                                    array $geoLocations = [])
     {
-        $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>SegmentacionListado</Producto>%s</SolicitudSegmentacion>';
+        $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>SegmentacionListadoThinkandCloud</Producto>%s</SolicitudSegmentacion>';
 
         $filters = $this->getFilters($cnaes, $states, $cities, $postalCodes, $geoLocations);
         $xmlRequest = sprintf($xmlRequest, $page, $filters);
@@ -239,7 +239,6 @@ class QualitasSOAPApi
                           array $geoLocations = [])
     {
         $xmlRequest = $this->buildQueryXML($page, $cnaes, $states, $cities, $postalCodes, $geoLocations);
-        echo $xmlRequest . "<br>";
         $request = [
             "nombreUsuario" => $this->username,
             "pwd" => $this->password,
