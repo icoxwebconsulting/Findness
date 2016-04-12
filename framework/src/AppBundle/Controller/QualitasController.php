@@ -154,4 +154,39 @@ class QualitasController extends FOSRestController implements ClassResourceInter
             ->getRepository("AppBundle:State")
             ->findAll();
     }
+
+    /**
+     * Get Qualitas Cities
+     *
+     * @param Request $request
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/qualitas/cities")
+     *
+     * @ApiDoc(
+     *  section="Qualitas",
+     *  description="Get Qualitas Cities",
+     *  parameters={
+     *     {
+     *          "name"="state",
+     *          "dataType"="string",
+     *          "required"=true,
+     *          "description"="state"
+     *      }
+     *  },
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getCitiesAction(Request $request)
+    {
+        return $this->getDoctrine()
+            ->getRepository("AppBundle:City")
+            ->findByState($request->get("state"));
+    }
 }
