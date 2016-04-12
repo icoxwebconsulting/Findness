@@ -94,4 +94,38 @@ class QualitasController extends FOSRestController implements ClassResourceInter
         $qualitas = $this->container->get('findness.qualitas');
         return $qualitas->query($page, $cnaes, $states, $cities, $postalCodes, $geoLocations);
     }
+
+    /**
+     * Get Qualitas Postal codes
+     *
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/qualitas/postal-codes")
+     *
+     * @ApiDoc(
+     *  section="Qualitas",
+     *  description="Get Qualitas Postal codes",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getPostalCodesAction()
+    {
+        return array_reduce($this->getDoctrine()
+            ->getRepository("AppBundle:PostalCode")
+            ->createQueryBuilder('pc')
+            ->select('pc.id')
+            ->getQuery()
+            ->getArrayResult(),
+            function ($carry, $item) {
+                $carry[] = $item["id"];
+                return $carry;
+            },
+            []);
+    }
 }
