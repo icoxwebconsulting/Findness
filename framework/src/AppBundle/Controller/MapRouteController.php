@@ -11,6 +11,7 @@ use AppBundle\ResponseObjects\MapRoutePath as MapRoutePathResponse;
 use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+use MapRoute\MapRoutePath\MapRoutePathInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -320,5 +321,46 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
             ];
         }
         return $paths;
+    }
+
+    /**
+     * Get MapRoute Path
+     *
+     * @param MapRoute $mapRoute
+     * @param MapRoutePath $mapRoutePath
+     * @return MapRoutePathInterface
+     * @throws HttpException
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @FOSRestBundleAnnotations\Route("/map-routes/{mapRoute}/path/{mapRoutePath}")
+     *
+     * @ApiDoc(
+     *  section="MapRoute",
+     *  description="Get MapRoute",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getPathAction(MapRoute $mapRoute = null, MapRoutePath $mapRoutePath = null)
+    {
+        if (!$mapRoute) {
+            throw new HttpException(500, 'Map Route not found');
+        }
+
+        if (!$mapRoutePath) {
+            throw new HttpException(500, 'Map Route Path not found');
+        }
+
+        return [
+            "id" => $mapRoutePath->getId(),
+            "startPoint" => $mapRoutePath->getStartPoint(),
+            "endPoint" => $mapRoutePath->getEndPoint()
+        ];
     }
 }
