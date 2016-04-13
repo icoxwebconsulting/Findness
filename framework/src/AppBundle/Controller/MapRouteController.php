@@ -278,4 +278,47 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
 
         return $mapRoutePathForm->getErrors();
     }
+
+    /**
+     * Get MapRoute Path's by MapRoute
+     *
+     * @param MapRoute $mapRoute
+     * @return array
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @FOSRestBundleAnnotations\Route("/map-routes/{mapRoute}/paths")
+     *
+     * @ApiDoc(
+     *  section="MapRoute",
+     *  description="Get MapRoute Path's by MapRoute",
+     *  statusCodes={
+     *         200="Returned when successful",
+     *         500="Returned on not found map route"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function cgetPathsAction(MapRoute $mapRoute)
+    {
+        if (!$mapRoute) {
+            throw new HttpException(500, 'Map Route not found');
+        }
+
+        $mapRoutePaths = $this->getDoctrine()
+            ->getRepository("AppBundle:MapRoutePath")
+            ->findByMapRoute($mapRoute);
+        $paths = [];
+        foreach ($mapRoutePaths as $path) {
+            $paths[] = [
+                "id" => $path->getId(),
+                "startPoint" => $path->getStartPoint(),
+                "endPoint" => $path->getEndPoint()
+            ];
+        }
+        return $paths;
+    }
 }
