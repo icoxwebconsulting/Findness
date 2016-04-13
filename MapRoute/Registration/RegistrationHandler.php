@@ -4,6 +4,7 @@ namespace MapRoute\Registration;
 
 use Customer\Customer\CustomerInterface;
 use MapRoute\MapRoute\MapRouteInterface;
+use MapRoute\MapRoutePath\MapRoutePathInterface;
 
 /**
  * Class RegistrationHandler
@@ -47,5 +48,42 @@ class RegistrationHandler
         $mapRoute->setName($name);
         $mapRoute->setTransport($transport);
         return $mapRoute;
+    }
+
+    /**
+     * Handle map route path registration logic
+     *
+     * @param MapRouteInterface $mapRoute
+     * @param MapRoutePathInterface $mapRoutePath
+     * @param array $startPoint
+     * @param array $endPoint
+     * @return MapRoutePathInterface
+     */
+    public function registerMapRoutePath(MapRouteInterface $mapRoute,
+                                         MapRoutePathInterface $mapRoutePath,
+                                         array $startPoint,
+                                         array $endPoint)
+    {
+        $mapRoutePath->setMapRoute($mapRoute);
+        $mapRoutePath->setStartPoint($startPoint["latitude"], $startPoint["longitude"]);
+        $mapRoutePath->setEndPoint($endPoint["latitude"], $endPoint["longitude"]);
+        return $mapRoutePath;
+    }
+
+    /**
+     * Handle map route path update logic
+     *
+     * @param MapRoutePathInterface $mapRoutePath
+     * @param array $startPoint
+     * @param array $endPoint
+     * @return MapRoutePathInterface
+     */
+    public function updateMapRoutePath(MapRoutePathInterface $mapRoutePath,
+                                       array $startPoint,
+                                       array $endPoint)
+    {
+        $mapRoutePath->setStartPoint($startPoint["latitude"], $startPoint["longitude"]);
+        $mapRoutePath->setEndPoint($endPoint["latitude"], $endPoint["longitude"]);
+        return $mapRoutePath;
     }
 }

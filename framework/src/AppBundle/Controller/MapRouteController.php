@@ -3,8 +3,11 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\MapRoute;
+use AppBundle\Entity\MapRoutePath;
+use AppBundle\Form\MapRoutePathType;
 use AppBundle\Form\MapRouteType;
 use AppBundle\ResponseObjects\MapRoute as MapRouteResponse;
+use AppBundle\ResponseObjects\MapRoutePath as MapRoutePathResponse;
 use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -223,5 +226,56 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
         $em->flush();
 
         return true;
+    }
+
+    /**
+     * Create a new MapRoute Path
+     *
+     * @param MapRoute $mapRoute
+     * @param Request $request
+     * @return MapRoutePathResponse\Symfony\Component\Form\FormErrorIterator
+     * @throws HttpException
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @FOSRestBundleAnnotations\Route("/map-routes/{mapRoute}")
+     *
+     * @ApiDoc(
+     *  section="MapRoute",
+     *  description="Create a new MapRoute Path",
+     *  input="AppBundle\Form\MapRoutePathType",
+     *  statusCodes={
+     *         200="Returned when successful",
+     *         500="Returned on not found map route"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function postPathAction(MapRoute $mapRoute, Request $request)
+    {
+        if (!$mapRoute) {
+            throw new HttpException(500, 'Map Route not found');
+        }
+
+        $mapRoutePathForm = $this->createForm(new MapRoutePathType());
+
+        $mapRoutePathForm->handleRequest($request);
+
+        if ($mapRoutePathForm->isValid()) {
+            $mapRoutePath = new MapRoutePath();
+            $startPoint = json_decode($mapRoutePathForm->get('startPoint')->getData(), true);
+            $endPoint = json_decode($mapRoutePathForm->get('endPoint')->getData(), true);
+            $registrationHandler = $this->get('findness.mapRoute.registration');
+            $response = $registrationHandler->registerPath($mapRoute,
+                $mapRoutePath,
+                $startPoint,
+                $endPoint);
+            return new MapRoutePathResponse($response);
+        }
+
+        return $mapRoutePathForm->getErrors();
     }
 }

@@ -6,6 +6,7 @@ use AppBundle\Entity\MapRoute;
 use Customer\Customer\CustomerInterface;
 use Doctrine\ORM\EntityManager;
 use MapRoute\MapRoute\MapRouteInterface;
+use MapRoute\MapRoutePath\MapRoutePathInterface;
 use MapRoute\Registration\RegistrationHandler;
 
 /**
@@ -73,5 +74,29 @@ class MapRouteRegistration
             $transport);
         $this->em->flush();
         return $mapRoute;
+    }
+
+    /**
+     * Register new Map Route Path
+     *
+     * @param MapRouteInterface $mapRoute
+     * @param MapRoutePathInterface $mapRoutePath
+     * @param array $startPoint
+     * @param array $endPoint
+     * @return MapRoute
+     */
+    public function registerPath(MapRouteInterface $mapRoute,
+                                 MapRoutePathInterface $mapRoutePath,
+                                 array $startPoint,
+                                 array $endPoint)
+    {
+        $handler = new RegistrationHandler();
+        $mapRoutePath = $handler->registerMapRoutePath($mapRoute,
+            $mapRoutePath,
+            $startPoint,
+            $endPoint);
+        $this->em->persist($mapRoutePath);
+        $this->em->flush();
+        return $mapRoutePath;
     }
 }

@@ -9,10 +9,10 @@ AppBundle\Entity\MapRoutePath:
             length: 255
     fields:
         startPoint:
-            type: string
+            type: array
             length: 255
         endPoint:
-            type: string
+            type: array
             length: 255
         created:
             type: datetime
