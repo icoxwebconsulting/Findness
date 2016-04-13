@@ -83,7 +83,7 @@ class MapRouteRegistration
      * @param MapRoutePathInterface $mapRoutePath
      * @param array $startPoint
      * @param array $endPoint
-     * @return MapRoute
+     * @return MapRoutePathInterface
      */
     public function registerPath(MapRouteInterface $mapRoute,
                                  MapRoutePathInterface $mapRoutePath,
@@ -96,6 +96,26 @@ class MapRouteRegistration
             $startPoint,
             $endPoint);
         $this->em->persist($mapRoutePath);
+        $this->em->flush();
+        return $mapRoutePath;
+    }
+
+    /**
+     * Update new Map Route Path
+     *
+     * @param MapRoutePathInterface $mapRoutePath
+     * @param array $startPoint
+     * @param array $endPoint
+     * @return MapRoutePathInterface
+     */
+    public function updatePath(MapRoutePathInterface $mapRoutePath,
+                               array $startPoint,
+                               array $endPoint)
+    {
+        $handler = new RegistrationHandler();
+        $mapRoutePath = $handler->updateMapRoutePath($mapRoutePath,
+            $startPoint,
+            $endPoint);
         $this->em->flush();
         return $mapRoutePath;
     }

@@ -337,9 +337,11 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
      *
      * @ApiDoc(
      *  section="MapRoute",
-     *  description="Get MapRoute",
+     *  description="Get MapRoute Path",
      *  statusCodes={
-     *         200="Returned when successful"
+     *         200="Returned when successful",
+     *         500="Returned on not found map route",
+     *         500="Returned on not found map route path"
      *  },
      *  tags={
      *   "stable" = "#4A7023",
@@ -362,5 +364,60 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
             "startPoint" => $mapRoutePath->getStartPoint(),
             "endPoint" => $mapRoutePath->getEndPoint()
         ];
+    }
+
+    /**
+     * Update MapRoute Path
+     *
+     * @param Request $request
+     * @param MapRoute $mapRoute
+     * @param MapRoutePath $mapRoutePath
+     * @return MapRoutePathInterface
+     * @throws HttpException
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @FOSRestBundleAnnotations\Route("/map-routes/{mapRoute}/path/{mapRoutePath}")
+     *
+     * @ApiDoc(
+     *  section="MapRoute",
+     *  description="Update MapRoute",
+     *  input="AppBundle\Form\MapRoutePathType",
+     *  statusCodes={
+     *         200="Returned when successful",
+     *         500="Returned on not found map route",
+     *         500="Returned on not found map route path"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function putPathAction(Request $request, MapRoute $mapRoute = null, MapRoutePath $mapRoutePath = null)
+    {
+        if (!$mapRoute) {
+            throw new HttpException(500, 'Map Route not found');
+        }
+
+        if (!$mapRoutePath) {
+            throw new HttpException(500, 'Map Route Path not found');
+        }
+
+        $mapRoutePathForm = $this->createForm(new MapRoutePathType(), null, array('method' => 'PUT'));
+
+        $mapRoutePathForm->handleRequest($request);
+
+        if ($mapRoutePathForm->isValid()) {
+            $startPoint = json_decode($mapRoutePathForm->get('startPoint')->getData(), true);
+            $endPoint = json_decode($mapRoutePathForm->get('endPoint')->getData(), true);
+            $registrationHandler = $this->get('findness.mapRoute.registration');
+            $response = $registrationHandler->updatePath($mapRoutePath,
+                $startPoint,
+                $endPoint);
+            return new MapRoutePathResponse($response);
+        }
+
+        return $mapRoutePathForm->getErrors();
     }
 }
