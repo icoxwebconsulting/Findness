@@ -145,6 +145,8 @@ class CustomersController extends FOSRestController implements ClassResourceInte
             throw new HttpException(500, 'Customer not found');
         }
 
-        return $customer->getSalt();
+        return [
+            "salt" => $customer->getSalt()
+        ];
     }
 }
