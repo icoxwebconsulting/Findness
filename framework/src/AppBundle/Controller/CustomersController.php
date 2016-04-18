@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -105,5 +106,45 @@ class CustomersController extends FOSRestController implements ClassResourceInte
         }
 
         return new CustomerResponse($customer);
+    }
+
+    /**
+     * Response with the customer salt by {username}
+     *
+     * @param Customer $customer
+     * @return CustomerResponse
+     * @throws HttpException
+     *
+     * @FOSRestBundleAnnotations\Route("/customers/{username}/salt")
+     * @ParamConverter("customer", options={"mapping": {"username": "username"}})
+     *
+     * @ApiDoc(
+     *  section="Customer",
+     *  description="Get a customer salt",
+     *  requirements={
+     *      {
+     *          "name"="username",
+     *          "dataType"="string",
+     *          "requirement"="*",
+     *          "description"="customer id"
+     *      }
+     *  },
+     *  statusCodes={
+     *         200="Returned when successful",
+     *         500="Returned on not found customer"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getSaltAction(Customer $customer = null)
+    {
+        if (!$customer) {
+            throw new HttpException(500, 'Customer not found');
+        }
+
+        return $customer->getSalt();
     }
 }
