@@ -1,0 +1,5 @@
+suites:
+    customer:
+        namespace: Customer
+        src_path: %paths.config%/..
+        spec_path: %paths.config%

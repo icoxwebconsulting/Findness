@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-packages=(Customer MapRoute)
+packages=(Customer MapRoute Finance)
 
 for package in ${packages[@]}; do
         echo "testing ${package}"
