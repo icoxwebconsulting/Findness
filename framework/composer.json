@@ -6,7 +6,8 @@
     "psr-4": {
       "": "src/",
       "Customer\\": "../Customer/",
-      "MapRoute\\": "../MapRoute/"
+      "MapRoute\\": "../MapRoute/",
+      "Finance\\": "../Finance/"
     },
     "classmap": [
       "app/AppKernel.php",

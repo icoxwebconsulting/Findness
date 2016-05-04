@@ -1,0 +1,35 @@
+AppBundle\Entity\Balance:
+    type: entity
+    table: balance
+    repositoryClass: AppBundle\EntityRepository\BalanceRepository
+    id:
+        customer:
+            associationKey: true
+    fields:
+        balance:
+            type: float
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    manyToOne:
+        customer:
+            targetEntity: Customer
+            joinColumn:
+                name: customer
+                referencedColumnName: id
+            cascade: ["persist", "merge"]
+    lifecycleCallbacks: {  }
+    gedmo:
+        soft_deleteable:
+          field_name: deletedAt
+          time_aware: false
