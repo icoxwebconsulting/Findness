@@ -2,6 +2,7 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\Balance;
 use Customer\Customer\CustomerInterface;
 use Customer\Registration\RegistrationHandler;
 use Doctrine\ORM\EntityManager;
@@ -55,6 +56,10 @@ class CustomerRegistration
             $salt,
             $password);
         $this->em->persist($customer);
+        $this->em->flush();
+        $balance = new Balance($customer);
+        $balance->setBalance(0);
+        $this->em->persist($balance);
         $this->em->flush();
         return $customer;
     }
