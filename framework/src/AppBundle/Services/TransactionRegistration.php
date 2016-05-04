@@ -5,6 +5,7 @@ namespace AppBundle\Services;
 use AppBundle\Entity\Transaction;
 use Customer\Customer\CustomerInterface;
 use Doctrine\ORM\EntityManager;
+use Finance\Finance\BalanceInterface;
 use Finance\Registration\RegistrationHandler;
 
 /**
@@ -28,6 +29,17 @@ class TransactionRegistration
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
+    }
+
+    /**
+     * Get customer balance
+     *
+     * @param CustomerInterface $customer
+     * @return BalanceInterface
+     */
+    private function getBalance(CustomerInterface $customer)
+    {
+        return $this->em->getRepository("AppBundle:Balance")->findOneByCustomer($customer);
     }
 
     /**
@@ -55,6 +67,11 @@ class TransactionRegistration
             $cardId);
         $this->em->persist($transaction);
         $this->em->flush();
+
+        $balanceEntity = $this->getBalance($customer);
+        $balanceEntity->setBalance($balanceEntity->getBalance() + $balance);
+        $this->em->flush();
+
         return $transaction;
     }
 }
