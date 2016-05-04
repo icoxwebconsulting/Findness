@@ -49,6 +49,11 @@ services:
         arguments:
             - "@doctrine.orm.entity_manager"
 
+    findness.transaction.registration:
+        class: AppBundle\Services\TransactionRegistration
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
     findness.qualitas:
         class: AppBundle\Services\QualitasSOAPApi
         arguments:

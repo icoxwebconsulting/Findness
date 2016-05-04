@@ -2,6 +2,9 @@
 
 namespace AppBundle\Entity;
 
+use Finance\Finance\FindnessOperator;
+use Finance\Finance\PaypalOperator;
+use Finance\Finance\StripeOperator;
 use Finance\Finance\Transaction as TransactionBase;
 
 /**
@@ -72,5 +75,34 @@ class Transaction extends TransactionBase
     public function getDeletedAt()
     {
         return $this->deletedAt;
+    }
+
+    /**
+     * PrePersist and PreUpdate convert the operator object to integer
+     */
+    public function convertOperatorToInteger()
+    {
+        $this->operator = $this->operator->getId();
+    }
+
+    /**
+     * PostPersist, PostUpdate and PostLoad convert the operator from integer
+     */
+    public function convertOperatorFromInteger()
+    {
+        switch ($this->operator) {
+            case 1: {
+                $this->operator = new FindnessOperator();
+                break;
+            }
+            case 2: {
+                $this->operator = new PaypalOperator();
+                break;
+            }
+            case 3: {
+                $this->operator = new StripeOperator();
+                break;
+            }
+        }
     }
 }

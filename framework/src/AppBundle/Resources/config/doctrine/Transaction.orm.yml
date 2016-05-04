@@ -36,7 +36,12 @@ AppBundle\Entity\Transaction:
                 name: customer
                 referencedColumnName: id
             cascade: ["persist", "merge"]
-    lifecycleCallbacks: {  }
+    lifecycleCallbacks:
+        prePersist: [ convertOperatorToInteger ]
+        postPersist: [ convertOperatorFromInteger ]
+        postLoad: [ convertOperatorFromInteger ]
+        preUpdate: [ convertOperatorToInteger ]
+        postUpdate: [ convertOperatorFromInteger ]
     gedmo:
         soft_deleteable:
           field_name: deletedAt
