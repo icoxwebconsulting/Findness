@@ -2,10 +2,12 @@
 
 namespace Finance\Registration;
 
+use Customer\Customer\CustomerInterface;
 use Finance\Finance\FindnessOperator;
 use Finance\Finance\OperatorInterface;
 use Finance\Finance\PaypalOperator;
 use Finance\Finance\StripeOperator;
+use Finance\Finance\Transaction;
 use Finance\Finance\TransactionInterface;
 
 /**
@@ -71,5 +73,22 @@ class RegistrationHandler
         $reference = $this->getReference($operator, $transactionId, $cardId);
         $transaction->setReference($reference);
         return $transaction;
+    }
+
+    /**
+     * Charge Customer for search
+     *
+     * @param CustomerInterface $customer
+     * @param $itemsCount
+     * @param $charge
+     * @return TransactionInterface
+     */
+    public function charge(CustomerInterface $customer,
+                           $itemsCount,
+                           $charge)
+    {
+        $transaction = new Transaction($customer);
+        $balance = $itemsCount * $charge;
+        return $this->register($transaction, $balance, (new FindnessOperator())->getId());
     }
 }

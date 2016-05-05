@@ -3,6 +3,7 @@
 namespace spec\Finance\Registration;
 
 use Customer\Customer\Customer;
+use Finance\Finance\FindnessOperator;
 use Finance\Finance\Transaction;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -45,5 +46,15 @@ class RegistrationHandlerSpec extends ObjectBehavior
         $transaction->getBalance()->shouldBe($balance);
         $transaction->getOperator()->getId()->shouldBe($operator);
         $transaction->getReference()->shouldBe(sprintf("%s@%s", $transactionId, $cardId));
+    }
+
+    public function it_should_get_transaction_for_search()
+    {
+        $customer = new Customer();
+        $charge = 0.15;
+        $itemsCount = 10;
+        $transaction = $this->charge($customer, $itemsCount, $charge);
+        $transaction->getBalance()->shouldBe($itemsCount * $charge);
+        $transaction->getOperator()->getId()->shouldBe((new FindnessOperator())->getId());
     }
 }

@@ -6,6 +6,7 @@ use Finance\Finance\FindnessOperator;
 use Finance\Finance\PaypalOperator;
 use Finance\Finance\StripeOperator;
 use Finance\Finance\Transaction as TransactionBase;
+use Finance\Finance\TransactionInterface;
 
 /**
  * Transaction ORM Entity
@@ -104,5 +105,20 @@ class Transaction extends TransactionBase
                 break;
             }
         }
+    }
+
+    /**
+     * Get orm transaction from business entity
+     *
+     * @param TransactionInterface $transaction
+     * @return Transaction
+     */
+    public function fromBusinessEntity(TransactionInterface $transaction)
+    {
+        $ormTransaction = new Transaction($transaction->getCustomer());
+        $ormTransaction->setBalance($transaction->getBalance());
+        $ormTransaction->setOperator($transaction->getOperator());
+        $ormTransaction->setReference($transaction->getReference());
+        return $ormTransaction;
     }
 }

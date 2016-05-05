@@ -21,3 +21,5 @@ parameters:
     qualitas_username: alvaro535
     qualitas_password: qkxb4huv
     qualitas_geo_radio: 500
+
+    findness_search_charge: 0.15
