@@ -9,7 +9,7 @@ AppBundle\Entity\Company:
             length: 255
     fields:
         externalId:
-            type: string:
+            type: string
             length: 255
         created:
             type: datetime

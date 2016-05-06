@@ -18,13 +18,13 @@ class CustomerViewCompany implements CustomerViewCompanyInterface,
     /**
      * @var CustomerInterface
      */
-    private $customer;
+    protected $customer;
 
 
     /**
      * @var CompanyInterface
      */
-    private $company;
+    protected $company;
 
     /**
      * @inheritdoc
