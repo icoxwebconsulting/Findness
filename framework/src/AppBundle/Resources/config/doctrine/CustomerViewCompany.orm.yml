@@ -1,0 +1,41 @@
+AppBundle\Entity\CustomerViewCompany:
+    type: entity
+    table: customer_view_company
+    repositoryClass: AppBundle\EntityRepository\CustomerViewCompanyRepository
+    id:
+        customer:
+            associationKey: true
+        company:
+            associationKey: true
+    fields:
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    manyToOne:
+        customer:
+            targetEntity: Customer
+            joinColumn:
+                name: customer
+                referencedColumnName: id
+            cascade: ["persist", "merge"]
+        company:
+            targetEntity: Company
+            joinColumn:
+                name: company
+                referencedColumnName: id
+            cascade: ["persist", "merge"]
+    lifecycleCallbacks: {  }
+    gedmo:
+        soft_deleteable:
+          field_name: deletedAt
+          time_aware: false

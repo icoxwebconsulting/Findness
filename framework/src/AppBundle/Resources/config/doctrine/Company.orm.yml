@@ -1,0 +1,31 @@
+AppBundle\Entity\Company:
+    type: entity
+    table: company
+    repositoryClass: AppBundle\EntityRepository\CompanyRepository
+    id:
+        id:
+            id: true
+            type: string
+            length: 255
+    fields:
+        externalId:
+            type: string:
+            length: 255
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    lifecycleCallbacks: {  }
+    gedmo:
+        soft_deleteable:
+          field_name: deletedAt
+          time_aware: false
