@@ -52,6 +52,10 @@ services:
     findness.transaction.registration:
         class: AppBundle\Services\TransactionRegistration
         arguments:
+            - "%stripe_key%"
+            - "%stripe_secret%"
+            - "%paypal_client_id%"
+            - "%paypal_secret%"
             - "@doctrine.orm.entity_manager"
 
     findness.qualitas:

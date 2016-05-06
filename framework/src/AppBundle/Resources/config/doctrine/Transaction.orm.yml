@@ -14,7 +14,9 @@ AppBundle\Entity\Transaction:
             type: float
         operator:
             type: integer
-        reference:
+        transactionId:
+            type: text
+        cardId:
             type: text
         created:
             type: datetime

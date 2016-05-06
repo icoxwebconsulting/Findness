@@ -17,4 +17,20 @@ class StripeOperator implements OperatorInterface
     {
         return 3;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName()
+    {
+        return "stripe";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validateTransaction($transactionId, array $apisConf)
+    {
+        return true;
+    }
 }

@@ -35,7 +35,12 @@ class Transaction implements TransactionInterface
     /**
      * @var string
      */
-    protected $reference;
+    protected $transactionId;
+
+    /**
+     * @var string
+     */
+    protected $cardId;
 
     /**
      * Balance constructor.
@@ -112,16 +117,32 @@ class Transaction implements TransactionInterface
     /**
      * @inheritdoc
      */
-    public function getReference()
+    public function getTransactionId()
     {
-        return $this->reference;
+        return $this->transactionId;
     }
 
     /**
      * @inheritdoc
      */
-    public function setReference($reference)
+    public function setTransactionId($transactionId)
     {
-        $this->reference = $reference;
+        $this->transactionId = $transactionId;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCardId()
+    {
+        return $this->cardId;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCardId($cardId)
+    {
+        $this->cardId = $cardId;
     }
 }

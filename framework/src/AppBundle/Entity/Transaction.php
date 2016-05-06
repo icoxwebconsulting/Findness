@@ -118,7 +118,8 @@ class Transaction extends TransactionBase
         $ormTransaction = new Transaction($transaction->getCustomer());
         $ormTransaction->setBalance($transaction->getBalance());
         $ormTransaction->setOperator($transaction->getOperator());
-        $ormTransaction->setReference($transaction->getReference());
+        $ormTransaction->setTransactionId($transaction->getTransactionId());
+        $ormTransaction->setCardId($transaction->getCardId());
         return $ormTransaction;
     }
 }

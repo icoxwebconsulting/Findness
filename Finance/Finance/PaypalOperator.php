@@ -17,4 +17,20 @@ class PaypalOperator implements OperatorInterface
     {
         return 2;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName()
+    {
+        return "paypal";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validateTransaction($transactionId, array $apisConf)
+    {
+        return true;
+    }
 }

@@ -4,7 +4,6 @@ namespace Finance\Registration;
 
 use Customer\Customer\CustomerInterface;
 use Finance\Finance\FindnessOperator;
-use Finance\Finance\OperatorInterface;
 use Finance\Finance\PaypalOperator;
 use Finance\Finance\StripeOperator;
 use Finance\Finance\Transaction;
@@ -39,18 +38,6 @@ class RegistrationHandler
         }
     }
 
-    private function getReference(OperatorInterface $operator, $transactionId = null, $cardId = null)
-    {
-        if ($operator instanceof FindnessOperator) {
-            return uniqid();
-        } else {
-            if (!$transactionId || !$cardId) {
-                throw new \Exception("Need to provide transaction id and card id");
-            }
-            return sprintf("%s@%s", $transactionId, $cardId);
-        }
-    }
-
     /**
      * Handle customer registration logic
      *
@@ -59,36 +46,44 @@ class RegistrationHandler
      * @param int $operator
      * @param string|null $transactionId
      * @param string|null $cardId
+     * @param array|null $apisConf
      * @return TransactionInterface
+     * @throws \Exception
      */
     public function register(TransactionInterface $transaction,
                              $balance,
                              $operator,
                              $transactionId = null,
-                             $cardId = null)
+                             $cardId = null,
+                             array $apisConf)
     {
-        $transaction->setBalance($balance);
         $operator = $this->getOperator($operator);
-        $transaction->setOperator($operator);
-        $reference = $this->getReference($operator, $transactionId, $cardId);
-        $transaction->setReference($reference);
-        return $transaction;
+        if ($operator->validateTransaction($transactionId, $apisConf[$operator->getName()])) {
+            $transaction->setBalance($balance);
+            $transaction->setOperator($operator);
+            $transaction->setTransactionId($transactionId);
+            $transaction->setCardId($cardId);
+            return $transaction;
+        }
     }
 
     /**
      * Charge Customer for search
      *
      * @param CustomerInterface $customer
-     * @param $itemsCount
-     * @param $charge
+     * @param int $itemsCount
+     * @param float $fee
+     * @param array|null $apisConf
      * @return TransactionInterface
      */
     public function charge(CustomerInterface $customer,
                            $itemsCount,
-                           $charge)
+                           $fee,
+                           array $apisConf)
     {
         $transaction = new Transaction($customer);
-        $balance = $itemsCount * $charge;
-        return $this->register($transaction, $balance, (new FindnessOperator())->getId());
+        $balance = -1 * ($itemsCount * $fee);
+        return $this->register($transaction, $balance, (new FindnessOperator())->getId(), uniqid(),
+            $customer->getId(), $apisConf);
     }
 }

@@ -68,16 +68,21 @@ class TransactionSpec extends ObjectBehavior
         $this->getOperator()->shouldBe($stripeOperator);
     }
 
-    public function it_should_set_and_get_reference()
+    public function it_should_set_and_get_transaction_id()
     {
         $customer = new Customer();
         $this->beConstructedWith($customer);
-        $reference = uniqid();
-        $this->setReference($reference);
-        $this->getReference()->shouldBe($reference);
+        $transactionId = uniqid();
+        $this->setTransactionId($transactionId);
+        $this->getTransactionId()->shouldBe($transactionId);
+    }
 
-        $reference = sprintf("%s@%s", uniqid(), uniqid());
-        $this->setReference($reference);
-        $this->getReference()->shouldBe($reference);
+    public function it_should_set_and_get_card_id()
+    {
+        $customer = new Customer();
+        $this->beConstructedWith($customer);
+        $cardId = uniqid();
+        $this->setCardId($cardId);
+        $this->getCardId()->shouldBe($cardId);
     }
 }

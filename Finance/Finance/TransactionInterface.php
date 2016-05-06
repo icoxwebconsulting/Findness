@@ -17,7 +17,7 @@ interface TransactionInterface extends CustomerDependantInterface
      * @return string
      */
     public function getId();
-    
+
     /**
      * Get Balance
      *
@@ -47,16 +47,30 @@ interface TransactionInterface extends CustomerDependantInterface
     public function setOperator(OperatorInterface $operator);
 
     /**
-     * Get Reference
+     * Get External Transaction Id
      *
      * @return string
      */
-    public function getReference();
+    public function getTransactionId();
 
     /**
-     * Set Reference
+     * Set External Transaction Id
      *
-     * @param string $reference
+     * @param string $transactionId
      */
-    public function setReference($reference);
+    public function setTransactionId($transactionId);
+
+    /**
+     * Get card id
+     *
+     * @return string
+     */
+    public function getCardId();
+
+    /**
+     * Set Card Id
+     *
+     * @param string $cardId
+     */
+    public function setCardId($cardId);
 }

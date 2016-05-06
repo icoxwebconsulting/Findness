@@ -15,5 +15,9 @@
       "Finance\\": "",
       "Customer\\": "../Customer/"
     }
+  },
+  "require": {
+    "stripe/stripe-php": "^3.13",
+    "paypal/rest-api-sdk-php": "^1.7"
   }
 }

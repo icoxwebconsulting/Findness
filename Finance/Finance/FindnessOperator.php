@@ -17,4 +17,20 @@ class FindnessOperator implements OperatorInterface
     {
         return 1;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName()
+    {
+        return "findness";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validateTransaction($transactionId, array $apisConf)
+    {
+        return true;
+    }
 }
