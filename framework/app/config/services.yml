@@ -61,3 +61,4 @@ services:
             - "%qualitas_password%"
             - "%qualitas_geo_radio%"
             - "@besimple.soap.client.qualitasapi"
+            - "@doctrine.orm.entity_manager"

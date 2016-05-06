@@ -7,7 +7,8 @@
       "": "src/",
       "Customer\\": "../Customer/",
       "MapRoute\\": "../MapRoute/",
-      "Finance\\": "../Finance/"
+      "Finance\\": "../Finance/",
+      "Company\\": "../Company/"
     },
     "classmap": [
       "app/AppKernel.php",

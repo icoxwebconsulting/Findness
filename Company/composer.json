@@ -1,0 +1,20 @@
+{
+  "require-dev": {
+    "phpspec/phpspec": "~2.0",
+    "henrikbjorn/phpspec-code-coverage": "~1.0",
+    "symfony/symfony": "2.8.*",
+    "friendsofsymfony/user-bundle": "~2.0@dev",
+    "besimple/soap": "^0.2.6",
+    "bossa/phpspec2-expect": "^1.0"
+  },
+  "config": {
+    "bin-dir": "bin"
+  },
+  "autoload": {
+    "psr-4": {
+      "Company\\": "",
+      "Customer\\": "../Customer/",
+      "Finance\\": "../Finance/"
+    }
+  }
+}

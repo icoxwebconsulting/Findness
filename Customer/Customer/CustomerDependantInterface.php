@@ -10,14 +10,14 @@ namespace Customer\Customer;
 interface CustomerDependantInterface
 {
     /**
-     * Set the Message Customer sender
+     * Set Customer
      *
      * @param CustomerInterface $customer
      */
     public function setCustomer(CustomerInterface $customer);
 
     /**
-     * Get the Message Customer sender
+     * Get Customer
      *
      * @return CustomerInterface
      */
