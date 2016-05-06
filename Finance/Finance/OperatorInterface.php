@@ -27,8 +27,9 @@ interface OperatorInterface
      * Validate transaction
      *
      * @param string $transactionId
+     * @param float $balance
      * @param array $apisConf
      * @return bool
      */
-    public function validateTransaction($transactionId, array $apisConf);
+    public function validateTransaction($transactionId, $balance, array $apisConf);
 }

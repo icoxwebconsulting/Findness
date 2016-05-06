@@ -29,7 +29,7 @@ class FindnessOperator implements OperatorInterface
     /**
      * @inheritdoc
      */
-    public function validateTransaction($transactionId, array $apisConf)
+    public function validateTransaction($transactionId, $balance, array $apisConf)
     {
         return true;
     }

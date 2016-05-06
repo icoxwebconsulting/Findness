@@ -2,6 +2,9 @@
 
 namespace Finance\Finance;
 
+use Stripe\Charge;
+use Stripe\Stripe;
+
 /**
  * Class StripeOperator
  *
@@ -29,8 +32,18 @@ class StripeOperator implements OperatorInterface
     /**
      * @inheritdoc
      */
-    public function validateTransaction($transactionId, array $apisConf)
+    public function validateTransaction($transactionId, $balance, array $apisConf)
     {
-        return true;
+        try {
+            Stripe::setApiKey($apisConf["secret"]);
+            $charge = Charge::retrieve($transactionId);
+            $response = $charge->getLastResponse()->json;
+            if ($response["id"] !== $transactionId || (float)($response["amount"] / 100) !== (float)$balance) {
+                throw new \Exception();
+            }
+            return true;
+        } catch (\Exception $exception) {
+            throw new \Exception("Transaction do not exist");
+        }
     }
 }

@@ -58,7 +58,7 @@ class RegistrationHandler
                              array $apisConf)
     {
         $operator = $this->getOperator($operator);
-        if ($operator->validateTransaction($transactionId, $apisConf[$operator->getName()])) {
+        if ($operator->validateTransaction($transactionId, $balance, $apisConf[$operator->getName()])) {
             $transaction->setBalance($balance);
             $transaction->setOperator($operator);
             $transaction->setTransactionId($transactionId);
