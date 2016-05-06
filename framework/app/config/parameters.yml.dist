@@ -22,4 +22,4 @@ parameters:
     qualitas_password: qkxb4huv
     qualitas_geo_radio: 500
 
-    findness_search_charge: 0.15
+    findness_search_fee: 0.15

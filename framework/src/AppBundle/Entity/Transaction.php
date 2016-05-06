@@ -113,7 +113,7 @@ class Transaction extends TransactionBase
      * @param TransactionInterface $transaction
      * @return Transaction
      */
-    public function fromBusinessEntity(TransactionInterface $transaction)
+    static public function fromBusinessEntity(TransactionInterface $transaction)
     {
         $ormTransaction = new Transaction($transaction->getCustomer());
         $ormTransaction->setBalance($transaction->getBalance());

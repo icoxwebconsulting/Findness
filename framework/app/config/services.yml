@@ -60,5 +60,6 @@ services:
             - "%qualitas_username%"
             - "%qualitas_password%"
             - "%qualitas_geo_radio%"
+            - "%findness_search_fee%"
             - "@besimple.soap.client.qualitasapi"
             - "@doctrine.orm.entity_manager"

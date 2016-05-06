@@ -3,6 +3,10 @@
 namespace Company\Qualitas;
 
 use BeSimple\SoapClient\SoapClient;
+use Customer\Customer\CustomerInterface;
+use Finance\Finance\FindnessOperator;
+use Finance\Finance\Transaction;
+use Finance\Finance\TransactionInterface;
 
 /**
  * Class QualitasSOAPApi
@@ -15,22 +19,27 @@ class SOAPApi
     /**
      * @var string
      */
-    private $username;
+    protected $username;
 
     /**
      * @var string
      */
-    private $password;
+    protected $password;
 
     /**
      * @var string
      */
-    private $geoRadio;
+    protected $geoRadio;
+
+    /**
+     * @var string
+     */
+    protected $findnessSearchFee;
 
     /**
      * @var SoapClient
      */
-    private $soapClient;
+    protected $soapClient;
 
     /**
      * QualitasSOAPApi constructor.
@@ -38,13 +47,15 @@ class SOAPApi
      * @param string $username
      * @param string $password
      * @param string $geoRadio
+     * @param string $findnessSearchFee
      * @param SoapClient $client
      */
-    public function __construct($username, $password, $geoRadio, SoapClient $client)
+    public function __construct($username, $password, $geoRadio, $findnessSearchFee, SoapClient $client)
     {
         $this->username = $username;
         $this->password = $password;
         $this->geoRadio = $geoRadio;
+        $this->findnessSearchFee = $findnessSearchFee;
         $this->soapClient = $client;
     }
 
@@ -54,7 +65,7 @@ class SOAPApi
      * @param array $cnaes
      * @return string
      */
-    private function getCnaeFilter(array $cnaes = [])
+    protected function getCnaeFilter(array $cnaes = [])
     {
         if (!$cnaes) {
             return "";
@@ -77,7 +88,7 @@ class SOAPApi
      * @param array $states
      * @return string
      */
-    private function getStateFilter(array $states = [])
+    protected function getStateFilter(array $states = [])
     {
         if (!$states) {
             return "";
@@ -100,7 +111,7 @@ class SOAPApi
      * @param array $cities
      * @return string
      */
-    private function getCityFilter(array $cities = [])
+    protected function getCityFilter(array $cities = [])
     {
         if (!$cities) {
             return "";
@@ -125,7 +136,7 @@ class SOAPApi
      * @param array $postalCodes
      * @return string
      */
-    private function getPostalCodeFilter(array $postalCodes = [])
+    protected function getPostalCodeFilter(array $postalCodes = [])
     {
         if (!$postalCodes) {
             return "";
@@ -148,7 +159,7 @@ class SOAPApi
      * @param array $geoLocations
      * @return string
      */
-    private function getGeoFilter(array $geoLocations = [])
+    protected function getGeoFilter(array $geoLocations = [])
     {
         if (!$geoLocations) {
             return "";
@@ -178,11 +189,11 @@ class SOAPApi
      * @param array $geoLocations
      * @return string
      */
-    private function getFilters(array $cnaes = [],
-                                array $states = [],
-                                array $cities = [],
-                                array $postalCodes = [],
-                                array $geoLocations = [])
+    protected function getFilters(array $cnaes = [],
+                                  array $states = [],
+                                  array $cities = [],
+                                  array $postalCodes = [],
+                                  array $geoLocations = [])
     {
         $filters = "";
         $filters .= $this->getCnaeFilter($cnaes);
@@ -205,12 +216,12 @@ class SOAPApi
      * @param array $geoLocations
      * @return string
      */
-    private function buildQueryXML($page = 1,
-                                   array $cnaes = [],
-                                   array $states = [],
-                                   array $cities = [],
-                                   array $postalCodes = [],
-                                   array $geoLocations = [])
+    protected function buildQueryXML($page = 1,
+                                     array $cnaes = [],
+                                     array $states = [],
+                                     array $cities = [],
+                                     array $postalCodes = [],
+                                     array $geoLocations = [])
     {
         $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>SegmentacionListadoThinkandCloud</Producto>%s</SolicitudSegmentacion>';
 
@@ -218,6 +229,29 @@ class SOAPApi
         $xmlRequest = sprintf($xmlRequest, $page, $filters);
 
         return $xmlRequest;
+    }
+
+    /**
+     * Store companies in the response that are new to findness database
+     *
+     * @param array $companies
+     */
+    protected abstract function store(array $companies);
+
+    /**
+     * Charge customer for non paid companies
+     *
+     * @param int $companiesNotViewed
+     * @param CustomerInterface $customer
+     * @return TransactionInterface
+     */
+    protected function charge($companiesNotViewed, CustomerInterface $customer)
+    {
+        $balance = $companiesNotViewed * $this->findnessSearchFee;
+        $transaction = new Transaction($customer);
+        $transaction->setOperator(new FindnessOperator());
+        $transaction->setBalance($balance);
+        return $transaction;
     }
 
     /**
@@ -229,6 +263,7 @@ class SOAPApi
      * @param array $cities
      * @param array $postalCodes
      * @param array $geoLocations
+     * @param CustomerInterface $customer
      * @return array
      */
     public function query($page = 1,
@@ -236,7 +271,8 @@ class SOAPApi
                           array $states = [],
                           array $cities = [],
                           array $postalCodes = [],
-                          array $geoLocations = [])
+                          array $geoLocations = [],
+                          CustomerInterface $customer)
     {
         $xmlRequest = $this->buildQueryXML($page, $cnaes, $states, $cities, $postalCodes, $geoLocations);
         $request = [
@@ -247,6 +283,9 @@ class SOAPApi
 
         $client = $this->soapClient;
         $response = $client->AtenderPeticion($request);
-        return $response->getAtenderPeticionResult();
+        $companies = $response->getAtenderPeticionResult();
+        $this->store($companies);
+        $this->charge($companies, $customer);
+        return $companies;
     }
 }
