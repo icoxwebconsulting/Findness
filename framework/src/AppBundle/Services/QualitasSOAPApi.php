@@ -81,6 +81,10 @@ class QualitasSOAPApi extends SOAPApi
             if (!array_key_exists($id, $ormCompanies)) {
                 $ormCompany = new Company();
                 $ormCompany->setExternalId($id);
+                $ormCompany->setSocialReason($company["RazonSocial"]);
+                $ormCompany->setSocialObject($company["ObjetoSocial"]);
+                $ormCompany->setLatitude($company["Direccion"]["Latitud"]);
+                $ormCompany->setLongitude($company["Direccion"]["Longitud"]);
                 $this->em->persist($ormCompany);
                 $ormCompanies[$id] = $ormCompany;
             }

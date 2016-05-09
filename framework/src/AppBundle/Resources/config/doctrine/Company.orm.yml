@@ -11,6 +11,15 @@ AppBundle\Entity\Company:
         externalId:
             type: string
             length: 255
+            unique: true
+        socialReason:
+            type: text
+        socialObject:
+            type: text
+        latitude:
+            type: text
+        longitude:
+            type: text
         created:
             type: datetime
             gedmo:
