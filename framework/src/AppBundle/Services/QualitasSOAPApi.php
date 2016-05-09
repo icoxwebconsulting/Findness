@@ -9,7 +9,7 @@ use BeSimple\SoapClient\SoapClient;
 use Company\Qualitas\SOAPApi;
 use Customer\Customer\CustomerInterface;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\NoResultException;
+use Finance\Finance\BalanceInterface;
 
 /**
  * Class QualitasSOAPApi
@@ -42,51 +42,81 @@ class QualitasSOAPApi extends SOAPApi
     }
 
     /**
-     * @inheritdoc
+     * Get customer balance
+     *
+     * @param CustomerInterface $customer
+     * @return BalanceInterface
      */
-    protected function store(array $companies)
+    private function getBalance(CustomerInterface $customer)
     {
-        foreach ($companies as $company) {
-            $id = $company["id"];
-            try {
-                $this->em
-                    ->getRepository("AppBundle:Company")
-                    ->findOneByExternalId($id);
-            } catch (NoResultException $exception) {
-                $ormCompany = new Company();
-                $ormCompany->setExternalId($id);
-                $this->em->persist($ormCompany);
-            }
-        }
-        $this->em->flush();
+        return $this->em
+            ->getRepository("AppBundle:Balance")
+            ->findOneByCustomer($customer);
     }
 
     /**
      * @inheritdoc
      */
-    protected function charge(array $companies, CustomerInterface $customer)
+    protected function store(array $companies)
     {
-        $companiesNotViewed = 0;
-        foreach ($companies as $company) {
-            if (!$company["viewed"]) {
-                $companiesNotViewed++;
-                $id = $company["id"];
-                $company = $this->em
-                    ->getRepository("AppBundle:Company")
-                    ->findOneByExternalId($id);
-                $customerViewCompany = new CustomerViewCompany();
-                $customerViewCompany->setCustomer($customer);
-                $customerViewCompany->setCompany($company);
-                $this->em->persist($customerViewCompany);
+        $ormCompanies = [];
+        foreach ($companies as $id => $company) {
+            $ormCompany = $this->em
+                ->getRepository("AppBundle:Company")
+                ->findOneByExternalId($id);
+
+            if (!$ormCompany) {
+                $ormCompany = new Company();
+                $ormCompany->setExternalId($id);
+                $this->em->persist($ormCompany);
             }
+
+            $ormCompanies[$id] = $ormCompany;
         }
-        $transaction = parent::charge($companiesNotViewed, $customer);
-        $ormTransaction = Transaction::fromBusinessEntity($transaction);
-        $this->em->persist($ormTransaction);
-        $balance = $this->em
-            ->getRepository("AppBundle:Balance")
-            ->findOneByCustomer($customer);
-        $balance->setBalance($balance);
         $this->em->flush();
+
+        return $ormCompanies;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function charge(array $notViewedCompanies, CustomerInterface $customer)
+    {
+        foreach ($notViewedCompanies as $company) {
+            $customerViewCompany = new CustomerViewCompany();
+            $customerViewCompany->setCustomer($customer);
+            $customerViewCompany->setCompany($company);
+            $this->em->persist($customerViewCompany);
+        }
+
+        if (count($notViewedCompanies)) {
+            $transaction = parent::charge($notViewedCompanies, $customer);
+
+            $ormTransaction = Transaction::fromBusinessEntity($transaction);
+            $balanceEntity = $this->getBalance($customer);
+            $balanceEntity->setBalance($balanceEntity->getBalance() + $transaction->getBalance());
+            $this->em->persist($ormTransaction);
+            $this->em->flush();
+            
+            return $transaction;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function query($page = 1,
+                          $notViewedAllowedAmount = 0,
+                          array $cnaes = [],
+                          array $states = [],
+                          array $cities = [],
+                          array $postalCodes = [],
+                          array $geoLocations = [],
+                          CustomerInterface $customer)
+    {
+        set_time_limit(0);
+        $notViewedAllowedAmount = floor($this->getBalance($customer)->getBalance() / $this->findnessSearchFee);
+        return parent::query($page, $notViewedAllowedAmount, $cnaes, $states, $cities, $postalCodes, $geoLocations, $customer);
     }
 }

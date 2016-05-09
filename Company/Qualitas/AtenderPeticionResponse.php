@@ -12,7 +12,7 @@ class AtenderPeticionResponse
     /**
      * @var string
      */
-    private $AtenderPeticionResult;
+    protected $AtenderPeticionResult;
 
     /**
      * Parse xml to object
@@ -35,12 +35,11 @@ class AtenderPeticionResponse
     private function parseData($data)
     {
         $result = [];
-        $data = $data->ListaEmpresas->Empresa;
-        if ($data) {
-            foreach ($data as $item) {
-                $direccionData = $item->Direccion->Direccion;
+        $empresas = $data->ListaEmpresas->Empresas;
+        if ($empresas) {
+            foreach ($empresas as $empresa) {
+                $direccionData = $empresa->Direccion->Direccion;
                 $direccion = [
-                    "CodInfotel" => $item->CodInfotel->__toString(),
                     "CodigoPostal" => $direccionData->CodigoPostal->__toString(),
                     "IdPais" => $direccionData->IdPais->__toString(),
                     "Pais" => $direccionData->Pais->__toString(),
@@ -62,11 +61,23 @@ class AtenderPeticionResponse
                     "PrecisionCoordenadas" => $direccionData->PrecisionCoordenadas->__toString()
                 ];
 
-                $result[] = [
-                    "CIF" => $item->CIF->__toString(),
-                    "RazonSocial" => $item->RazonSocial->__toString(),
+                $id = $empresa->CodInfotel->__toString();
+
+                $consultada = false;
+                foreach ($empresa->attributes() as $name => $value) {
+                    if ($name === "Consultada") {
+                        $consultada = (string)$value;
+                    }
+                }
+
+                $result[$id] = [
+                    "id" => $id,
+                    "Consultada" => $consultada,
+                    "CIF" => $empresa->CIF->__toString(),
+                    "RazonSocial" => $empresa->RazonSocial->__toString(),
+                    "ObjetoSocial" => $empresa->ObjetoSocial->__toString(),
                     "Direccion" => $direccion,
-                    "Telefono" => $item->Telefono->__toString(),
+                    "Telefono" => $empresa->Telefono->__toString(),
                 ];
             }
         }

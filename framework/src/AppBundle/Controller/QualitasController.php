@@ -6,6 +6,7 @@ use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -22,6 +23,8 @@ class QualitasController extends FOSRestController implements ClassResourceInter
      *
      * @param Request $request
      * @return array
+     *
+     * @Security("has_role('ROLE_USER')")
      *
      * @ApiDoc(
      *  section="Qualitas",
@@ -92,7 +95,7 @@ class QualitasController extends FOSRestController implements ClassResourceInter
         $postalCodes = json_decode($request->get("postalCodes", json_encode([])));
         $geoLocations = json_decode($request->get("geoLocations", json_encode([])));
         $qualitas = $this->container->get('findness.qualitas');
-        return $qualitas->query($page, $cnaes, $states, $cities, $postalCodes, $geoLocations);
+        return $qualitas->query($page, 0, $cnaes, $states, $cities, $postalCodes, $geoLocations, $this->getUser());
     }
 
     /**

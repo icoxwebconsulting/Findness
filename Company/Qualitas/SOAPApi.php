@@ -4,16 +4,15 @@ namespace Company\Qualitas;
 
 use BeSimple\SoapClient\SoapClient;
 use Customer\Customer\CustomerInterface;
-use Finance\Finance\FindnessOperator;
-use Finance\Finance\Transaction;
 use Finance\Finance\TransactionInterface;
+use Finance\Registration\RegistrationHandler;
 
 /**
  * Class QualitasSOAPApi
  *
  * @package Company\Qualitas
  */
-class SOAPApi
+abstract class SOAPApi
 {
 
     /**
@@ -208,7 +207,9 @@ class SOAPApi
     /**
      * Build query XML
      *
+     * @param CustomerInterface $customer
      * @param int $page
+     * @param int $notViewedAllowedAmount
      * @param array $cnaes
      * @param array $states
      * @param array $cities
@@ -216,17 +217,20 @@ class SOAPApi
      * @param array $geoLocations
      * @return string
      */
-    protected function buildQueryXML($page = 1,
+    protected function buildQueryXML(CustomerInterface $customer,
+                                     $page = 1,
+                                     $notViewedAllowedAmount = 0,
                                      array $cnaes = [],
                                      array $states = [],
                                      array $cities = [],
                                      array $postalCodes = [],
                                      array $geoLocations = [])
     {
-        $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>SegmentacionListadoThinkandCloud</Producto>%s</SolicitudSegmentacion>';
+        $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>%s</Producto><ComentarioLibre>%s</ComentarioLibre><MaximoElementosNoDevueltos>%s</MaximoElementosNoDevueltos>%s</SolicitudSegmentacion>';
 
         $filters = $this->getFilters($cnaes, $states, $cities, $postalCodes, $geoLocations);
-        $xmlRequest = sprintf($xmlRequest, $page, $filters);
+        $xmlRequest = sprintf($xmlRequest, $page, "SegmentacionListadoThinkandCloud", $customer->getId(),
+            $notViewedAllowedAmount, $filters);
 
         return $xmlRequest;
     }
@@ -235,22 +239,24 @@ class SOAPApi
      * Store companies in the response that are new to findness database
      *
      * @param array $companies
+     * @return array
      */
     protected abstract function store(array $companies);
 
     /**
      * Charge customer for non paid companies
      *
-     * @param int $companiesNotViewed
+     * @param array $notViewedCompanies
      * @param CustomerInterface $customer
-     * @return TransactionInterface
+     * @return TransactionInterface|null
      */
-    protected function charge($companiesNotViewed, CustomerInterface $customer)
+    protected function charge(array $notViewedCompanies, CustomerInterface $customer)
     {
-        $balance = $companiesNotViewed * $this->findnessSearchFee;
-        $transaction = new Transaction($customer);
-        $transaction->setOperator(new FindnessOperator());
-        $transaction->setBalance($balance);
+        $apisConf = ["findness" => []];
+        $transactionRegistration = new RegistrationHandler();
+        $transaction = $transactionRegistration->charge($customer, count($notViewedCompanies),
+            $this->findnessSearchFee, $apisConf);
+
         return $transaction;
     }
 
@@ -258,6 +264,7 @@ class SOAPApi
      * Query API
      *
      * @param int $page
+     * @param int $notViewedAllowedAmount
      * @param array $cnaes
      * @param array $states
      * @param array $cities
@@ -267,6 +274,7 @@ class SOAPApi
      * @return array
      */
     public function query($page = 1,
+                          $notViewedAllowedAmount = 0,
                           array $cnaes = [],
                           array $states = [],
                           array $cities = [],
@@ -274,7 +282,8 @@ class SOAPApi
                           array $geoLocations = [],
                           CustomerInterface $customer)
     {
-        $xmlRequest = $this->buildQueryXML($page, $cnaes, $states, $cities, $postalCodes, $geoLocations);
+        $xmlRequest = $this->buildQueryXML($customer, $page, $notViewedAllowedAmount, $cnaes, $states, $cities,
+            $postalCodes, $geoLocations);
         $request = [
             "nombreUsuario" => $this->username,
             "pwd" => $this->password,
@@ -284,8 +293,14 @@ class SOAPApi
         $client = $this->soapClient;
         $response = $client->AtenderPeticion($request);
         $companies = $response->getAtenderPeticionResult();
-        $this->store($companies);
-        $this->charge($companies, $customer);
-        return $companies;
+        $storedCompanies = $this->store($companies);
+        $notViewedCompanies = [];
+        foreach ($companies as $company) {
+            if (!$company["Consultada"]) {
+                $notViewedCompanies[] = $storedCompanies[$company["id"]];
+            }
+        }
+        $this->charge($notViewedCompanies, $customer);
+        return $storedCompanies;
     }
 }
