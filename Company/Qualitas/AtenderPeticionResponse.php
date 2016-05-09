@@ -66,7 +66,7 @@ class AtenderPeticionResponse
                 $consultada = false;
                 foreach ($empresa->attributes() as $name => $value) {
                     if ($name === "Consultada") {
-                        $consultada = (string)$value;
+                        $consultada = (string)$value === "true" ? true : false;
                     }
                 }
 

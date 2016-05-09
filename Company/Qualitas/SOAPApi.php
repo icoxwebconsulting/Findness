@@ -293,14 +293,20 @@ abstract class SOAPApi
         $client = $this->soapClient;
         $response = $client->AtenderPeticion($request);
         $companies = $response->getAtenderPeticionResult();
-        $storedCompanies = $this->store($companies);
-        $notViewedCompanies = [];
-        foreach ($companies as $company) {
-            if (!$company["Consultada"]) {
-                $notViewedCompanies[] = $storedCompanies[$company["id"]];
+
+        $storedCompanies = [];
+
+        if ($companies) {
+            $storedCompanies = $this->store($companies);
+            $notViewedCompanies = [];
+            foreach ($storedCompanies as $id => $company) {
+                if (!$companies[$id]["Consultada"]) {
+                    $notViewedCompanies[] = $storedCompanies[$id];
+                }
             }
+            $this->charge($notViewedCompanies, $customer);
         }
-        $this->charge($notViewedCompanies, $customer);
+
         return $storedCompanies;
     }
 }

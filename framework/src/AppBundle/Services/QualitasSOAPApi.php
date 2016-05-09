@@ -59,20 +59,33 @@ class QualitasSOAPApi extends SOAPApi
      */
     protected function store(array $companies)
     {
-        $ormCompanies = [];
+        $ids = [];
         foreach ($companies as $id => $company) {
-            $ormCompany = $this->em
-                ->getRepository("AppBundle:Company")
-                ->findOneByExternalId($id);
+            $ids[] = $id;
+        }
 
-            if (!$ormCompany) {
+        $qb = $this->em->createQueryBuilder();
+
+        $ormCompanies = $qb->select('c')
+            ->from('AppBundle:Company', 'c')
+            ->where($qb->expr()->in('c.externalId', $ids))
+            ->getQuery()
+            ->getResult();
+
+        $ormCompanies = array_reduce($ormCompanies, function ($previous, $current) {
+            $previous[$current->getExternalId()] = $current;
+            return $previous;
+        }, []);
+
+        foreach ($companies as $id => $company) {
+            if (!array_key_exists($id, $ormCompanies)) {
                 $ormCompany = new Company();
                 $ormCompany->setExternalId($id);
                 $this->em->persist($ormCompany);
+                $ormCompanies[$id] = $ormCompany;
             }
-
-            $ormCompanies[$id] = $ormCompany;
         }
+
         $this->em->flush();
 
         return $ormCompanies;
@@ -90,6 +103,8 @@ class QualitasSOAPApi extends SOAPApi
             $this->em->persist($customerViewCompany);
         }
 
+        $transaction = null;
+
         if (count($notViewedCompanies)) {
             $transaction = parent::charge($notViewedCompanies, $customer);
 
@@ -97,10 +112,11 @@ class QualitasSOAPApi extends SOAPApi
             $balanceEntity = $this->getBalance($customer);
             $balanceEntity->setBalance($balanceEntity->getBalance() + $transaction->getBalance());
             $this->em->persist($ormTransaction);
-            $this->em->flush();
-            
-            return $transaction;
         }
+
+        $this->em->flush();
+
+        return $transaction;
     }
 
     /**
