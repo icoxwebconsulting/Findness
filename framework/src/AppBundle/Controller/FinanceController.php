@@ -2,7 +2,6 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Transaction;
 use AppBundle\Form\TransactionType;
 use AppBundle\ResponseObjects\Transaction as TransactionResponse;
 use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
@@ -20,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *
  * @FOSRestBundleAnnotations\View()
  */
-class TransactionController extends FOSRestController implements ClassResourceInterface
+class FinanceController extends FOSRestController implements ClassResourceInterface
 {
     /**
      * Create a new Transaction
@@ -28,10 +27,12 @@ class TransactionController extends FOSRestController implements ClassResourceIn
      * @param Request $request
      * @return TransactionResponse\Symfony\Component\Form\FormErrorIterator
      *
+     * @FOSRestBundleAnnotations\Route("/transaction")
+     *
      * @Security("has_role('ROLE_USER')")
      *
      * @ApiDoc(
-     *  section="Transactions",
+     *  section="Finance",
      *  description="Create a new Transaction",
      *  input="AppBundle\Form\TransactionType",
      *  statusCodes={
@@ -65,5 +66,36 @@ class TransactionController extends FOSRestController implements ClassResourceIn
         }
 
         return $mapRouteForm->getErrors();
+    }
+
+    /**
+     * Get Balance
+     *
+     * @return float
+     *
+     * @FOSRestBundleAnnotations\Route("/balance")
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="Finance",
+     *  description="Get balance",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getBalanceAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        return [
+            "balance" => $em->getRepository("AppBundle:Balance")
+                ->findOneByCustomer($this->getUser())
+                ->getBalance()
+        ];
     }
 }
