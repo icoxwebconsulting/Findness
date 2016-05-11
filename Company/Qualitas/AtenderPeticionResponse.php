@@ -35,6 +35,11 @@ class AtenderPeticionResponse
     private function parseData($data)
     {
         $result = [];
+        foreach ($data->ListaEmpresas->attributes() as $attribute => $value) {
+            $result[$attribute] = (int)$value;
+        }
+
+        $companies = [];
         $empresas = $data->ListaEmpresas->Empresas;
         if ($empresas) {
             foreach ($empresas as $empresa) {
@@ -70,7 +75,7 @@ class AtenderPeticionResponse
                     }
                 }
 
-                $result[$id] = [
+                $companies[$id] = [
                     "id" => $id,
                     "Consultada" => $consultada,
                     "CIF" => $empresa->CIF->__toString(),
@@ -81,6 +86,9 @@ class AtenderPeticionResponse
                 ];
             }
         }
+
+        $result["items"] = $companies;
+
         return $result;
     }
 

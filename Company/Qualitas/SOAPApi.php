@@ -292,7 +292,8 @@ abstract class SOAPApi
 
         $client = $this->soapClient;
         $response = $client->AtenderPeticion($request);
-        $companies = $response->getAtenderPeticionResult();
+        $result = $response->getAtenderPeticionResult();
+        $companies = $result["items"];
 
         $storedCompanies = [];
 
@@ -305,8 +306,9 @@ abstract class SOAPApi
                 }
             }
             $this->charge($notViewedCompanies, $customer);
+            $result["items"] = $storedCompanies;
         }
 
-        return $storedCompanies;
+        return $result;
     }
 }
