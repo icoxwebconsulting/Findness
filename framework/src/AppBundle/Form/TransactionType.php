@@ -3,6 +3,8 @@
 namespace AppBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -20,10 +22,10 @@ class TransactionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('balance', 'number')
-            ->add('operator', 'number')
-            ->add('transactionId', 'text')
-            ->add('cardId', 'text');
+            ->add('balance', NumberType::class)
+            ->add('operator', NumberType::class)
+            ->add('transactionId', TextType::class)
+            ->add('cardId', TextType::class);
     }
 
     /**

@@ -8,12 +8,6 @@ AppBundle\Entity\MapRoutePath:
             type: string
             length: 255
     fields:
-        startPoint:
-            type: array
-            length: 255
-        endPoint:
-            type: array
-            length: 255
         created:
             type: datetime
             gedmo:
@@ -32,6 +26,18 @@ AppBundle\Entity\MapRoutePath:
             targetEntity: MapRoute
             joinColumn:
                 name: map_route
+                referencedColumnName: id
+            cascade: ["persist", "merge"]
+        startPoint:
+            targetEntity: Company
+            joinColumn:
+                name: start_point
+                referencedColumnName: id
+            cascade: ["persist", "merge"]
+        endPoint:
+            targetEntity: Company
+            joinColumn:
+                name: end_point
                 referencedColumnName: id
             cascade: ["persist", "merge"]
     lifecycleCallbacks: {  }

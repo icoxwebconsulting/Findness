@@ -13,7 +13,8 @@
   "autoload": {
     "psr-4": {
       "MapRoute\\": "",
-      "Customer\\": "../Customer/"
+      "Customer\\": "../Customer/",
+      "Company\\": "../Company/"
     }
   }
 }

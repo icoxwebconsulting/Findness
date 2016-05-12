@@ -2,6 +2,7 @@
 
 namespace spec\MapRoute\MapRoutePath;
 
+use Company\Company\Company;
 use Doctrine\Common\Collections\ArrayCollection;
 use MapRoute\MapRoute\MapRoute;
 use PhpSpec\ObjectBehavior;
@@ -23,18 +24,16 @@ class MapRoutePathSpec extends ObjectBehavior
 
     public function it_should_set_and_get_start_point()
     {
-        $latitude = "1111111111111111111";
-        $longitude = "2222222222222222222";
-        $this->setStartPoint($latitude, $longitude);
-        $this->getStartPoint()->shouldBe(["latitude" => $latitude, "longitude" => $longitude]);
+        $company = new Company();
+        $this->setStartPoint($company);
+        $this->getStartPoint()->shouldBe($company);
     }
 
     public function it_should_set_and_get_end_point()
     {
-        $latitude = "1111111111111111111";
-        $longitude = "2222222222222222222";
-        $this->setEndPoint($latitude, $longitude);
-        $this->getEndPoint()->shouldBe(["latitude" => $latitude, "longitude" => $longitude]);
+        $company = new Company();
+        $this->setEndPoint($company);
+        $this->getEndPoint()->shouldBe($company);
     }
 
     public function it_should_set_and_get_map_route()

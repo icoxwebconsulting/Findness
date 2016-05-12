@@ -2,6 +2,7 @@
 
 namespace MapRoute\MapRoutePath;
 
+use Company\Company\CompanyInterface;
 use MapRoute\MapRoute\MapRouteInterface;
 
 /**
@@ -21,10 +22,9 @@ interface MapRoutePathInterface
     /**
      * Set MapRoutePath Start Point
      *
-     * @param string $latitude
-     * @param string $longitude
+     * @param CompanyInterface $company
      */
-    public function setStartPoint($latitude, $longitude);
+    public function setStartPoint(CompanyInterface $company);
 
     /**
      * Get MapRoutePath Start Point
@@ -36,10 +36,9 @@ interface MapRoutePathInterface
     /**
      * Set MapRoutePath End Point
      *
-     * @param string $latitude
-     * @param string $longitude
+     * @param CompanyInterface $company
      */
-    public function setEndPoint($latitude, $longitude);
+    public function setEndPoint(CompanyInterface $company);
 
     /**
      * Get MapRoutePath End Point

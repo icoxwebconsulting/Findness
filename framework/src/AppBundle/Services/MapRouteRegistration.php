@@ -3,6 +3,7 @@
 namespace AppBundle\Services;
 
 use AppBundle\Entity\MapRoute;
+use Company\Company\CompanyInterface;
 use Customer\Customer\CustomerInterface;
 use Doctrine\ORM\EntityManager;
 use MapRoute\MapRoute\MapRouteInterface;
@@ -81,14 +82,14 @@ class MapRouteRegistration
      *
      * @param MapRouteInterface $mapRoute
      * @param MapRoutePathInterface $mapRoutePath
-     * @param array $startPoint
-     * @param array $endPoint
+     * @param CompanyInterface $startPoint
+     * @param CompanyInterface $endPoint
      * @return MapRoutePathInterface
      */
     public function registerPath(MapRouteInterface $mapRoute,
                                  MapRoutePathInterface $mapRoutePath,
-                                 array $startPoint,
-                                 array $endPoint)
+                                 CompanyInterface $startPoint,
+                                 CompanyInterface $endPoint)
     {
         $handler = new RegistrationHandler();
         $mapRoutePath = $handler->registerMapRoutePath($mapRoute,
@@ -104,13 +105,13 @@ class MapRouteRegistration
      * Update new Map Route Path
      *
      * @param MapRoutePathInterface $mapRoutePath
-     * @param array $startPoint
-     * @param array $endPoint
+     * @param CompanyInterface $startPoint
+     * @param CompanyInterface $endPoint
      * @return MapRoutePathInterface
      */
     public function updatePath(MapRoutePathInterface $mapRoutePath,
-                               array $startPoint,
-                               array $endPoint)
+                               CompanyInterface $startPoint,
+                               CompanyInterface $endPoint)
     {
         $handler = new RegistrationHandler();
         $mapRoutePath = $handler->updateMapRoutePath($mapRoutePath,

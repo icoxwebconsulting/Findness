@@ -2,6 +2,7 @@
 
 namespace MapRoute\MapRoutePath;
 
+use Company\Company\CompanyInterface;
 use MapRoute\MapRoute\MapRouteInterface;
 
 /**
@@ -18,12 +19,12 @@ class MapRoutePath implements MapRoutePathInterface
     protected $id;
 
     /**
-     * @var array
+     * @var CompanyInterface
      */
     protected $startPoint;
 
     /**
-     * @var array
+     * @var CompanyInterface
      */
     protected $endPoint;
 
@@ -55,12 +56,9 @@ class MapRoutePath implements MapRoutePathInterface
     /**
      * @inheritdoc
      */
-    public function setStartPoint($latitude, $longitude)
+    public function setStartPoint(CompanyInterface $company)
     {
-        $this->startPoint = [
-            "latitude" => $latitude,
-            "longitude" => $longitude
-        ];
+        $this->startPoint = $company;
     }
 
     /**
@@ -74,12 +72,9 @@ class MapRoutePath implements MapRoutePathInterface
     /**
      * @inheritdoc
      */
-    public function setEndPoint($latitude, $longitude)
+    public function setEndPoint(CompanyInterface $company)
     {
-        $this->endPoint = [
-            "latitude" => $latitude,
-            "longitude" => $longitude
-        ];
+        $this->endPoint = $company;
     }
 
     /**

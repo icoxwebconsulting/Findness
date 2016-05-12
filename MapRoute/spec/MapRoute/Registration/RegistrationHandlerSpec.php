@@ -2,6 +2,7 @@
 
 namespace spec\MapRoute\Registration;
 
+use Company\Company\Company;
 use Customer\Customer\Customer;
 use MapRoute\MapRoute\MapRoute;
 use MapRoute\MapRoutePath\MapRoutePath;
@@ -50,14 +51,8 @@ class RegistrationHandlerSpec extends ObjectBehavior
         $id = uniqid();
         $mapRoute = new MapRoute($id);
         $mapRoutePath = new MapRoutePath($id);
-        $startPoint = [
-            "latitude" => "1231313",
-            "longitude" => "123123123"
-        ];
-        $endPoint = [
-            "latitude" => "1231313",
-            "longitude" => "123123123"
-        ];
+        $startPoint = new Company();
+        $endPoint = new Company();
         $mapRoutePath = $this->registerMapRoutePath($mapRoute, $mapRoutePath, $startPoint, $endPoint);
         $mapRoutePath->getStartPoint()->shouldBe($startPoint);
         $mapRoutePath->getEndPoint()->shouldBe($endPoint);
@@ -68,25 +63,13 @@ class RegistrationHandlerSpec extends ObjectBehavior
         $id = uniqid();
         $mapRoute = new MapRoute($id);
         $mapRoutePath = new MapRoutePath($id);
-        $startPoint = [
-            "latitude" => "1231313",
-            "longitude" => "123123123"
-        ];
-        $endPoint = [
-            "latitude" => "1231313",
-            "longitude" => "123123123"
-        ];
+        $startPoint = new Company();
+        $endPoint = new Company();
         $mapRoutePath->setMapRoute($mapRoute);
-        $mapRoutePath->setStartPoint($startPoint["latitude"], $startPoint["longitude"]);
-        $mapRoutePath->setEndPoint($endPoint["latitude"], $endPoint["longitude"]);
-        $startPoint = [
-            "latitude" => "2222222222222",
-            "longitude" => "2222222222222"
-        ];
-        $endPoint = [
-            "latitude" => "2222222222222",
-            "longitude" => "2222222222222"
-        ];
+        $mapRoutePath->setStartPoint($startPoint);
+        $mapRoutePath->setEndPoint($endPoint);
+        $startPoint = new Company();
+        $endPoint = new Company();
         $mapRoutePath = $this->updateMapRoutePath($mapRoutePath, $startPoint, $endPoint);
         $mapRoutePath->getStartPoint()->shouldBe($startPoint);
         $mapRoutePath->getEndPoint()->shouldBe($endPoint);

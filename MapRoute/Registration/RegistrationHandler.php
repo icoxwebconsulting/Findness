@@ -2,6 +2,7 @@
 
 namespace MapRoute\Registration;
 
+use Company\Company\CompanyInterface;
 use Customer\Customer\CustomerInterface;
 use MapRoute\MapRoute\MapRouteInterface;
 use MapRoute\MapRoutePath\MapRoutePathInterface;
@@ -55,18 +56,18 @@ class RegistrationHandler
      *
      * @param MapRouteInterface $mapRoute
      * @param MapRoutePathInterface $mapRoutePath
-     * @param array $startPoint
-     * @param array $endPoint
+     * @param CompanyInterface $startPoint
+     * @param CompanyInterface $endPoint
      * @return MapRoutePathInterface
      */
     public function registerMapRoutePath(MapRouteInterface $mapRoute,
                                          MapRoutePathInterface $mapRoutePath,
-                                         array $startPoint,
-                                         array $endPoint)
+                                         CompanyInterface $startPoint,
+                                         CompanyInterface $endPoint)
     {
         $mapRoutePath->setMapRoute($mapRoute);
-        $mapRoutePath->setStartPoint($startPoint["latitude"], $startPoint["longitude"]);
-        $mapRoutePath->setEndPoint($endPoint["latitude"], $endPoint["longitude"]);
+        $mapRoutePath->setStartPoint($startPoint);
+        $mapRoutePath->setEndPoint($endPoint);
         return $mapRoutePath;
     }
 
@@ -74,16 +75,16 @@ class RegistrationHandler
      * Handle map route path update logic
      *
      * @param MapRoutePathInterface $mapRoutePath
-     * @param array $startPoint
-     * @param array $endPoint
+     * @param CompanyInterface $startPoint
+     * @param CompanyInterface $endPoint
      * @return MapRoutePathInterface
      */
     public function updateMapRoutePath(MapRoutePathInterface $mapRoutePath,
-                                       array $startPoint,
-                                       array $endPoint)
+                                       CompanyInterface $startPoint,
+                                       CompanyInterface $endPoint)
     {
-        $mapRoutePath->setStartPoint($startPoint["latitude"], $startPoint["longitude"]);
-        $mapRoutePath->setEndPoint($endPoint["latitude"], $endPoint["longitude"]);
+        $mapRoutePath->setStartPoint($startPoint);
+        $mapRoutePath->setEndPoint($endPoint);
         return $mapRoutePath;
     }
 }

@@ -267,8 +267,8 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
 
         if ($mapRoutePathForm->isValid()) {
             $mapRoutePath = new MapRoutePath();
-            $startPoint = json_decode($mapRoutePathForm->get('startPoint')->getData(), true);
-            $endPoint = json_decode($mapRoutePathForm->get('endPoint')->getData(), true);
+            $startPoint = $mapRoutePathForm->get('startPoint')->getData();
+            $endPoint = $mapRoutePathForm->get('endPoint')->getData();
             $registrationHandler = $this->get('findness.mapRoute.registration');
             $response = $registrationHandler->registerPath($mapRoute,
                 $mapRoutePath,
@@ -409,8 +409,8 @@ class MapRouteController extends FOSRestController implements ClassResourceInter
         $mapRoutePathForm->handleRequest($request);
 
         if ($mapRoutePathForm->isValid()) {
-            $startPoint = json_decode($mapRoutePathForm->get('startPoint')->getData(), true);
-            $endPoint = json_decode($mapRoutePathForm->get('endPoint')->getData(), true);
+            $startPoint = $mapRoutePathForm->get('startPoint')->getData();
+            $endPoint = $mapRoutePathForm->get('endPoint')->getData();
             $registrationHandler = $this->get('findness.mapRoute.registration');
             $response = $registrationHandler->updatePath($mapRoutePath,
                 $startPoint,
