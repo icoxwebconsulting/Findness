@@ -4,7 +4,6 @@ namespace Company\Qualitas;
 
 use BeSimple\SoapClient\SoapClient;
 use Customer\Customer\CustomerInterface;
-use Finance\Finance\TransactionInterface;
 use Finance\Registration\RegistrationHandler;
 
 /**
@@ -248,7 +247,7 @@ abstract class SOAPApi
      *
      * @param array $notViewedCompanies
      * @param CustomerInterface $customer
-     * @return TransactionInterface|null
+     * @return mixed|null
      */
     protected function charge(array $notViewedCompanies, CustomerInterface $customer)
     {
@@ -295,8 +294,6 @@ abstract class SOAPApi
         $result = $response->getAtenderPeticionResult();
         $companies = $result["items"];
 
-        $storedCompanies = [];
-
         if ($companies) {
             $storedCompanies = $this->store($companies);
             $notViewedCompanies = [];
@@ -305,8 +302,9 @@ abstract class SOAPApi
                     $notViewedCompanies[] = $storedCompanies[$id];
                 }
             }
-            $this->charge($notViewedCompanies, $customer);
+            $balance = $this->charge($notViewedCompanies, $customer);
             $result["items"] = $storedCompanies;
+            $result["balance"] = $balance->getBalance();
         }
 
         return $result;

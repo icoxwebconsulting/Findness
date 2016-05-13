@@ -107,20 +107,19 @@ class QualitasSOAPApi extends SOAPApi
             $this->em->persist($customerViewCompany);
         }
 
-        $transaction = null;
+        $balanceEntity = $this->getBalance($customer);
 
         if (count($notViewedCompanies)) {
             $transaction = parent::charge($notViewedCompanies, $customer);
 
             $ormTransaction = Transaction::fromBusinessEntity($transaction);
-            $balanceEntity = $this->getBalance($customer);
             $balanceEntity->setBalance($balanceEntity->getBalance() + $transaction->getBalance());
             $this->em->persist($ormTransaction);
         }
 
         $this->em->flush();
 
-        return $transaction;
+        return $balanceEntity;
     }
 
     /**
