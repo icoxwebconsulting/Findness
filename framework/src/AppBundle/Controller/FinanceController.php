@@ -98,4 +98,34 @@ class FinanceController extends FOSRestController implements ClassResourceInterf
                 ->getBalance()
         ];
     }
+
+    /**
+     * Get Transactions
+     *
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/transaction")
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="Finance",
+     *  description="Get transactions",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getTransactionsAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        return [
+            "transactions" => $em->getRepository("AppBundle:Transaction")
+                ->findByCustomer($this->getUser())
+        ];
+    }
 }

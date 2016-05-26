@@ -125,6 +125,23 @@ stof_doctrine_extensions:
             timestampable: true
             softdeleteable: true
 
+jms_serializer:
+    metadata:
+        auto_detection: true
+        directories:
+            AppBundle:
+                namespace_prefix: "AppBundle"
+                path: "@AppBundle/Resources/config/serializer"
+            Customer:
+                namespace_prefix: "Customer"
+                path: "@AppBundle/Resources/config/serializer"
+            Finance:
+                namespace_prefix: "Finance"
+                path: "@AppBundle/Resources/config/serializer"
+            FOSUserBundle:
+                namespace_prefix: "FOS\\UserBundle"
+                path: "@AppBundle/Resources/config/serializer"
+
 nelmio_cors:
     defaults:
         allow_credentials: true

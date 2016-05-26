@@ -1,0 +1,2 @@
+AppBundle\Entity\Transaction:
+    exclusion_policy: ALL

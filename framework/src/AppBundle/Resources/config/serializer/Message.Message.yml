@@ -1,0 +1,7 @@
+Message\Message\Message:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+        body:
+            expose: true

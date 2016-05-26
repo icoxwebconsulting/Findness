@@ -1,0 +1,9 @@
+AppBundle\Entity\Customer:
+    exclusion_policy: ALL
+    relations:
+        -
+            rel: self
+            href:
+                route: get_customers
+                parameters:
+                    customer: expr(object.getId())
