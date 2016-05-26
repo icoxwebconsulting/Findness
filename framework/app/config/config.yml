@@ -102,7 +102,7 @@ fos_user:
     user_class: AppBundle\Entity\Customer
 
 nelmio_api_doc:
-    name: MUM API
+    name: FINDNESS API
 
 fos_oauth_server:
     db_driver: orm
