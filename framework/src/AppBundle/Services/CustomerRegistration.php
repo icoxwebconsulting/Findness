@@ -63,4 +63,22 @@ class CustomerRegistration
         $this->em->flush();
         return $customer;
     }
+
+    /**
+     * Register new customer
+     *
+     * @param CustomerInterface $customer
+     * @param string $salt
+     * @param string $password
+     * @return mixed
+     */
+    public function changePassword(CustomerInterface $customer,
+                                   $salt,
+                                   $password)
+    {
+        $customer->setSalt($salt);
+        $customer->setPassword($password);
+        $this->em->flush();
+        return $customer;
+    }
 }

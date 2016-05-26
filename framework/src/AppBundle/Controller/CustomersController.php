@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Customer;
+use AppBundle\Form\CustomerChangePasswordType;
 use AppBundle\Form\CustomerType;
 use AppBundle\ResponseObjects\Customer as CustomerResponse;
 use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
@@ -63,6 +64,46 @@ class CustomersController extends FOSRestController implements ClassResourceInte
                 $lastName,
                 $salt,
                 $password);
+            return new CustomerResponse($response);
+        }
+
+        return $customerForm->getErrors();
+    }
+
+    /**
+     * Update customer password
+     *
+     * @param Request $request
+     * @return CustomerResponse\Symfony\Component\Form\FormErrorIterator
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="Customer",
+     *  description="Update customer password",
+     *  input="AppBundle\Form\CustomerChangePasswordType",
+     *  output="AppBundle\Entity\Customer",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function putChangePasswordAction(Request $request)
+    {
+        $customerForm = $this->createForm(new CustomerChangePasswordType(), null, array('method' => 'PUT'));
+
+        $customerForm->handleRequest($request);
+
+        if ($customerForm->isValid()) {
+            $customer = $this->getUser();
+            $salt = $customerForm->get('salt')->getData();
+            $password = $customerForm->get('password')->getData();
+            $registrationHandler = $this->get('findness.customer.registration');
+            $response = $registrationHandler->changePassword($customer, $salt, $password);
             return new CustomerResponse($response);
         }
 
