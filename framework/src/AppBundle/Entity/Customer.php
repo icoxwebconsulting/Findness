@@ -15,6 +15,12 @@ use Hateoas\Configuration\Annotation as Hateoas;
  */
 class Customer extends CustomerBase
 {
+
+    /**
+     * @var string
+     */
+    protected $securityCode;
+
     /**
      * @var array
      */
@@ -58,6 +64,22 @@ class Customer extends CustomerBase
         $this->authCodes = new ArrayCollection();
         $this->refreshTokens = new ArrayCollection();
         $this->devices = new ArrayCollection();
+    }
+
+    /**
+     * @param \String $code
+     */
+    public function setSecurityCode($code)
+    {
+        $this->securityCode = $code;
+    }
+
+    /**
+     * @return \String
+     */
+    public function getSecurityCode()
+    {
+        return $this->securityCode;
     }
 
     /**

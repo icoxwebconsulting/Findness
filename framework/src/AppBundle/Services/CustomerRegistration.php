@@ -21,13 +21,20 @@ class CustomerRegistration
     private $em;
 
     /**
+     * @var \Swift_Mailer
+     */
+    private $mailer;
+
+
+    /**
      * CustomerRegistration constructor.
      *
      * @param EntityManager $em
      */
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, \Swift_Mailer $mailer)
     {
         $this->em = $em;
+        $this->mailer = $mailer;
     }
 
     /**
@@ -78,7 +85,68 @@ class CustomerRegistration
     {
         $customer->setSalt($salt);
         $customer->setPassword($password);
+        $customer->setSecurityCode(null);
         $this->em->flush();
         return $customer;
+    }
+
+
+    /**
+     * Register new password customer
+     *
+     * @param CustomerInterface $customer
+     * @param string $code
+     * @param string $password
+     * @return mixed
+     */
+    public function changeNewPassword(CustomerInterface $customer,
+                                   $code,
+                                   $password)
+    {
+        if($customer->getSecurityCode() == $code )
+        {
+            $this->changePassword($customer, $customer->getSalt(), $password);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private function generateSecurityCode($length = 6)
+    {
+        $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        $string = '';
+        for ($i = 0; $i < $length; $i++) {
+            $string .= $characters[rand(0, strlen($characters) - 1)];
+        }
+
+        return $string;
+    }
+
+    /**
+     * Reset password customer
+     *
+     * @param CustomerInterface $customer
+     * @return mixed
+     */
+    public function resetPassword(CustomerInterface $customer)
+    {
+        $code = $this->generateSecurityCode();
+        $customer->setSecurityCode($code);
+        $this->em->flush();
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Código de seguridad')
+            ->setFrom('info@findness.com')
+            ->setTo($customer->getEmail())
+            ->setBody(
+                'Su código de seguridad de Findness es: '.$code,
+                'text/html'
+            );
+
+        $response = $this->mailer->send($message);
+
+        return $response !== 0;
     }
 }
