@@ -28,6 +28,11 @@ class Customer extends BaseUser implements CustomerInterface
     protected $lastName;
 
     /**
+     * @var bool
+     */
+    protected $confirmed;
+
+    /**
      * Customer constructor.
      * @param string|null $id
      */
@@ -79,6 +84,22 @@ class Customer extends BaseUser implements CustomerInterface
     public function getLastName()
     {
         return $this->lastName;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setConfirmed($confirmed)
+    {
+        $this->confirmed = $confirmed;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isConfirmed()
+    {
+        return $this->confirmed;
     }
 
     /**

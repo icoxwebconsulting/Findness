@@ -14,9 +14,8 @@ AppBundle\Entity\Customer:
         lastName:
             type: string
             length: 255
-        securityCode:
-            type: string
-            length: 255
+        confirmed:
+            type: boolean
         created:
             type: datetime
             gedmo:

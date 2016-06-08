@@ -46,6 +46,16 @@ class CustomerSpec extends ObjectBehavior
         $this->getLastName()->shouldBe($lastName);
     }
 
+    public function it_should_set_and_get_confirmed()
+    {
+        $confirmed = false;
+        $this->setConfirmed($confirmed);
+        $this->isConfirmed()->shouldBe($confirmed);
+        $confirmed = true;
+        $this->setConfirmed($confirmed);
+        $this->isConfirmed()->shouldBe($confirmed);
+    }
+
     public function it_should_get_full_name()
     {
         $firstName = "Yasmany";

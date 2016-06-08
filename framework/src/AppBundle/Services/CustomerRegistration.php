@@ -25,16 +25,62 @@ class CustomerRegistration
      */
     private $mailer;
 
+    /**
+     * @var \Twig_Environment
+     */
+    private $templateEngine;
+
 
     /**
      * CustomerRegistration constructor.
      *
      * @param EntityManager $em
+     * @param \Swift_Mailer $mailer
+     * @param \Twig_Environment $templateEngine
      */
-    public function __construct(EntityManager $em, \Swift_Mailer $mailer)
+    public function __construct(EntityManager $em, \Swift_Mailer $mailer, \Twig_Environment $templateEngine)
     {
         $this->em = $em;
         $this->mailer = $mailer;
+        $this->templateEngine = $templateEngine;
+    }
+
+    /**
+     * @param CustomerInterface $customer
+     */
+    private function sendRegistrationEmail(CustomerInterface $customer)
+    {
+        $name = sprintf("%s %s",
+            $customer->getFirstName(),
+            $customer->getLastName());
+        $confirmationToken = $customer->getConfirmationToken();
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Confirm your email')
+            ->setFrom('info@findness.com')
+            ->setTo($customer->getEmail())
+            ->setBody(
+                $this->templateEngine->render(
+                    'registration_email.html.twig',
+                    array(
+                        'name' => $name,
+                        'confirmationToken' => $confirmationToken
+                    )
+                ),
+                'text/html'
+            )
+            ->addPart(
+                $this->templateEngine->render(
+                    'registration_email.txt.twig',
+                    array(
+                        'name' => $name,
+                        'confirmationToken' => $confirmationToken
+                    )
+                ),
+                'text/plain'
+            );
+
+        $this->mailer->send($message);
     }
 
     /**
@@ -68,6 +114,7 @@ class CustomerRegistration
         $balance->setBalance(0);
         $this->em->persist($balance);
         $this->em->flush();
+        $this->sendRegistrationEmail($customer);
         return $customer;
     }
 
@@ -100,11 +147,10 @@ class CustomerRegistration
      * @return mixed
      */
     public function changeNewPassword(CustomerInterface $customer,
-                                   $code,
-                                   $password)
+                                      $code,
+                                      $password)
     {
-        if($customer->getSecurityCode() == $code )
-        {
+        if ($customer->getSecurityCode() == $code) {
             $this->changePassword($customer, $customer->getSalt(), $password);
             return true;
         }
@@ -141,7 +187,7 @@ class CustomerRegistration
             ->setFrom('info@findness.com')
             ->setTo($customer->getEmail())
             ->setBody(
-                'Su código de seguridad de Findness es: '.$code,
+                'Su código de seguridad de Findness es: ' . $code,
                 'text/html'
             );
 

@@ -45,6 +45,20 @@ interface CustomerInterface
     public function getLastName();
 
     /**
+     * Set Customer confirmed
+     *
+     * @param bool $confirmed
+     */
+    public function setConfirmed($confirmed);
+
+    /**
+     * Get Customer confirmed
+     *
+     * @return string
+     */
+    public function isConfirmed();
+
+    /**
      * Get Customer Full Name
      *
      * @return string

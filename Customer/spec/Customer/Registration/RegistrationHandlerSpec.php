@@ -31,7 +31,8 @@ class RegistrationHandlerSpec extends ObjectBehavior
         $customer->getEmail()->shouldBe($username);
         $customer->getRoles()->shouldHaveCount(1);
         $customer->getRoles()[0]->shouldBe('ROLE_USER');
-        $customer->isEnabled()->shouldBe(true);
+        $customer->isEnabled()->shouldBe(false);
+        $customer->isConfirmed()->shouldBe(false);
         $customer->getFirstName()->shouldBe($firstName);
         $customer->getLastName()->shouldBe($lastName);
         $customer->getSalt()->shouldBe($salt);
