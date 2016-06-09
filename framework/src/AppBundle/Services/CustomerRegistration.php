@@ -118,6 +118,19 @@ class CustomerRegistration
         return $customer;
     }
 
+    public function confirm(CustomerInterface $customer, $token)
+    {
+        if ($customer->getConfirmationToken() == $token) {
+            $customer->setConfirmed(true);
+            $customer->setEnabled(true);
+            $customer->setConfirmationToken(null);
+            $this->em->flush();
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Register new customer
      *
@@ -158,7 +171,10 @@ class CustomerRegistration
         return false;
     }
 
-
+    /**
+     * @param int $length
+     * @return string
+     */
     private function generateSecurityCode($length = 6)
     {
         $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';

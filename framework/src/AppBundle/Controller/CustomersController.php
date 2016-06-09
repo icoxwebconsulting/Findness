@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Customer;
 use AppBundle\Form\CustomerChangePasswordType;
+use AppBundle\Form\CustomerConfirmationType;
 use AppBundle\Form\CustomerNewPasswordType;
 use AppBundle\Form\CustomerType;
 use AppBundle\ResponseObjects\Customer as CustomerResponse;
@@ -69,6 +70,48 @@ class CustomersController extends FOSRestController implements ClassResourceInte
         }
 
         return $customerForm->getErrors();
+    }
+
+    /**
+     * Confirm customer
+     *
+     * @param Customer $customer
+     * @param Request $request
+     * @return array\Symfony\Component\Form\FormErrorIterator
+     *
+     * @FOSRestBundleAnnotations\Route("/customers/{customer}/confirm")
+     *
+     * @ApiDoc(
+     *  section="Customer",
+     *  description="Confirm Customer",
+     *  input="AppBundle\Form\CustomerConfirmationType",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function postConfirmAction(Customer $customer = null, Request $request)
+    {
+        if (!$customer) {
+            throw new HttpException(500, 'Customer not found');
+        }
+
+        $customerConfirmationForm = $this->createForm(new CustomerConfirmationType());
+
+        $customerConfirmationForm->handleRequest($request);
+
+        if ($customerConfirmationForm->isValid()) {
+            $registrationHandler = $this->get('findness.customer.registration');
+            return array(
+                "confirmed" => $registrationHandler->confirm($customer,
+                    $customerConfirmationForm->get('token')->getData()));
+        }
+
+        return $customerConfirmationForm->getErrors();
     }
 
 
