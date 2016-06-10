@@ -163,16 +163,10 @@ abstract class SOAPApi
             return "";
         }
 
-        $filter = "<Geografia Tipo=“Buffer”><Coordenadas>%%s</Coordenadas><Radio>%s</Radio></Geografia>";
-        $filter = sprintf($filter, $this->geoRadio);
-
-        foreach ($geoLocations as $geoLocation) {
-            $filter = sprintf($filter, sprintf('<Latitud>%s</Latitud><Longitud>%s</Longitud>%%s',
-                $geoLocation->latitude,
-                $geoLocation->longitude));
-        }
-
-        $filter = str_replace("</Longitud>%s", "</Longitud>", $filter);
+        $filter = "<Geografia Tipo=“Buffer”><Coordenadas><Latitud>%s</Latitud><Longitud>%s</Longitud></Coordenadas><Radio>%s</Radio></Geografia>";
+        $filter = sprintf($filter, $geoLocations->latitude,
+            $geoLocations->longitude,
+            $geoLocations->radio);
 
         return $filter;
     }
@@ -269,6 +263,7 @@ abstract class SOAPApi
      * @param array $cities
      * @param array $postalCodes
      * @param array $geoLocations
+     * @param bool $dryRun
      * @param CustomerInterface $customer
      * @return array
      */
@@ -279,6 +274,7 @@ abstract class SOAPApi
                           array $cities = [],
                           array $postalCodes = [],
                           array $geoLocations = [],
+                          $dryRun,
                           CustomerInterface $customer)
     {
         $xmlRequest = $this->buildQueryXML($customer, $page, $notViewedAllowedAmount, $cnaes, $states, $cities,

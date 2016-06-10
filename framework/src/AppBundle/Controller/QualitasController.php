@@ -71,6 +71,13 @@ class QualitasController extends FOSRestController implements ClassResourceInter
      *          "requirement"="*",
      *          "required"=false,
      *          "description"="json string of geo locations array"
+     *      },
+     *     {
+     *          "name"="dryRun",
+     *          "dataType"="boolean",
+     *          "requirement"="*",
+     *          "required"=true,
+     *          "description"="boolean describing if the query will be executed over balance"
      *      }
      *  },
      *  statusCodes={
@@ -94,8 +101,10 @@ class QualitasController extends FOSRestController implements ClassResourceInter
         }
         $postalCodes = json_decode($request->get("postalCodes", json_encode([])));
         $geoLocations = json_decode($request->get("geoLocations", json_encode([])));
+        $dryRun = $request->get("dryRun", true);
         $qualitas = $this->container->get('findness.qualitas');
-        return $qualitas->query($page, 0, $cnaes, $states, $cities, $postalCodes, $geoLocations, $this->getUser());
+        return $qualitas->query($page, 0, $cnaes, $states, $cities, $postalCodes, $geoLocations,
+            $dryRun, $this->getUser());
     }
 
     /**
