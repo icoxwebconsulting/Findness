@@ -263,7 +263,6 @@ abstract class SOAPApi
      * @param array $cities
      * @param array $postalCodes
      * @param array $geoLocations
-     * @param bool $dryRun
      * @param CustomerInterface $customer
      * @return array
      */
@@ -274,7 +273,6 @@ abstract class SOAPApi
                           array $cities = [],
                           array $postalCodes = [],
                           array $geoLocations = [],
-                          $dryRun,
                           CustomerInterface $customer)
     {
         $xmlRequest = $this->buildQueryXML($customer, $page, $notViewedAllowedAmount, $cnaes, $states, $cities,

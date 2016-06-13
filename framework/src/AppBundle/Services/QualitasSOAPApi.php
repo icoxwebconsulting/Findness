@@ -132,16 +132,17 @@ class QualitasSOAPApi extends SOAPApi
                           array $cities = [],
                           array $postalCodes = [],
                           array $geoLocations = [],
-                          $dryRun = true,
                           CustomerInterface $customer)
     {
         set_time_limit(0);
-        if (!$dryRun) {
-            $notViewedAllowedAmount = floor($this->getBalance($customer)->getBalance() / $this->findnessSearchFee);
+        $available = floor($this->getBalance($customer)->getBalance() / $this->findnessSearchFee);
+        if ($notViewedAllowedAmount !== 0 && $available >= $notViewedAllowedAmount) {
+            return parent::query($page, $notViewedAllowedAmount, $cnaes, $states, $cities, $postalCodes, $geoLocations,
+                $customer);
         } else {
-            $notViewedAllowedAmount = 0;
+            return [
+                "error" => "Not enough balance"
+            ];
         }
-        return parent::query($page, $notViewedAllowedAmount, $cnaes, $states, $cities, $postalCodes, $geoLocations,
-            $dryRun, $customer);
     }
 }
