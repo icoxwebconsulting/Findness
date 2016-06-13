@@ -14,17 +14,17 @@ class StyledCompany implements StyledCompanyInterface
     /**
      * @var CompanyInterface
      */
-    private $company;
+    protected $company;
 
     /**
      * @var CustomerInterface
      */
-    private $customer;
+    protected $customer;
 
     /**
-     * @var mixd
+     * @var mixed
      */
-    private $style;
+    protected $style;
 
     /**
      * StyledCompany constructor.
