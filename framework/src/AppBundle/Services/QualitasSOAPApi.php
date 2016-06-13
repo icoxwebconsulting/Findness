@@ -123,6 +123,68 @@ class QualitasSOAPApi extends SOAPApi
     }
 
     /**
+     * @param array $companies
+     * @return array
+     */
+    protected function getAvailableStyles(array $companies)
+    {
+        $ids = array();
+        foreach ($companies as $company) {
+            $ids[] = $company["id"];
+        }
+
+        $qb = $this->em->createQueryBuilder();
+
+        $styles = $qb
+            ->select('sc')
+            ->from('AppBundle:StyledCompany', 'sc')
+            ->where($qb->expr()->in('sc.company', ':companyIds'))
+            ->setParameter('companyIds', $ids)
+            ->getQuery()
+            ->getArrayResult();
+
+        $styles = array_reduce($styles,
+            function ($carry, $current) {
+                $carry[$current["company"]] = $current["style"];
+                return $carry;
+            },
+            array());
+
+        return $styles;
+    }
+
+    /**
+     * @param array $response
+     * @return array
+     */
+    protected function applyStyles(array $response)
+    {
+        $response["items"] = array_reduce($response["items"],
+            function ($carry, $current) {
+                $carry[$current->getId()] = array(
+                    "id" => $current->getId(),
+                    "externalId" => $current->getExternalId(),
+                    "socialReason" => $current->getSocialReason(),
+                    "socialObject" => $current->getSocialObject(),
+                    "latitude" => $current->getLatitude(),
+                    "longitude" => $current->getLongitude()
+                );
+                return $carry;
+            },
+            array());
+
+        $styles = $this->getAvailableStyles($response["items"]);
+
+        foreach ($response["items"] as $key => $company) {
+            if (array_key_exists($key, $styles)) {
+                $response["items"][$key]["style"] = $styles[$key];
+            }
+        }
+
+        return $response;
+    }
+
+    /**
      * @inheritdoc
      */
     public function query($page = 1,
@@ -136,9 +198,10 @@ class QualitasSOAPApi extends SOAPApi
     {
         set_time_limit(0);
         $available = floor($this->getBalance($customer)->getBalance() / $this->findnessSearchFee);
-        if ($notViewedAllowedAmount !== 0 && $available >= $notViewedAllowedAmount) {
-            return parent::query($page, $notViewedAllowedAmount, $cnaes, $states, $cities, $postalCodes, $geoLocations,
+        if ($notViewedAllowedAmount === 0 || $available >= $notViewedAllowedAmount) {
+            $response = parent::query($page, $notViewedAllowedAmount, $cnaes, $states, $cities, $postalCodes, $geoLocations,
                 $customer);
+            return $this->applyStyles($response);
         } else {
             return [
                 "error" => "Not enough balance"
