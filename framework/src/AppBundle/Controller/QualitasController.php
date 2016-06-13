@@ -100,7 +100,7 @@ class QualitasController extends FOSRestController implements ClassResourceInter
             $cities = ["state" => $citiesObj->state, "cities" => $citiesObj->cities];
         }
         $postalCodes = json_decode($request->get("postalCodes", json_encode([])));
-        $geoLocations = json_decode($request->get("geoLocations", json_encode([])));
+        $geoLocations = json_decode($request->get("geoLocations", json_encode([])), true);
         $notViewedAllowedAmount = $request->get("nonViewedCompanies", 0);
         $qualitas = $this->container->get('findness.qualitas');
         return $qualitas->query($page, $notViewedAllowedAmount, $cnaes, $states, $cities, $postalCodes, $geoLocations,

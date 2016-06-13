@@ -154,19 +154,19 @@ abstract class SOAPApi
     /**
      * Get Geo filter
      *
-     * @param array $geoLocations
+     * @param array $geoLocation
      * @return string
      */
-    protected function getGeoFilter(array $geoLocations = [])
+    protected function getGeoFilter(array $geoLocation = [])
     {
-        if (!$geoLocations) {
+        if (empty($geoLocation)) {
             return "";
         }
 
-        $filter = "<Geografia Tipo=“Buffer”><Coordenadas><Latitud>%s</Latitud><Longitud>%s</Longitud></Coordenadas><Radio>%s</Radio></Geografia>";
-        $filter = sprintf($filter, $geoLocations->latitude,
-            $geoLocations->longitude,
-            $geoLocations->radio);
+        $filter = "<Geografia><Coordenadas><Latitud>%s</Latitud><Longitud>%s</Longitud></Coordenadas><Radio>%s</Radio></Geografia>";
+        $filter = sprintf($filter, $geoLocation["latitude"],
+            $geoLocation["longitude"],
+            $geoLocation["radio"]);
 
         return $filter;
     }
@@ -262,7 +262,7 @@ abstract class SOAPApi
      * @param array $states
      * @param array $cities
      * @param array $postalCodes
-     * @param array $geoLocations
+     * @param array $geoLocation
      * @param CustomerInterface $customer
      * @return array
      */
@@ -272,11 +272,11 @@ abstract class SOAPApi
                           array $states = [],
                           array $cities = [],
                           array $postalCodes = [],
-                          array $geoLocations = [],
+                          array $geoLocation = [],
                           CustomerInterface $customer)
     {
         $xmlRequest = $this->buildQueryXML($customer, $page, $notViewedAllowedAmount, $cnaes, $states, $cities,
-            $postalCodes, $geoLocations);
+            $postalCodes, $geoLocation);
         $request = [
             "nombreUsuario" => $this->username,
             "pwd" => $this->password,
