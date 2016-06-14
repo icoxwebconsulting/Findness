@@ -66,7 +66,12 @@ class CustomersController extends FOSRestController implements ClassResourceInte
                 $lastName,
                 $salt,
                 $password);
-            return new CustomerResponse($response);
+            if ($response) {
+                return new CustomerResponse($response);
+            } else {
+                throw new HttpException(409, "Customer already registered");
+            }
+
         }
 
         return $customerForm->getErrors();

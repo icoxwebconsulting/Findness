@@ -6,6 +6,7 @@ use AppBundle\Entity\Balance;
 use Customer\Customer\CustomerInterface;
 use Customer\Registration\RegistrationHandler;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Security\Acl\Exception\Exception;
 
 /**
  * Class CustomerRegistration
@@ -101,21 +102,26 @@ class CustomerRegistration
                              $salt,
                              $password)
     {
-        $handler = new RegistrationHandler();
-        $customer = $handler->register($customer,
-            $username,
-            $firstName,
-            $lastName,
-            $salt,
-            $password);
-        $this->em->persist($customer);
-        $this->em->flush();
-        $balance = new Balance($customer);
-        $balance->setBalance(0);
-        $this->em->persist($balance);
-        $this->em->flush();
-        $this->sendRegistrationEmail($customer);
-        return $customer;
+        try {
+            $handler = new RegistrationHandler();
+            $customer = $handler->register($customer,
+                $username,
+                $firstName,
+                $lastName,
+                $salt,
+                $password);
+            $this->em->persist($customer);
+            $this->em->flush();
+            $balance = new Balance($customer);
+            $balance->setBalance(0);
+            $this->em->persist($balance);
+            $this->em->flush();
+            $this->sendRegistrationEmail($customer);
+            return $customer;
+        } catch (\Exception $exception) {
+            return null;
+        }
+
     }
 
     public function confirm(CustomerInterface $customer, $token)
