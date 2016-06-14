@@ -93,7 +93,7 @@ class CustomerRegistration
      * @param string $lastName
      * @param string $salt
      * @param string $password
-     * @return mixed
+     * @return CustomerInterface|null
      */
     public function register(CustomerInterface $customer,
                              $username,

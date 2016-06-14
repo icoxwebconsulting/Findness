@@ -71,7 +71,6 @@ class CustomersController extends FOSRestController implements ClassResourceInte
             } else {
                 throw new HttpException(409, "Customer already registered");
             }
-
         }
 
         return $customerForm->getErrors();
