@@ -4,6 +4,7 @@ namespace AppBundle\Services;
 
 use AppBundle\Entity\Company;
 use AppBundle\Entity\CustomerViewCompany;
+use AppBundle\Entity\Search;
 use AppBundle\Entity\Transaction;
 use BeSimple\SoapClient\SoapClient;
 use Company\Qualitas\SOAPApi;
@@ -185,6 +186,37 @@ class QualitasSOAPApi extends SOAPApi
     }
 
     /**
+     * @param CustomerInterface $customer
+     * @param array $cnaes
+     * @param array $states
+     * @param array $cities
+     * @param array $postalCodes
+     * @param array $geoLocation
+     */
+    private function saveSearch(CustomerInterface $customer,
+                                array $cnaes = [],
+                                array $states = [],
+                                array $cities = [],
+                                array $postalCodes = [],
+                                array $geoLocation = [])
+    {
+        $filters = array(
+            'cnaes' => $cnaes,
+            'states' => $states,
+            'cities' => $cities,
+            'postalCodes' => $postalCodes,
+            'geoLocation' => $geoLocation
+        );
+        $name = sprintf('%s#%s', $cnaes[0], date("Y-m-d@H:i:s"));
+        $search = new Search();
+        $search->setName($name);
+        $search->setFilters($filters);
+        $search->setCustomer($customer);
+        $this->em->persist($search);
+        $this->em->flush();
+    }
+
+    /**
      * @inheritdoc
      */
     public function query($page = 1,
@@ -196,11 +228,22 @@ class QualitasSOAPApi extends SOAPApi
                           array $geoLocation = [],
                           CustomerInterface $customer)
     {
+        if (empty($cnaes)) {
+            return [
+                "error" => "You need to specify a CNAE"
+            ];
+        }
+
         set_time_limit(0);
         $available = floor($this->getBalance($customer)->getBalance() / $this->findnessSearchFee);
         if ($notViewedAllowedAmount === 0 || $available >= $notViewedAllowedAmount) {
             $response = parent::query($page, $notViewedAllowedAmount, $cnaes, $states, $cities, $postalCodes,
                 $geoLocation, $customer);
+
+            if ($notViewedAllowedAmount) {
+                $this->saveSearch($customer, $cnaes, $states, $cities, $postalCodes, $geoLocation);
+            }
+
             return $this->applyStyles($response);
         } else {
             return [
