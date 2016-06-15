@@ -124,6 +124,11 @@ class CustomerRegistration
 
     }
 
+    /**
+     * @param CustomerInterface $customer
+     * @param $token
+     * @return bool
+     */
     public function confirm(CustomerInterface $customer, $token)
     {
         if ($customer->getConfirmationToken() == $token) {
