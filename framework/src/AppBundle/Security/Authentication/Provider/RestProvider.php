@@ -40,14 +40,23 @@ class RestProvider implements AuthenticationProviderInterface
     {
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
-        if ($user && $user->getPassword() === $token->getPassword()) {
+        if ($user &&
+            $user->getPassword() === $token->getPassword() &&
+            $user->isEnabled() &&
+            $user->isConfirmed()
+        ) {
             $authenticatedToken = new RestUserToken($user->getRoles());
             $authenticatedToken->setUser($user);
 
             return $authenticatedToken;
         }
 
-        throw new AuthenticationException('The REST authentication failed.');
+        $message = 'The REST authentication failed.';
+        if (!$user->isConfirmed()) {
+            $message = 'Unconfirmed Customer.';
+        }
+
+        throw new AuthenticationException($message);
     }
 
     /**

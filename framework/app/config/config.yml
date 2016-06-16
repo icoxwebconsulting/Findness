@@ -73,7 +73,6 @@ fos_rest:
     param_fetcher_listener: true
     body_listener: true
     allowed_methods_listener: true
-    unauthorized_challenge: "Basic realm=\"Restricted Area\""
     access_denied_listener:
         json: true
         xml: true

@@ -83,11 +83,20 @@ class CustomersController extends FOSRestController implements ClassResourceInte
      * @param Request $request
      * @return array\Symfony\Component\Form\FormErrorIterator
      *
-     * @FOSRestBundleAnnotations\Route("/customers/{customer}/confirm")
+     * @FOSRestBundleAnnotations\Route("/customers/{username}/confirm")
+     * @ParamConverter("customer", options={"mapping": {"username": "username"}})
      *
      * @ApiDoc(
      *  section="Customer",
      *  description="Confirm Customer",
+     *  requirements={
+     *      {
+     *          "name"="username",
+     *          "dataType"="string",
+     *          "requirement"="*",
+     *          "description"="username | email"
+     *      }
+     *  },
      *  input="AppBundle\Form\CustomerConfirmationType",
      *  statusCodes={
      *         200="Returned when successful"
@@ -110,9 +119,11 @@ class CustomersController extends FOSRestController implements ClassResourceInte
 
         if ($customerConfirmationForm->isValid()) {
             $registrationHandler = $this->get('findness.customer.registration');
+            $confirmed = $registrationHandler->confirm($customer, $customerConfirmationForm->get('token')->getData());
             return array(
-                "confirmed" => $registrationHandler->confirm($customer,
-                    $customerConfirmationForm->get('token')->getData()));
+                "confirmed" => $confirmed,
+                "id" => $customer->getId()
+            );
         }
 
         return $customerConfirmationForm->getErrors();
@@ -311,7 +322,7 @@ class CustomersController extends FOSRestController implements ClassResourceInte
      *          "name"="username",
      *          "dataType"="string",
      *          "requirement"="*",
-     *          "description"="customer id"
+     *          "description"="username | email"
      *      }
      *  },
      *  statusCodes={

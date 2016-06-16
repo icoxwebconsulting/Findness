@@ -4,6 +4,7 @@ namespace AppBundle\Security\Firewall;
 
 use AppBundle\Security\Authentication\Token\RestUserToken;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -66,7 +67,7 @@ class RestListener implements ListenerInterface
             if ($token instanceof RestUserToken) {
                 $this->tokenStorage->setToken(null);
             }
-            return;
+            throw new HttpException(401, $failed->getMessage());
         }
     }
 }
