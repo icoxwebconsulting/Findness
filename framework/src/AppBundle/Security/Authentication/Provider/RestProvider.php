@@ -52,8 +52,13 @@ class RestProvider implements AuthenticationProviderInterface
         }
 
         $message = 'The REST authentication failed.';
+
         if (!$user->isConfirmed()) {
             $message = 'Unconfirmed Customer.';
+        }
+
+        if (!$user->isEnabled()) {
+            $message = 'Disabled Customer.';
         }
 
         throw new AuthenticationException($message);
