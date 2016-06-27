@@ -10,6 +10,11 @@ customers:
     prefix:   api/v1
     type:     rest
 
+companies:
+    resource: "AppBundle\Controller\CompaniesController"
+    prefix:   api/v1
+    type:     rest
+
 devices:
     resource: "AppBundle\Controller\DevicesController"
     prefix:   api/v1

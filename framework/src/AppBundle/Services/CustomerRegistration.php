@@ -31,7 +31,6 @@ class CustomerRegistration
      */
     private $templateEngine;
 
-
     /**
      * CustomerRegistration constructor.
      *
