@@ -3,8 +3,6 @@
 namespace MapRoute\MapRoute;
 
 use Customer\Customer\CustomerInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use MapRoute\MapRoutePath\MapRoutePathInterface;
 
 /**
  * Class MapRoute
@@ -35,9 +33,9 @@ class MapRoute implements MapRouteInterface
     protected $customer;
 
     /**
-     * @var ArrayCollection
+     * @var array
      */
-    protected $paths;
+    protected $points;
 
     /**
      * MapRoute constructor.
@@ -49,7 +47,7 @@ class MapRoute implements MapRouteInterface
         if (!$this->id) {
             $this->id = uniqid();
         }
-        $this->paths = new ArrayCollection();
+        $this->points = array();
     }
 
     /**
@@ -111,32 +109,16 @@ class MapRoute implements MapRouteInterface
     /**
      * @inheritdoc
      */
-    public function setPaths(ArrayCollection $paths)
+    public function setPath(array $points)
     {
-        $this->paths = $paths;
+        $this->points = $points;
     }
 
     /**
      * @inheritdoc
      */
-    public function addPath(MapRoutePathInterface $mapRoutePath)
+    public function getPath()
     {
-        $this->paths->add($mapRoutePath);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function removePath(MapRoutePathInterface $mapRoutePath)
-    {
-        $this->paths->removeElement($mapRoutePath);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPaths()
-    {
-        return $this->paths;
+        return $this->points;
     }
 }

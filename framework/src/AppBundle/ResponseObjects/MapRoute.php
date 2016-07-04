@@ -22,9 +22,14 @@ class MapRoute
     public $name;
 
     /**
-     * @var array
+     * @var string
      */
     public $transport;
+
+    /**
+     * @var array
+     */
+    public $points;
 
     /**
      * MapRoute constructor.
@@ -36,5 +41,6 @@ class MapRoute
         $this->id = $mapRoute->getId();
         $this->name = $mapRoute->getName();
         $this->transport = $mapRoute->getTransport();
+        $this->points = $mapRoute->getPath();
     }
 }

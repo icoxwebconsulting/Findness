@@ -3,8 +3,6 @@
 namespace MapRoute\MapRoute;
 
 use Customer\Customer\CustomerInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use MapRoute\MapRoutePath\MapRoutePathInterface;
 
 /**
  * Interface MapRoute
@@ -63,30 +61,16 @@ interface MapRouteInterface
     public function getCustomer();
 
     /**
-     * Set Paths
+     * Set Path
      *
-     * @param ArrayCollection $paths
+     * @param array $points
      */
-    public function setPaths(ArrayCollection $paths);
+    public function setPath(array $points);
 
     /**
-     * Add Paths
+     * Get Path
      *
-     * @param MapRoutePathInterface $mapRoutePath
+     * @return array
      */
-    public function addPath(MapRoutePathInterface $mapRoutePath);
-
-    /**
-     * Remove Paths
-     *
-     * @param MapRoutePathInterface $mapRoutePath
-     */
-    public function removePath(MapRoutePathInterface $mapRoutePath);
-
-    /**
-     * Get Paths
-     *
-     * @return ArrayCollection
-     */
-    public function getPaths();
+    public function getPath();
 }
