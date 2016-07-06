@@ -345,48 +345,4 @@ class CustomersController extends FOSRestController implements ClassResourceInte
             "salt" => $customer->getSalt()
         ];
     }
-
-
-    /**
-     * Resend Confirmation email
-     *
-     * @param Customer $customer
-     * @param Request $request
-     * @return array
-     *
-     * @FOSRestBundleAnnotations\Route("/customers/{username}/resend-confirmation-email")
-     * @ParamConverter("customer", options={"mapping": {"username": "username"}})
-     *
-     * @ApiDoc(
-     *  section="Customer",
-     *  description="Resend Confirmation email",
-     *  requirements={
-     *      {
-     *          "name"="username",
-     *          "dataType"="string",
-     *          "requirement"="*",
-     *          "description"="username | email"
-     *      }
-     *  },
-     *  statusCodes={
-     *         200="Returned when successful"
-     *  },
-     *  tags={
-     *   "stable" = "#4A7023",
-     *   "v1" = "#ff0000"
-     *  }
-     * )
-     */
-    public function postResendConfirmationEmailAction(Customer $customer = null)
-    {
-        if (!$customer) {
-            throw new HttpException(500, 'Customer not found');
-        }
-
-        $registrationHandler = $this->get('findness.customer.registration');
-        $sent = $registrationHandler->resendConfirmationEmail($customer);
-        return array(
-            "sent" => $sent
-        );
-    }
 }

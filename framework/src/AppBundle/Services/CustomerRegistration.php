@@ -121,6 +121,7 @@ class CustomerRegistration
         } catch (\Exception $exception) {
             return null;
         }
+
     }
 
     /**
@@ -220,28 +221,5 @@ class CustomerRegistration
         $response = $this->mailer->send($message);
 
         return $response !== 0;
-    }
-
-    /**
-     * Resend Confirmation Email
-     *
-     * @param CustomerInterface $customer
-     * @return bool
-     */
-    public function resendConfirmationEmail(CustomerInterface $customer)
-    {
-        try {
-            $customer->setEnabled(false);
-            $customer->setConfirmationToken(mt_rand(100000, 999999));
-            $customer->setConfirmed(false);
-
-            $this->em->flush();
-
-            $this->sendRegistrationEmail($customer);
-
-            return true;
-        } catch (\Exception $exception) {
-            return false;
-        }
     }
 }
