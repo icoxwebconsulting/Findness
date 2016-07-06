@@ -22,7 +22,8 @@ class MapRouteType extends AbstractType
     {
         $builder
             ->add('name', TextType::class)
-            ->add('transport', TextType::class);
+            ->add('transport', TextType::class)
+            ->add('points', TextType::class);
     }
 
     /**

@@ -14,6 +14,8 @@ AppBundle\Entity\MapRoute:
         transport:
             type: string
             length: 255
+        points:
+            type: json_array
         created:
             type: datetime
             gedmo:
@@ -33,11 +35,6 @@ AppBundle\Entity\MapRoute:
             joinColumn:
                 name: customer
                 referencedColumnName: id
-            cascade: ["persist", "merge"]
-    oneToMany:
-        paths:
-            targetEntity: MapRoutePath
-            mappedBy: mapRoute
             cascade: ["persist", "merge"]
     lifecycleCallbacks: {  }
     gedmo:

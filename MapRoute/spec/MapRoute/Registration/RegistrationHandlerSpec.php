@@ -2,7 +2,6 @@
 
 namespace spec\MapRoute\Registration;
 
-use Company\Company\Company;
 use Customer\Customer\Customer;
 use MapRoute\MapRoute\MapRoute;
 use MapRoute\MapRoutePath\MapRoutePath;
@@ -23,10 +22,12 @@ class RegistrationHandlerSpec extends ObjectBehavior
         $name = 'route 1';
         $transport = 'car';
         $customer = new Customer($id);
-        $mapRoute = $this->registerMapRoute($mapRoute, $name, $transport, $customer);
+        $mapRoutePath = array(1, 2, 3);
+        $mapRoute = $this->registerMapRoute($mapRoute, $name, $transport, $customer, $mapRoutePath);
         $mapRoute->getName()->shouldBe($name);
         $mapRoute->getTransport()->shouldBe($transport);
         $mapRoute->getCustomer()->shouldBe($customer);
+        $mapRoute->getPath()->shouldBe($mapRoutePath);
     }
 
     public function it_should_update_a_map_route()
@@ -37,41 +38,16 @@ class RegistrationHandlerSpec extends ObjectBehavior
         $mapRoute->setTransport('car');
         $customer = new Customer($id);
         $mapRoute->setCustomer($customer);
+        $mapRoutePath = array(1, 2, 3);
+        $mapRoute->setPath($mapRoutePath);
 
         $name = 'route 2';
         $transport = 'public';
-        $mapRoute = $this->updateMapRoute($mapRoute, $name, $transport);
+        $mapRoutePath = array(4, 5, 6);
+        $mapRoute = $this->updateMapRoute($mapRoute, $name, $transport, $mapRoutePath);
         $mapRoute->getName()->shouldBe($name);
         $mapRoute->getTransport()->shouldBe($transport);
         $mapRoute->getCustomer()->shouldBe($customer);
-    }
-
-    public function it_should_register_a_map_route_path()
-    {
-        $id = uniqid();
-        $mapRoute = new MapRoute($id);
-        $mapRoutePath = new MapRoutePath($id);
-        $startPoint = new Company();
-        $endPoint = new Company();
-        $mapRoutePath = $this->registerMapRoutePath($mapRoute, $mapRoutePath, $startPoint, $endPoint);
-        $mapRoutePath->getStartPoint()->shouldBe($startPoint);
-        $mapRoutePath->getEndPoint()->shouldBe($endPoint);
-    }
-
-    public function it_should_update_a_map_route_path()
-    {
-        $id = uniqid();
-        $mapRoute = new MapRoute($id);
-        $mapRoutePath = new MapRoutePath($id);
-        $startPoint = new Company();
-        $endPoint = new Company();
-        $mapRoutePath->setMapRoute($mapRoute);
-        $mapRoutePath->setStartPoint($startPoint);
-        $mapRoutePath->setEndPoint($endPoint);
-        $startPoint = new Company();
-        $endPoint = new Company();
-        $mapRoutePath = $this->updateMapRoutePath($mapRoutePath, $startPoint, $endPoint);
-        $mapRoutePath->getStartPoint()->shouldBe($startPoint);
-        $mapRoutePath->getEndPoint()->shouldBe($endPoint);
+        $mapRoute->getPath()->shouldBe($mapRoutePath);
     }
 }

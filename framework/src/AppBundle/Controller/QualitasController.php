@@ -94,7 +94,7 @@ class QualitasController extends FOSRestController implements ClassResourceInter
         $page = $request->get("page", 1);
         $cnaes = json_decode($request->get("cnaes", json_encode([])));
         $states = json_decode($request->get("states", json_encode([])));
-        $citiesObj = json_decode($request->get("cities", json_encode([])), JSON_FORCE_OBJECT);
+        $citiesObj = json_decode($request->get("cities", json_encode([])));
         $cities = [];
         if (is_object($citiesObj) && property_exists($citiesObj, "state") && property_exists($citiesObj, "cities")) {
             $cities = ["state" => $citiesObj->state, "cities" => $citiesObj->cities];

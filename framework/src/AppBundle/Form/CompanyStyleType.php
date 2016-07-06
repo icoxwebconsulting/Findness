@@ -2,17 +2,17 @@
 
 namespace AppBundle\Form;
 
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class MapRoutePathType
+ * Class CompanyStyleType
  *
  * @package AppBundle\Form
  */
-class MapRoutePathType extends AbstractType
+class CompanyStyleType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -21,12 +21,7 @@ class MapRoutePathType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('startPoint', EntityType::class, array(
-                'class' => 'AppBundle:Company'
-            ))
-            ->add('endPoint', EntityType::class, array(
-                'class' => 'AppBundle:Company'
-            ));
+            ->add('style', TextType::class);
     }
 
     /**

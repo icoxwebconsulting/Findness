@@ -2,10 +2,8 @@
 
 namespace MapRoute\Registration;
 
-use Company\Company\CompanyInterface;
 use Customer\Customer\CustomerInterface;
 use MapRoute\MapRoute\MapRouteInterface;
-use MapRoute\MapRoutePath\MapRoutePathInterface;
 
 /**
  * Class RegistrationHandler
@@ -21,16 +19,19 @@ class RegistrationHandler
      * @param string $name
      * @param string $transport
      * @param CustomerInterface $customer
+     * @param array $points
      * @return MapRouteInterface
      */
     public function registerMapRoute(MapRouteInterface $mapRoute,
                                      $name,
                                      $transport,
-                                     CustomerInterface $customer)
+                                     CustomerInterface $customer,
+                                     array $points)
     {
         $mapRoute->setName($name);
         $mapRoute->setTransport($transport);
         $mapRoute->setCustomer($customer);
+        $mapRoute->setPath($points);
         return $mapRoute;
     }
 
@@ -40,51 +41,17 @@ class RegistrationHandler
      * @param MapRouteInterface $mapRoute
      * @param string $name
      * @param string $transport
+     * @param array $points
      * @return MapRouteInterface
      */
     public function updateMapRoute(MapRouteInterface $mapRoute,
                                    $name,
-                                   $transport)
+                                   $transport,
+                                   array $points)
     {
         $mapRoute->setName($name);
         $mapRoute->setTransport($transport);
+        $mapRoute->setPath($points);
         return $mapRoute;
-    }
-
-    /**
-     * Handle map route path registration logic
-     *
-     * @param MapRouteInterface $mapRoute
-     * @param MapRoutePathInterface $mapRoutePath
-     * @param CompanyInterface $startPoint
-     * @param CompanyInterface $endPoint
-     * @return MapRoutePathInterface
-     */
-    public function registerMapRoutePath(MapRouteInterface $mapRoute,
-                                         MapRoutePathInterface $mapRoutePath,
-                                         CompanyInterface $startPoint,
-                                         CompanyInterface $endPoint)
-    {
-        $mapRoutePath->setMapRoute($mapRoute);
-        $mapRoutePath->setStartPoint($startPoint);
-        $mapRoutePath->setEndPoint($endPoint);
-        return $mapRoutePath;
-    }
-
-    /**
-     * Handle map route path update logic
-     *
-     * @param MapRoutePathInterface $mapRoutePath
-     * @param CompanyInterface $startPoint
-     * @param CompanyInterface $endPoint
-     * @return MapRoutePathInterface
-     */
-    public function updateMapRoutePath(MapRoutePathInterface $mapRoutePath,
-                                       CompanyInterface $startPoint,
-                                       CompanyInterface $endPoint)
-    {
-        $mapRoutePath->setStartPoint($startPoint);
-        $mapRoutePath->setEndPoint($endPoint);
-        return $mapRoutePath;
     }
 }

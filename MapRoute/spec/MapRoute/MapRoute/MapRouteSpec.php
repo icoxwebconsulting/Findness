@@ -3,8 +3,6 @@
 namespace spec\MapRoute\MapRoute;
 
 use Customer\Customer\Customer;
-use Doctrine\Common\Collections\ArrayCollection;
-use MapRoute\MapRoutePath\MapRoutePath;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -45,27 +43,8 @@ class MapRouteSpec extends ObjectBehavior
 
     public function it_should_set_and_get_map_route_path()
     {
-        $path1 = new MapRoutePath();
-        $this->addPath($path1);
-        $path2 = new MapRoutePath();
-        $this->addPath($path2);
-
-        $paths = new ArrayCollection();
-        $paths->add($path1);
-        $paths->add($path2);
-
-        $this->getPaths()->shouldBeLike($paths);
-        $this->removePath($path1);
-        $paths->removeElement($path1);
-        $this->getPaths()->shouldBeLike($paths);
-
-        $path3 = new MapRoutePath();
-        $this->addPath($path3);
-        $paths = new ArrayCollection();
-        $paths->add($path1);
-        $paths->add($path2);
-        $paths->add($path3);
-        $this->setPaths($paths);
-        $this->getPaths()->shouldBeLike($paths);
+        $mapRoutePath = array(1, 2, 3);
+        $this->setPath($mapRoutePath);
+        $this->getPath()->shouldBe($mapRoutePath);
     }
 }

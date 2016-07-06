@@ -41,7 +41,6 @@ services:
             "mailer": "@mailer"
             "templateEngine": '@twig'
 
-
     findness.device.registration:
         class: AppBundle\Services\DeviceRegistration
         arguments:
@@ -70,3 +69,8 @@ services:
             - "%findness_search_fee%"
             - "@besimple.soap.client.qualitasapi"
             - "@doctrine.orm.entity_manager"
+
+    findness.company:
+        class: AppBundle\Services\Company
+        arguments:
+            "em": "@doctrine.orm.entity_manager"
