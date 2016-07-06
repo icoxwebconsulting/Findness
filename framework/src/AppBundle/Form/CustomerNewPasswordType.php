@@ -22,7 +22,8 @@ class CustomerNewPasswordType extends AbstractType
     {
         $builder
             ->add('code', TextType::class)
-            ->add('password', TextType::class);
+            ->add('password', TextType::class)
+            ->add('salt', TextType::class);
     }
 
     /**

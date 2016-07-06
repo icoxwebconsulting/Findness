@@ -166,14 +166,16 @@ class CustomerRegistration
      * @param CustomerInterface $customer
      * @param string $code
      * @param string $password
+     * @param string $salt
      * @return mixed
      */
     public function changeNewPassword(CustomerInterface $customer,
                                       $code,
-                                      $password)
+                                      $password,
+                                      $salt)
     {
         if ($customer->getSecurityCode() == $code) {
-            $this->changePassword($customer, $customer->getSalt(), $password);
+            $this->changePassword($customer, $salt, $password);
             return true;
         }
 
