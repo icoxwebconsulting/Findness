@@ -19,6 +19,7 @@ AppBundle\Entity\Customer:
         securityCode:
             type: string
             length: 255
+            nullable: true
         created:
             type: datetime
             gedmo:
