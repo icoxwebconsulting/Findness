@@ -1,0 +1,5 @@
+suites:
+    staticlist:
+        namespace: StaticList
+        src_path: %paths.config%/..
+        spec_path: %paths.config%
