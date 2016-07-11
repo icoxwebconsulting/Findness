@@ -17,7 +17,7 @@ class RegistrationHandler
      * Handle registration
      *
      * @param CustomerInterface $customer
-     * @param $name
+     * @param string $name
      * @param array $companies
      * @return StaticListInterface
      */

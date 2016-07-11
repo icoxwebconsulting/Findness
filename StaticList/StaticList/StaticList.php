@@ -38,6 +38,7 @@ class StaticList implements StaticListInterface
      *
      * @param CustomerInterface $customer
      * @param string $name
+     * @param string $id
      */
     public function __construct(CustomerInterface $customer, $name, $id = null)
     {

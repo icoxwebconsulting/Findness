@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *
  * @FOSRestBundleAnnotations\View()
  */
-class FinanceController extends FOSRestController implements ClassResourceInterface
+class FinancesController extends FOSRestController implements ClassResourceInterface
 {
     /**
      * Create a new Transaction

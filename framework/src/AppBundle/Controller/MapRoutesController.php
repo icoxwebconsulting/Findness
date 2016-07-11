@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *
  * @FOSRestBundleAnnotations\View()
  */
-class MapRouteController extends FOSRestController implements ClassResourceInterface
+class MapRoutesController extends FOSRestController implements ClassResourceInterface
 {
     /**
      * Create a new MapRoute
