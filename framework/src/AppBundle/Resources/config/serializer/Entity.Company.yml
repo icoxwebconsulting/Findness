@@ -1,0 +1,2 @@
+AppBundle\Entity\Company:
+    exclusion_policy: ALL
