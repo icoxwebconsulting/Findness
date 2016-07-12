@@ -7,8 +7,6 @@ AppBundle\Entity\StaticList:
             id: true
             type: string
             length: 255
-        customer:
-            associationKey: true
     fields:
         name:
             type: string
@@ -41,8 +39,6 @@ AppBundle\Entity\StaticList:
                 joinColumns:
                     static_list:
                         referencedColumnName: id
-                    customer:
-                        referencedColumnName: customer
                 inverseJoinColumns:
                     company:
                         referencedColumnName: id

@@ -34,4 +34,21 @@ class RegistrationHandlerSpec extends ObjectBehavior
         }
         $staticList->getCompanies()->shouldBeLike($acCompanies);
     }
+
+    public function it_should_share_an_static_list()
+    {
+        $customer = new Customer();
+        $name = uniqid();
+        $companies = [
+            new Company(),
+            new Company(),
+            new Company(),
+            new Company()
+        ];
+        $staticList = $this->register($customer, $name, $companies);
+        $shared = new Customer();
+        $sharedStaticList = $this->share($shared, $staticList);
+        $sharedStaticList->getCustomer()->shouldBe($shared);
+        $sharedStaticList->getStaticList()->shouldBe($staticList);
+    }
 }

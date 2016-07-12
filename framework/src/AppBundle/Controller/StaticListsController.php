@@ -2,8 +2,9 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Customer;
 use AppBundle\Form\StaticListType;
-use AppBundle\ResponseObjects\StaticList;
+use AppBundle\ResponseObjects\StaticList as StaticListResponse;
 use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -53,9 +54,100 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
             $companies = json_decode($staticListForm->get('companies')->getData());
             $registrationHandler = $this->get('findness.staticlist');
             $staticList = $registrationHandler->register($this->getUser(), $name, $companies);
-            return new StaticList($staticList);
+            return new StaticListResponse($staticList);
         }
 
         return $staticListForm->getErrors();
+    }
+
+    /**
+     * Create static list
+     *
+     * @param string $staticList
+     * @param Customer $customer
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/static/list/{staticList}/share/{customer}")
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="StaticList",
+     *  description="Share static list",
+     *  statusCodes={
+     *         200="Returned when successful",
+     *         500="Customer not found."
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function postShareAction($staticList, Customer $customer = null)
+    {
+        if (!$customer) {
+            throw new HttpException(500, 'Customer not found.');
+        }
+
+        $registrationHandler = $this->get('findness.staticlist');
+        $shared = $registrationHandler->share($staticList, $this->getUser(), $customer);
+        return [
+            "shared" => $shared
+        ];
+    }
+
+    /**
+     * Get static lists
+     *
+     * @return array
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="StaticList",
+     *  description="Get static lists",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getAction()
+    {
+        $registrationHandler = $this->get('findness.staticlist');
+        return $registrationHandler->get($this->getUser());
+    }
+
+    /**
+     * Get static lists
+     *
+     * @param string $staticList
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/static/list/{staticList}")
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="StaticList",
+     *  description="Get static list",
+     *  statusCodes={
+     *         200="Returned when successful",
+     *         500="Static list not found."
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getStaticListAction($staticList)
+    {
+        $registrationHandler = $this->get('findness.staticlist');
+        return $registrationHandler->getStaticList($this->getUser(), $staticList);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\SharedStaticList;
 use Customer\Customer\CustomerInterface;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
@@ -72,5 +73,88 @@ class StaticList
             throw new HttpException(500, 'Not unique list name.');
         }
         return $staticList;
+    }
+
+    /**
+     * Get static lists by customer
+     *
+     * @param CustomerInterface $customer
+     * @return array
+     */
+    public function get(CustomerInterface $customer)
+    {
+        $sharedLists = $this->em
+            ->getRepository('AppBundle:SharedStaticList')
+            ->allByCustomer($customer);
+
+        $response = [];
+
+        foreach ($sharedLists as $sharedList) {
+            $response[] = [
+                "id" => $sharedList->getStaticList()->getId(),
+                "name" => $sharedList->getStaticList()->getName()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * Share static list
+     *
+     * @param string $staticListId
+     * @param CustomerInterface $owner
+     * @param CustomerInterface $shared
+     * @return bool
+     */
+    public function share($staticListId, CustomerInterface $owner, CustomerInterface $shared)
+    {
+        try {
+            $staticList = $this->em
+                ->getRepository('AppBundle:StaticList')
+                ->findOneBy([
+                    "id" => $staticListId,
+                    "customer" => $owner->getId()
+                ]);
+        } catch (NoResultException $exception) {
+            throw new HttpException(500, 'Static list not found.');
+        }
+
+        try {
+            $register = new RegistrationHandler();
+            $sharedStaticList = $register->share($shared, $staticList);
+            $sharedStaticList = SharedStaticList::fromBusinessEntity($sharedStaticList);
+        } catch (\Exception $exception) {
+            throw new HttpException(500, $exception->getMessage());
+        }
+
+        try {
+            $this->em->persist($sharedStaticList);
+            $this->em->flush();
+        } catch (UniqueConstraintViolationException $exception) {
+            throw new HttpException(500, 'Static list already shared with this customer.');
+        }
+
+        return true;
+    }
+
+    /**
+     * Get static list by customer (owner or shared)
+     *
+     * @param CustomerInterface $customer
+     * @param string $staticListId
+     * @return array
+     */
+    public function getStaticList(CustomerInterface $customer, $staticListId)
+    {
+        try {
+            $sharedStaticList = $this->em
+                ->getRepository('AppBundle:SharedStaticList')
+                ->byCustomer($customer, $staticListId);
+        } catch (NoResultException $exception) {
+            throw new HttpException(500, 'Static list not found.');
+        }
+
+        return $sharedStaticList->getStaticList()->getCompanies();
     }
 }
