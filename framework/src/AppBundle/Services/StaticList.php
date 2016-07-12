@@ -157,4 +157,32 @@ class StaticList
 
         return $sharedStaticList->getStaticList()->getCompanies();
     }
+
+    /**
+     * Delete static list by owner
+     *
+     * @param CustomerInterface $customer
+     * @param string $staticListId
+     * @return bool
+     */
+    public function deleteStaticList(CustomerInterface $customer, $staticListId)
+    {
+        try {
+            $sharedStaticList = $this->em
+                ->getRepository('AppBundle:SharedStaticList')
+                ->byCustomer($customer, $staticListId);
+        } catch (NoResultException $exception) {
+            throw new HttpException(500, 'Static list not found.');
+        }
+
+        if ($sharedStaticList->getStaticList()->getCustomer()->getId() !== $customer->getId()) {
+            throw new HttpException(500, 'Customer not owner.');
+        }
+
+        $this->em->remove($sharedStaticList);
+        $this->em->remove($sharedStaticList->getStaticList());
+        $this->em->flush();
+
+        return true;
+    }
 }

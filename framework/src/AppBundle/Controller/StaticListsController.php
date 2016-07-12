@@ -35,7 +35,8 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
      *  description="Create static list",
      *  input="AppBundle\Form\StaticListType",
      *  statusCodes={
-     *         200="Returned when successful"
+     *         200="Returned when successful",
+     *         500="Returned when list name not unique"
      *  },
      *  tags={
      *   "stable" = "#4A7023",
@@ -76,7 +77,8 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
      *  description="Share static list",
      *  statusCodes={
      *         200="Returned when successful",
-     *         500="Customer not found."
+     *         500="Customer not found.",
+     *         500="Cant share with static list owner."
      *  },
      *  tags={
      *   "stable" = "#4A7023",
@@ -149,5 +151,37 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
     {
         $registrationHandler = $this->get('findness.staticlist');
         return $registrationHandler->getStaticList($this->getUser(), $staticList);
+    }
+
+    /**
+     * Delete static list
+     *
+     * @param string $staticList
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/static/list/{staticList}")
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="StaticList",
+     *  description="Delete static list",
+     *  statusCodes={
+     *         200="Returned when successful",
+     *         500="Customer not owner."
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function deleteListAction($staticList)
+    {
+        $registrationHandler = $this->get('findness.staticlist');
+        $deleted = $registrationHandler->deleteStaticList($this->getUser(), $staticList);
+        return [
+            "deleted" => $deleted
+        ];
     }
 }
