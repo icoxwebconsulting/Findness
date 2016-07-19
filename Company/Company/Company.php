@@ -41,6 +41,21 @@ class Company implements CompanyInterface
     protected $longitude;
 
     /**
+     * @var string
+     */
+    protected $cif;
+
+    /**
+     * @var string
+     */
+    protected $address;
+
+    /**
+     * @var string
+     */
+    protected $phoneNumber;
+
+    /**
      * Balance constructor.
      *
      * @param string|null $id
@@ -139,5 +154,53 @@ class Company implements CompanyInterface
     public function setLongitude($longitude)
     {
         $this->longitude = $longitude;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCIF()
+    {
+        return $this->cif;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCIF($cif)
+    {
+        $this->cif = $cif;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPhoneNumber()
+    {
+        return $this->phoneNumber;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPhoneNumber($phoneNumber)
+    {
+        $this->phoneNumber = $phoneNumber;
     }
 }

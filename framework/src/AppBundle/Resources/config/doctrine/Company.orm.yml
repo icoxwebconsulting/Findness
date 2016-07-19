@@ -20,6 +20,14 @@ AppBundle\Entity\Company:
             type: text
         longitude:
             type: text
+        cif:
+            type: string
+            length: 255
+        address:
+            type: text
+        phoneNumber:
+            type: string
+            length: 255
         created:
             type: datetime
             gedmo:

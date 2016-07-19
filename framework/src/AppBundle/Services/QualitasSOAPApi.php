@@ -86,6 +86,16 @@ class QualitasSOAPApi extends SOAPApi
                 $ormCompany->setSocialObject($company["ObjetoSocial"]);
                 $ormCompany->setLatitude($company["Direccion"]["Latitud"]);
                 $ormCompany->setLongitude($company["Direccion"]["Longitud"]);
+                $ormCompany->setCIF($company["CIF"]);
+                $ormCompany->setPhoneNumber($company["Telefono"]);
+                $ormCompany->setAddress(sprintf("%s %s %s %s %s %s %s",
+                    $company["Direccion"]["TipoVia"],
+                    $company["Direccion"]["Via"],
+                    $company["Direccion"]["Poblacion"],
+                    $company["Direccion"]["Municipio"],
+                    $company["Direccion"]["ComunidadAutonoma"],
+                    $company["Direccion"]["Provincia"],
+                    $company["Direccion"]["Pais"]));
                 $this->em->persist($ormCompany);
                 $ormCompanies[$id] = $ormCompany;
             }
@@ -168,7 +178,10 @@ class QualitasSOAPApi extends SOAPApi
                     "socialReason" => $current->getSocialReason(),
                     "socialObject" => $current->getSocialObject(),
                     "latitude" => $current->getLatitude(),
-                    "longitude" => $current->getLongitude()
+                    "longitude" => $current->getLongitude(),
+                    "cif" => $current->getCIF(),
+                    "address" => $current->getAddress(),
+                    "phoneNumber" => $current->getPhoneNumber()
                 );
                 return $carry;
             },
