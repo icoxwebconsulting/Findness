@@ -1,0 +1,19 @@
+Company\Company\Company:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+        socialReason:
+            expose: true
+        socialObject:
+            expose: true
+        latitude:
+            expose: true
+        longitude:
+            expose: true
+        cif:
+            expose: true
+        address:
+            expose: true
+        phoneNumber:
+            expose: true

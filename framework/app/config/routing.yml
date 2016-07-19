@@ -21,12 +21,17 @@ devices:
     type:     rest
 
 mapRoute:
-    resource: "AppBundle\Controller\MapRouteController"
+    resource: "AppBundle\Controller\MapRoutesController"
     prefix:   api/v1
     type:     rest
 
 finance:
-    resource: "AppBundle\Controller\FinanceController"
+    resource: "AppBundle\Controller\FinancesController"
+    prefix:   api/v1
+    type:     rest
+
+staticlist:
+    resource: "AppBundle\Controller\StaticListsController"
     prefix:   api/v1
     type:     rest
 

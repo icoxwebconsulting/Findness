@@ -22,11 +22,53 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class CompaniesController extends FOSRestController implements ClassResourceInterface
 {
     /**
+     * Get Company
+     *
+     * @param Company $company
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/companies/{company}")
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="Company",
+     *  description="Get Company",
+     *  statusCodes={
+     *         200="Returned when successful",
+     *         500="Company not found"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getAction(Company $company = null)
+    {
+        if (!$company) {
+            throw new HttpException(500, 'Company not found.');
+        }
+
+        $style = $this->getDoctrine()
+            ->getRepository('AppBundle:StyledCompany')
+            ->findOneBy([
+                "company" => $company->getId(),
+                "customer" => $this->getUser()->getId()
+            ]);
+
+        return [
+            "company" => $company,
+            "style" => $style
+        ];
+    }
+
+    /**
      * Update Company Style
      *
      * @param Company $company
      * @param Request $request
-     * @return CustomerResponse\Symfony\Component\Form\FormErrorIterator
+     * @return array|Symfony\Component\Form\FormErrorIterator
      *
      * @FOSRestBundleAnnotations\Route("/companies/{company}/style")
      *

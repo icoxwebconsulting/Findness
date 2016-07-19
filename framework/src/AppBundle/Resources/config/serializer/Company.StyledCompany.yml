@@ -1,0 +1,5 @@
+Company\Company\StyledCompany:
+    exclusion_policy: ALL
+    properties:
+        style:
+            expose: true

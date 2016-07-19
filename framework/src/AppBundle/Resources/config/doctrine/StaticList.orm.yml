@@ -1,0 +1,53 @@
+AppBundle\Entity\StaticList:
+    type: entity
+    table: static_list
+    repositoryClass: AppBundle\EntityRepository\StaticListRepository
+    id:
+        id:
+            id: true
+            type: string
+            length: 255
+    fields:
+        name:
+            type: string
+            length: 255
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    manyToOne:
+        customer:
+            targetEntity: Customer
+            joinColumn:
+                name: customer
+                referencedColumnName: id
+            cascade: ["persist", "merge"]
+    manyToMany:
+        companies:
+            targetEntity: Company
+            joinTable:
+                name: static_list_company
+                joinColumns:
+                    static_list:
+                        referencedColumnName: id
+                inverseJoinColumns:
+                    company:
+                        referencedColumnName: id
+                        unique: true
+    uniqueConstraints:
+        list:
+            columns: [ id, customer ]
+    lifecycleCallbacks: {  }
+    gedmo:
+        soft_deleteable:
+          field_name: deletedAt
+          time_aware: false
