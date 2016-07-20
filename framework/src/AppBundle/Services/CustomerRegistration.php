@@ -6,7 +6,6 @@ use AppBundle\Entity\Balance;
 use Customer\Customer\CustomerInterface;
 use Customer\Registration\RegistrationHandler;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Security\Acl\Exception\Exception;
 
 /**
  * Class CustomerRegistration
@@ -244,5 +243,22 @@ class CustomerRegistration
         } catch (\Exception $exception) {
             return false;
         }
+    }
+
+    /**
+     * Update customer profile
+     *
+     * @param CustomerInterface $customer
+     * @param $firstName
+     * @param $lastName
+     * @return bool
+     */
+    public function updateProfile(CustomerInterface $customer, $firstName, $lastName)
+    {
+        $customer->setFirstName($firstName);
+        $customer->setLastName($lastName);
+        $this->em->flush();
+
+        return true;
     }
 }
