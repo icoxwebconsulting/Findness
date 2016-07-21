@@ -137,7 +137,8 @@ class MapRoutesController extends FOSRestController implements ClassResourceInte
             throw new HttpException(500, 'Map Route not found');
         }
 
-        return new MapRouteResponse($mapRoute);
+        $registrationHandler = $this->get('findness.mapRoute.registration');
+        return $registrationHandler->get($mapRoute);
     }
 
     /**
