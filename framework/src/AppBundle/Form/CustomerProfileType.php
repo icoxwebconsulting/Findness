@@ -8,11 +8,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class CustomerType
+ * Class CustomerProfileType
  *
  * @package AppBundle\Form
  */
-class CustomerType extends AbstractType
+class CustomerProfileType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -21,12 +21,8 @@ class CustomerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('username', TextType::class)
-            ->add('salt', TextType::class)
-            ->add('password', TextType::class);
-
-        $customerProfileType = new CustomerProfileType();
-        $customerProfileType->buildForm($builder, $options);
+            ->add('firstName', TextType::class)
+            ->add('lastName', TextType::class);
     }
 
     /**

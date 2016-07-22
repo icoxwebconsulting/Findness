@@ -6,7 +6,6 @@ use AppBundle\Entity\Balance;
 use Customer\Customer\CustomerInterface;
 use Customer\Registration\RegistrationHandler;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Security\Acl\Exception\Exception;
 
 /**
  * Class CustomerRegistration
@@ -222,5 +221,45 @@ class CustomerRegistration
         $response = $this->mailer->send($message);
 
         return $response !== 0;
+    }
+
+    /**
+     * Resend Confirmation Email
+     *
+     * @param CustomerInterface $customer
+     * @return bool
+     */
+    public function resendConfirmationEmail(CustomerInterface $customer)
+    {
+        try {
+            $customer->setEnabled(false);
+            $customer->setConfirmationToken(mt_rand(100000, 999999));
+            $customer->setConfirmed(false);
+
+            $this->em->flush();
+
+            $this->sendRegistrationEmail($customer);
+
+            return true;
+        } catch (\Exception $exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Update customer profile
+     *
+     * @param CustomerInterface $customer
+     * @param $firstName
+     * @param $lastName
+     * @return bool
+     */
+    public function updateProfile(CustomerInterface $customer, $firstName, $lastName)
+    {
+        $customer->setFirstName($firstName);
+        $customer->setLastName($lastName);
+        $this->em->flush();
+
+        return true;
     }
 }

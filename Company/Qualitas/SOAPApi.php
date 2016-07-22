@@ -192,7 +192,6 @@ abstract class SOAPApi
         $filters .= $this->getStateFilter($states);
         $filters .= $this->getCityFilter($cities);
         $filters .= $this->getPostalCodeFilter($postalCodes);
-        $filters .= $this->getPostalCodeFilter($postalCodes);
         $filters .= $this->getGeoFilter($geoLocations);
         return $filters;
     }
@@ -277,6 +276,7 @@ abstract class SOAPApi
     {
         $xmlRequest = $this->buildQueryXML($customer, $page, $notViewedAllowedAmount, $cnaes, $states, $cities,
             $postalCodes, $geoLocation);
+
         $request = [
             "nombreUsuario" => $this->username,
             "pwd" => $this->password,

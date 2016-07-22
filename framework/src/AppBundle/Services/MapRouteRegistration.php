@@ -80,4 +80,30 @@ class MapRouteRegistration
         $this->em->flush();
         return $mapRoute;
     }
+
+    /**
+     * Get Map Route
+     *
+     * @param MapRouteInterface $mapRoute
+     * @return array
+     */
+    public function get(MapRouteInterface $mapRoute)
+    {
+        $expr = $this->em->createQueryBuilder()->expr();
+
+        $points = $this->em->createQueryBuilder()
+            ->select('c')
+            ->from('AppBundle:Company', 'c')
+            ->where($expr->in('c.id', ':ids'))
+            ->setParameter('ids', $mapRoute->getPath())
+            ->getQuery()
+            ->getResult();
+
+        return [
+            "id" => $mapRoute->getId(),
+            "name" => $mapRoute->getName(),
+            "transport" => $mapRoute->getTransport(),
+            "points" => $points
+        ];
+    }
 }

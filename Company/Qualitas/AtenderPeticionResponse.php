@@ -95,15 +95,17 @@ class AtenderPeticionResponse
     /**
      * Get result
      *
-     * @return string
+     * @return array
+     * @throws \Exception
      */
     public function getAtenderPeticionResult()
     {
         $result = $this->parseXML($this->AtenderPeticionResult);
-        if ($result) {
+
+        if ($result && !$result->CodigoError) {
             return $this->parseData($result);
         } else {
-            return "Bad Data";
+            throw new \Exception('Error on request');
         }
     }
 }

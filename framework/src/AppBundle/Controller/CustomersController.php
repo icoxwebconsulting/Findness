@@ -6,6 +6,7 @@ use AppBundle\Entity\Customer;
 use AppBundle\Form\CustomerChangePasswordType;
 use AppBundle\Form\CustomerConfirmationType;
 use AppBundle\Form\CustomerNewPasswordType;
+use AppBundle\Form\CustomerProfileType;
 use AppBundle\Form\CustomerType;
 use AppBundle\ResponseObjects\Customer as CustomerResponse;
 use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
@@ -129,7 +130,6 @@ class CustomersController extends FOSRestController implements ClassResourceInte
         return $customerConfirmationForm->getErrors();
     }
 
-
     /**
      * Reset password Customer
      *
@@ -224,7 +224,6 @@ class CustomersController extends FOSRestController implements ClassResourceInte
 
         return $customerForm->getErrors();
     }
-
 
     /**
      * Update customer password
@@ -345,5 +344,93 @@ class CustomersController extends FOSRestController implements ClassResourceInte
         return [
             "salt" => $customer->getSalt()
         ];
+    }
+
+    /**
+     * Resend Confirmation email
+     *
+     * @param Customer $customer
+     * @param Request $request
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/customers/{username}/resend-confirmation-email")
+     * @ParamConverter("customer", options={"mapping": {"username": "username"}})
+     *
+     * @ApiDoc(
+     *  section="Customer",
+     *  description="Resend Confirmation email",
+     *  requirements={
+     *      {
+     *          "name"="username",
+     *          "dataType"="string",
+     *          "requirement"="*",
+     *          "description"="username | email"
+     *      }
+     *  },
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function postResendConfirmationEmailAction(Customer $customer = null)
+    {
+        if (!$customer) {
+            throw new HttpException(500, 'Customer not found');
+        }
+
+        $registrationHandler = $this->get('findness.customer.registration');
+        $sent = $registrationHandler->resendConfirmationEmail($customer);
+        return array(
+            "sent" => $sent
+        );
+    }
+
+    /**
+     * Update customer profile
+     *
+     * @param Request $request
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/customers/update-profile")
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="Customer",
+     *  description="Update Customer Profile",
+     *  input="AppBundle\Form\CustomerProfileType",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function putCustomerProfileAction(Request $request)
+    {
+        $customerProfileForm = $this->createForm(new CustomerProfileType(), null, array('method' => 'PUT'));
+
+        $customerProfileForm->handleRequest($request);
+
+        if ($customerProfileForm->isValid()) {
+            $firstName = $customerProfileForm->get('firstName')->getData();
+            $lastName = $customerProfileForm->get('lastName')->getData();
+            $registrationHandler = $this->get('findness.customer.registration');
+            $updated = $registrationHandler->updateProfile($this->getUser(),
+                $firstName,
+                $lastName);
+
+            return [
+                "updated" => $updated
+            ];
+        }
+
+        return $customerProfileForm->getErrors();
     }
 }
