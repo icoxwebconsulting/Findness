@@ -63,7 +63,7 @@ class MapRoutesController extends FOSRestController implements ClassResourceInte
             }
 
             $registrationHandler = $this->get('findness.mapRoute.registration');
-            return $registrationHandler->register($mapRoute,
+            $response = $registrationHandler->register($mapRoute,
                 $name,
                 $transport,
                 $customer,

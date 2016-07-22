@@ -10,9 +10,6 @@ use MapRoute\MapRoute\MapRoute as MapRouteBase;
  * MapRoute ORM Entity
  *
  * @package AppBundle\Entity
- *
- * @Hateoas\Relation("self", href = @Hateoas\Route("get_map_route", parameters = { "mapRoute" = "expr(object.getId())" }))
- * @Hateoas\Relation("map_routes", href = @Hateoas\Route("get_map_routes"))))
  */
 class MapRoute extends MapRouteBase
 {
