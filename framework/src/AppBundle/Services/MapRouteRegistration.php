@@ -95,7 +95,7 @@ class MapRouteRegistration
             ->select('c')
             ->from('AppBundle:Company', 'c')
             ->where($expr->in('c.id', ':ids'))
-            ->setParameter('ids', $mapRoute->getPath())
+            ->setParameter('ids', implode(', ', $mapRoute->getPath()))
             ->getQuery()
             ->getResult();
 
