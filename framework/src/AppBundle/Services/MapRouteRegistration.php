@@ -7,6 +7,7 @@ use Customer\Customer\CustomerInterface;
 use Doctrine\ORM\EntityManager;
 use MapRoute\MapRoute\MapRouteInterface;
 use MapRoute\Registration\RegistrationHandler;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class MapRouteRegistration
@@ -32,6 +33,37 @@ class MapRouteRegistration
     }
 
     /**
+     * Validate points are companies that customer can handle
+     *
+     * @param CustomerInterface $customer
+     * @param array $points
+     * @return bool
+     * @throws HttpException
+     */
+    private function validatePoints(CustomerInterface $customer, array $points)
+    {
+        $expr = $this->em->createQueryBuilder()->expr();
+
+        $companies = $this->em->createQueryBuilder()
+            ->select('c')
+            ->from('AppBundle:Company', 'c')
+            ->from('AppBundle:CustomerViewCompany', 'cvc')
+            ->where($expr->in('c.id', ':ids'))
+            ->andWhere('c.id = cvc.company')
+            ->andWhere('cvc.customer = :customer')
+            ->setParameter('ids', $points)
+            ->setParameter('customer', $customer->getId())
+            ->getQuery()
+            ->getArrayResult();
+
+        if (count($companies) !== count($points)) {
+            throw new HttpException(500, 'Route points are not valid.');
+        }
+
+        return true;
+    }
+
+    /**
      * Register new Map Route
      *
      * @param MapRouteInterface $mapRoute
@@ -47,6 +79,8 @@ class MapRouteRegistration
                              CustomerInterface $customer,
                              array $points)
     {
+        $this->validatePoints($customer, $points);
+
         $handler = new RegistrationHandler();
         $mapRoute = $handler->registerMapRoute($mapRoute,
             $name,
@@ -61,17 +95,21 @@ class MapRouteRegistration
     /**
      * Update a Map Route
      *
+     * @param CustomerInterface $customer
      * @param MapRouteInterface $mapRoute
      * @param string $name
      * @param string $transport
      * @param array $points
      * @return MapRoute
      */
-    public function update(MapRouteInterface $mapRoute,
+    public function update(CustomerInterface $customer,
+                           MapRouteInterface $mapRoute,
                            $name,
                            $transport,
                            array $points)
     {
+        $this->validatePoints($customer, $points);
+
         $handler = new RegistrationHandler();
         $mapRoute = $handler->updateMapRoute($mapRoute,
             $name,
