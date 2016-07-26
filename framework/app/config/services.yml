@@ -79,3 +79,8 @@ services:
         class: AppBundle\Services\StaticList
         arguments:
             "em": "@doctrine.orm.entity_manager"
+
+    findness.search:
+        class: AppBundle\Services\Search
+        arguments:
+            "em": "@doctrine.orm.entity_manager"
