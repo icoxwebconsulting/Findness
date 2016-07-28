@@ -214,7 +214,7 @@ class CustomersController extends FOSRestController implements ClassResourceInte
         if ($customerForm->isValid()) {
             $code = $customerForm->get('code')->getData();
             $password = $customerForm->get('password')->getData();
-            $salt = $customerForm->get('password')->getData();
+            $salt = $customerForm->get('salt')->getData();
             $registrationHandler = $this->get('findness.customer.registration');
             $response = $registrationHandler->changeNewPassword($customer, $code, $password, $salt);
             return [
