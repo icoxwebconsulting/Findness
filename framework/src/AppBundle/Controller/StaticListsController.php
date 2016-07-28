@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -68,13 +69,22 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
      * @param Customer $customer
      * @return array
      *
-     * @FOSRestBundleAnnotations\Route("/static/list/{staticList}/share/{customer}")
+     * @FOSRestBundleAnnotations\Route("/static/list/{staticList}/share/{username}")
+     * @ParamConverter("customer", options={"mapping": {"username": "username"}})
      *
      * @Security("has_role('ROLE_USER')")
      *
      * @ApiDoc(
      *  section="StaticList",
      *  description="Share static list",
+     *  requirements={
+     *      {
+     *          "name"="username",
+     *          "dataType"="string",
+     *          "requirement"="*",
+     *          "description"="username | email"
+     *      }
+     *  },
      *  statusCodes={
      *         200="Returned when successful",
      *         500="Customer not found.",
