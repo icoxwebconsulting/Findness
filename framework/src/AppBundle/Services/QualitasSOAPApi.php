@@ -29,17 +29,23 @@ class QualitasSOAPApi extends SOAPApi
     /**
      * QualitasSOAPApi constructor.
      *
-     * @param string $username
-     * @param string $password
-     * @param string $geoRadio
-     * @param string $findnessSearchFee
+     * @param $username
+     * @param $password
+     * @param $geoRadio
+     * @param $findnessSearchFee
+     * @param $findnessSearchMin
+     * @param $findnessSearchExtraFee
+     * @param $findnessSearchExtraFeeThreshold
+     * @param $findnessSearchIvaFee
      * @param SoapClient $client
      * @param EntityManager $em
      */
-    public function __construct($username, $password, $geoRadio, $findnessSearchFee, SoapClient $client,
-                                EntityManager $em)
+    public function __construct($username, $password, $geoRadio, $findnessSearchFee, $findnessSearchMin,
+                                $findnessSearchExtraFee, $findnessSearchExtraFeeThreshold, $findnessSearchIvaFee,
+                                SoapClient $client, EntityManager $em)
     {
-        parent::__construct($username, $password, $geoRadio, $findnessSearchFee, $client);
+        parent::__construct($username, $password, $geoRadio, $findnessSearchFee, $findnessSearchMin,
+            $findnessSearchExtraFee, $findnessSearchExtraFeeThreshold, $findnessSearchIvaFee, $client);
         $this->em = $em;
     }
 
@@ -110,7 +116,7 @@ class QualitasSOAPApi extends SOAPApi
     /**
      * @inheritdoc
      */
-    protected function charge(array $notViewedCompanies, CustomerInterface $customer)
+    protected function charge(array $notViewedCompanies, CustomerInterface $customer, $balance)
     {
         foreach ($notViewedCompanies as $company) {
             $customerViewCompany = new CustomerViewCompany();
@@ -122,7 +128,7 @@ class QualitasSOAPApi extends SOAPApi
         $balanceEntity = $this->getBalance($customer);
 
         if (count($notViewedCompanies)) {
-            $transaction = parent::charge($notViewedCompanies, $customer);
+            $transaction = parent::charge($notViewedCompanies, $customer, $balance);
 
             $ormTransaction = Transaction::fromBusinessEntity($transaction);
             $balanceEntity->setBalance($balanceEntity->getBalance() + $transaction->getBalance());
@@ -256,7 +262,8 @@ class QualitasSOAPApi extends SOAPApi
                           array $cities = [],
                           array $postalCodes = [],
                           array $geoLocation = [],
-                          CustomerInterface $customer)
+                          CustomerInterface $customer,
+                          $balance = 0)
     {
         if (empty($cnaes)) {
             return [
@@ -265,10 +272,11 @@ class QualitasSOAPApi extends SOAPApi
         }
 
         set_time_limit(0);
-        $available = floor($this->getBalance($customer)->getBalance() / $this->findnessSearchFee);
-        if ($notViewedAllowedAmount === 0 || $available >= $notViewedAllowedAmount) {
+        try {
+            $balance = $this->getBalance($customer)->getBalance();
+
             $response = parent::query($page, $notViewedAllowedAmount, $cnaes, $states, $cities, $postalCodes,
-                $geoLocation, $customer);
+                $geoLocation, $customer, $balance);
 
             if ($notViewedAllowedAmount) {
                 $this->saveSearch($customer, $cnaes, $states, $cities, $postalCodes, $geoLocation);
@@ -276,9 +284,9 @@ class QualitasSOAPApi extends SOAPApi
             }
 
             return $this->applyStyles($response);
-        } else {
+        } catch (\Exception $exception) {
             return [
-                "error" => "Not enough balance"
+                'error' => $exception->getMessage()
             ];
         }
     }

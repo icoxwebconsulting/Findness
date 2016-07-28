@@ -35,25 +35,55 @@ abstract class SOAPApi
     protected $findnessSearchFee;
 
     /**
+     * @var string
+     */
+    protected $findnessSearchMin;
+
+    /**
+     * @var string
+     */
+    protected $findnessSearchExtraFee;
+
+    /**
+     * @var string
+     */
+    protected $findnessSearchExtraFeeThreshold;
+
+    /**
+     * @var string
+     */
+    protected $findnessSearchIvaFee;
+
+    /**
      * @var SoapClient
      */
     protected $soapClient;
 
     /**
-     * QualitasSOAPApi constructor.
+     * SOAPApi constructor.
      *
-     * @param string $username
-     * @param string $password
-     * @param string $geoRadio
-     * @param string $findnessSearchFee
+     * @param $username
+     * @param $password
+     * @param $geoRadio
+     * @param $findnessSearchFee
+     * @param $findnessSearchMin
+     * @param $findnessSearchExtraFee
+     * @param $findnessSearchExtraFeeThreshold
+     * @param $findnessSearchIvaFee
      * @param SoapClient $client
      */
-    public function __construct($username, $password, $geoRadio, $findnessSearchFee, SoapClient $client)
+    public function __construct($username, $password, $geoRadio, $findnessSearchFee, $findnessSearchMin,
+                                $findnessSearchExtraFee, $findnessSearchExtraFeeThreshold, $findnessSearchIvaFee,
+                                SoapClient $client)
     {
         $this->username = $username;
         $this->password = $password;
         $this->geoRadio = $geoRadio;
         $this->findnessSearchFee = $findnessSearchFee;
+        $this->findnessSearchMin = $findnessSearchMin;
+        $this->findnessSearchExtraFee = $findnessSearchExtraFee;
+        $this->findnessSearchExtraFeeThreshold = $findnessSearchExtraFeeThreshold;
+        $this->findnessSearchIvaFee = $findnessSearchIvaFee;
         $this->soapClient = $client;
     }
 
@@ -240,14 +270,21 @@ abstract class SOAPApi
      *
      * @param array $notViewedCompanies
      * @param CustomerInterface $customer
+     * @param $balance
      * @return mixed|null
      */
-    protected function charge(array $notViewedCompanies, CustomerInterface $customer)
+    protected function charge(array $notViewedCompanies, CustomerInterface $customer, $balance)
     {
         $apisConf = ["findness" => []];
         $transactionRegistration = new RegistrationHandler();
         $transaction = $transactionRegistration->charge($customer, count($notViewedCompanies),
-            $this->findnessSearchFee, $apisConf);
+            $this->findnessSearchFee,
+            $this->findnessSearchMin,
+            $this->findnessSearchExtraFee,
+            $this->findnessSearchExtraFeeThreshold,
+            $this->findnessSearchIvaFee,
+            $balance,
+            $apisConf);
 
         return $transaction;
     }
@@ -263,6 +300,7 @@ abstract class SOAPApi
      * @param array $postalCodes
      * @param array $geoLocation
      * @param CustomerInterface $customer
+     * @param $balance
      * @return array
      */
     public function query($page = 1,
@@ -272,7 +310,8 @@ abstract class SOAPApi
                           array $cities = [],
                           array $postalCodes = [],
                           array $geoLocation = [],
-                          CustomerInterface $customer)
+                          CustomerInterface $customer,
+                          $balance = 0)
     {
         $xmlRequest = $this->buildQueryXML($customer, $page, $notViewedAllowedAmount, $cnaes, $states, $cities,
             $postalCodes, $geoLocation);
@@ -296,7 +335,7 @@ abstract class SOAPApi
                     $notViewedCompanies[] = $storedCompanies[$id];
                 }
             }
-            $balance = $this->charge($notViewedCompanies, $customer);
+            $balance = $this->charge($notViewedCompanies, $customer, $balance);
             $result["items"] = $storedCompanies;
             $result["balance"] = $balance->getBalance();
         }
