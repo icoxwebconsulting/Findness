@@ -42,7 +42,6 @@ AppBundle\Entity\StaticList:
                 inverseJoinColumns:
                     company:
                         referencedColumnName: id
-                        unique: true
     uniqueConstraints:
         list:
             columns: [ id, customer ]

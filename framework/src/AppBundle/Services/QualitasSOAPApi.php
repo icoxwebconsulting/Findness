@@ -5,6 +5,7 @@ namespace AppBundle\Services;
 use AppBundle\Entity\Company;
 use AppBundle\Entity\CustomerViewCompany;
 use AppBundle\Entity\Search;
+use AppBundle\Entity\StaticList;
 use AppBundle\Entity\Transaction;
 use BeSimple\SoapClient\SoapClient;
 use Company\Qualitas\SOAPApi;
@@ -230,6 +231,22 @@ class QualitasSOAPApi extends SOAPApi
     }
 
     /**
+     * @param CustomerInterface $customer
+     * @param array $cnaes
+     * @param array $companies
+     */
+    private function saveList(CustomerInterface $customer,
+                              array $cnaes = [],
+                              array $companies = [])
+    {
+        $name = sprintf('%s#%s', $cnaes[0], date("Y-m-d@H:i:s"));
+        $staticList = new StaticList($customer, $name);
+        $staticList->setCompanies($companies);
+        $this->em->persist($staticList);
+        $this->em->flush();
+    }
+
+    /**
      * @inheritdoc
      */
     public function query($page = 1,
@@ -255,6 +272,7 @@ class QualitasSOAPApi extends SOAPApi
 
             if ($notViewedAllowedAmount) {
                 $this->saveSearch($customer, $cnaes, $states, $cities, $postalCodes, $geoLocation);
+                $this->saveList($customer, $cnaes, $response["items"]);
             }
 
             return $this->applyStyles($response);
