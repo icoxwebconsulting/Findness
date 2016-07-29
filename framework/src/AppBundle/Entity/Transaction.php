@@ -122,4 +122,12 @@ class Transaction extends TransactionBase
         $ormTransaction->setCardId($transaction->getCardId());
         return $ormTransaction;
     }
+
+    /**
+     * @return int
+     */
+    public function getOperatorId()
+    {
+        return $this->operator->getId();
+    }
 }

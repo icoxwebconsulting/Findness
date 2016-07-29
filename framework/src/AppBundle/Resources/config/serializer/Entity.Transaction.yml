@@ -1,2 +1,9 @@
 AppBundle\Entity\Transaction:
     exclusion_policy: ALL
+    properties:
+        created:
+            exposed: true
+    virtual_properties:
+        getOperatorId:
+            serialized_name: operator
+            type: integer
