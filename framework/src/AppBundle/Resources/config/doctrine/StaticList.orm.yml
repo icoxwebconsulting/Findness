@@ -42,6 +42,10 @@ AppBundle\Entity\StaticList:
                 inverseJoinColumns:
                     company:
                         referencedColumnName: id
+    oneToMany:
+        shareds:
+            targetEntity: SharedStaticList
+            mappedBy: staticList
     uniqueConstraints:
         list:
             columns: [ id, customer ]

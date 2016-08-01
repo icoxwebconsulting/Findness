@@ -10,7 +10,6 @@ use Doctrine\ORM\NoResultException;
 use StaticList\Registration\RegistrationHandler;
 use StaticList\StaticList\StaticListInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Security\Acl\Exception\Exception;
 
 /**
  * Class StaticList
@@ -83,16 +82,16 @@ class StaticList
      */
     public function get(CustomerInterface $customer)
     {
-        $sharedLists = $this->em
-            ->getRepository('AppBundle:SharedStaticList')
+        $staticLists = $this->em
+            ->getRepository('AppBundle:StaticList')
             ->allByCustomer($customer);
 
         $response = [];
 
-        foreach ($sharedLists as $sharedList) {
+        foreach ($staticLists as $list) {
             $response[] = [
-                "id" => $sharedList->getStaticList()->getId(),
-                "name" => $sharedList->getStaticList()->getName()
+                "id" => $list->getId(),
+                "name" => $list->getName()
             ];
         }
 
@@ -149,13 +148,13 @@ class StaticList
     {
         try {
             $sharedStaticList = $this->em
-                ->getRepository('AppBundle:SharedStaticList')
+                ->getRepository('AppBundle:StaticList')
                 ->byCustomer($customer, $staticListId);
         } catch (NoResultException $exception) {
             throw new HttpException(500, 'Static list not found.');
         }
 
-        return $sharedStaticList->getStaticList()->getCompanies();
+        return $sharedStaticList->getCompanies();
     }
 
     /**

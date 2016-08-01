@@ -2,6 +2,8 @@
 
 namespace AppBundle\Entity;
 
+use Customer\Customer\CustomerInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use StaticList\StaticList\StaticList as StaticListBase;
 use StaticList\StaticList\StaticListInterface;
 
@@ -26,6 +28,18 @@ class StaticList extends StaticListBase
      * @var \DateTime
      */
     protected $deletedAt;
+
+    /**
+     * @var ArrayCollection
+     */
+    protected $shareds;
+
+    public function __construct(CustomerInterface $customer, $name, $id)
+    {
+        parent::__construct($customer, $name, $id);
+
+        $this->shareds = new ArrayCollection();
+    }
 
     /**
      * @param \DateTime $created
