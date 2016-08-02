@@ -69,7 +69,7 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
      * @param Customer $customer
      * @return array
      *
-     * @FOSRestBundleAnnotations\Route("/static/list/{staticList}/share/{username}")
+     * @FOSRestBundleAnnotations\Route("/static/list/{staticList}/share/{username}/customer")
      * @ParamConverter("customer", options={"mapping": {"username": "username"}})
      *
      * @Security("has_role('ROLE_USER')")
