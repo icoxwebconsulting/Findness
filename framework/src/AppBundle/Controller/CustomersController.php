@@ -268,26 +268,17 @@ class CustomersController extends FOSRestController implements ClassResourceInte
     /**
      * Response with the customer that has {customer} for id
      *
-     * @param Customer $customer
      * @return CustomerResponse
      * @throws HttpException
      *
+     * @FOSRestBundleAnnotations\Route("/customers/profile")
      * @Security("has_role('ROLE_USER')")
      *
      * @ApiDoc(
      *  section="Customer",
      *  description="Get a customer",
-     *  requirements={
-     *      {
-     *          "name"="customer",
-     *          "dataType"="string",
-     *          "requirement"="*",
-     *          "description"="customer id"
-     *      }
-     *  },
      *  statusCodes={
-     *         200="Returned when successful",
-     *         500="Returned on not found customer"
+     *         200="Returned when successful"
      *  },
      *  tags={
      *   "stable" = "#4A7023",
@@ -295,13 +286,9 @@ class CustomersController extends FOSRestController implements ClassResourceInte
      *  }
      * )
      */
-    public function getAction(Customer $customer = null)
+    public function getAction()
     {
-        if (!$customer) {
-            throw new HttpException(500, 'Customer not found');
-        }
-
-        return new CustomerResponse($customer);
+        return new CustomerResponse($this->getUser());
     }
 
     /**

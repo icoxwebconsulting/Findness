@@ -22,6 +22,16 @@ class Customer
     public $username;
 
     /**
+     * @var string
+     */
+    public $firstName;
+
+    /**
+     * @var string
+     */
+    public $lastName;
+
+    /**
      * @var array
      */
     public $roles;
@@ -35,6 +45,8 @@ class Customer
     {
         $this->id = $customer->getId();
         $this->username = $customer->getUsername();
+        $this->firstName = $customer->getFirstName();
+        $this->lastName = $customer->getLastName();
         $this->roles = $customer->getRoles();
     }
 }
