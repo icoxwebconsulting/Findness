@@ -109,13 +109,16 @@ class QualitasSOAPApi extends SOAPApi
         }
 
         foreach ($ormCompanies as $company) {
-            $customerViewCompany = new CustomerViewCompany();
-            $customerViewCompany->setCustomer($customer);
-            $customerViewCompany->setCompany($company);
-            $this->em->persist($customerViewCompany);
-        }
+            try {
+                $customerViewCompany = new CustomerViewCompany();
+                $customerViewCompany->setCustomer($customer);
+                $customerViewCompany->setCompany($company);
+                $this->em->persist($customerViewCompany);
+                $this->em->flush();
+            } catch (\Exception $exception) {
 
-        $this->em->flush();
+            }
+        }
 
         return $ormCompanies;
     }
