@@ -110,13 +110,14 @@ class QualitasSOAPApi extends SOAPApi
 
         $qb = $this->em->createQueryBuilder();
 
-        $viewedCompanies = $qb->select('cvc')
+        echo $viewedCompanies = $qb->select('cvc')
             ->from('AppBundle:CustomerViewCompany', 'cvc')
             ->where($qb->expr()->in('cvc.company', $ids))
             ->andWhere('cvc.customer = :customer')
             ->setParameter('customer', $customer->getId())
             ->getQuery()
-            ->getResult();
+            ->getSQL();
+        die();
 
         $viewedCompanies = array_reduce($viewedCompanies, function ($previous, $current) {
             $previous[] = $current->getCompany()->getId();
