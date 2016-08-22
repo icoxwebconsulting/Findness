@@ -112,7 +112,8 @@ class QualitasSOAPApi extends SOAPApi
 
         echo $viewedCompanies = $qb->select('cvc')
             ->from('AppBundle:CustomerViewCompany', 'cvc')
-            ->where($qb->expr()->in('cvc.company', $ids))
+            ->innerJoin('cvc.company', 'c')
+            ->where($qb->expr()->in('c.externalId', $ids))
             ->andWhere('cvc.customer = :customer')
             ->setParameter('customer', $customer->getId())
             ->getQuery()
