@@ -108,17 +108,31 @@ class QualitasSOAPApi extends SOAPApi
             }
         }
 
+        $qb = $this->em->createQueryBuilder();
+
+        $viewedCompanies = $qb->select('cvc')
+            ->from('AppBundle:CustomerViewCompany', 'cvc')
+            ->where($qb->expr()->in('cvc.company', $ids))
+            ->andWhere('cvc.customer = :customer')
+            ->setParameter('customer', $customer->getId())
+            ->getQuery()
+            ->getResult();
+
+        $viewedCompanies = array_reduce($viewedCompanies, function ($previous, $current) {
+            $previous[] = $current->getCompany()->getId();
+            return $previous;
+        }, []);
+
         foreach ($ormCompanies as $company) {
-            try {
+            if (!in_array($company->getId(), $viewedCompanies)) {
                 $customerViewCompany = new CustomerViewCompany();
                 $customerViewCompany->setCustomer($customer);
                 $customerViewCompany->setCompany($company);
                 $this->em->persist($customerViewCompany);
-                $this->em->flush();
-            } catch (\Exception $exception) {
-
             }
         }
+
+        $this->em->flush();
 
         return $ormCompanies;
     }
