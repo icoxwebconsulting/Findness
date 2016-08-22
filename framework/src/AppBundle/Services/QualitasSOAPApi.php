@@ -65,7 +65,7 @@ class QualitasSOAPApi extends SOAPApi
     /**
      * @inheritdoc
      */
-    protected function store(array $companies)
+    protected function store(array $companies, CustomerInterface $customer)
     {
         $ids = [];
         foreach ($companies as $id => $company) {
@@ -108,6 +108,13 @@ class QualitasSOAPApi extends SOAPApi
             }
         }
 
+        foreach ($ormCompanies as $company) {
+            $customerViewCompany = new CustomerViewCompany();
+            $customerViewCompany->setCustomer($customer);
+            $customerViewCompany->setCompany($company);
+            $this->em->persist($customerViewCompany);
+        }
+
         $this->em->flush();
 
         return $ormCompanies;
@@ -116,24 +123,15 @@ class QualitasSOAPApi extends SOAPApi
     /**
      * @inheritdoc
      */
-    protected function charge(array $notViewedCompanies, CustomerInterface $customer, $balance)
+    protected function charge(CustomerInterface $customer, $balance)
     {
-        foreach ($notViewedCompanies as $company) {
-            $customerViewCompany = new CustomerViewCompany();
-            $customerViewCompany->setCustomer($customer);
-            $customerViewCompany->setCompany($company);
-            $this->em->persist($customerViewCompany);
-        }
-
         $balanceEntity = $this->getBalance($customer);
 
-        if (count($notViewedCompanies)) {
-            $transaction = parent::charge($notViewedCompanies, $customer, $balance);
+        $transaction = parent::charge($customer, $balance);
 
-            $ormTransaction = Transaction::fromBusinessEntity($transaction);
-            $balanceEntity->setBalance($balanceEntity->getBalance() + $transaction->getBalance());
-            $this->em->persist($ormTransaction);
-        }
+        $ormTransaction = Transaction::fromBusinessEntity($transaction);
+        $balanceEntity->setBalance($balanceEntity->getBalance() + $transaction->getBalance());
+        $this->em->persist($ormTransaction);
 
         $this->em->flush();
 
@@ -272,6 +270,7 @@ class QualitasSOAPApi extends SOAPApi
         }
 
         set_time_limit(0);
+        ini_set('memory_limit', '4048M');
         try {
             $balance = $this->getBalance($customer)->getBalance();
 

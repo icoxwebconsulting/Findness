@@ -261,32 +261,40 @@ abstract class SOAPApi
      * Store companies in the response that are new to findness database
      *
      * @param array $companies
+     * @param CustomerInterface $customer
      * @return array
      */
-    protected abstract function store(array $companies);
+    protected abstract function store(array $companies, CustomerInterface $customer);
 
     /**
      * Charge customer for non paid companies
      *
-     * @param array $notViewedCompanies
      * @param CustomerInterface $customer
      * @param $balance
      * @return mixed|null
      */
-    protected function charge(array $notViewedCompanies, CustomerInterface $customer, $balance)
+    protected function charge(CustomerInterface $customer, $balance)
     {
         $apisConf = ["findness" => []];
         $transactionRegistration = new RegistrationHandler();
-        $transaction = $transactionRegistration->charge($customer, count($notViewedCompanies),
+        return $transactionRegistration->charge($customer, $balance, $apisConf);
+    }
+
+    /**
+     * @param int $notViewedCompanies
+     * @param $balance
+     * @return int
+     */
+    protected function computeBalance($notViewedCompanies, $balance)
+    {
+        $transactionRegistration = new RegistrationHandler();
+        return $transactionRegistration->computeBalance($notViewedCompanies,
             $this->findnessSearchFee,
             $this->findnessSearchMin,
             $this->findnessSearchExtraFee,
             $this->findnessSearchExtraFeeThreshold,
             $this->findnessSearchIvaFee,
-            $balance,
-            $apisConf);
-
-        return $transaction;
+            $balance);
     }
 
     /**
@@ -313,6 +321,8 @@ abstract class SOAPApi
                           CustomerInterface $customer,
                           $balance = 0)
     {
+        $this->computeBalance((int)$notViewedAllowedAmount, $balance);
+
         $xmlRequest = $this->buildQueryXML($customer, $page, $notViewedAllowedAmount, $cnaes, $states, $cities,
             $postalCodes, $geoLocation);
 
@@ -328,14 +338,14 @@ abstract class SOAPApi
         $companies = $result["items"];
 
         if ($companies) {
-            $storedCompanies = $this->store($companies);
+            $storedCompanies = $this->store($companies, $customer);
             $notViewedCompanies = [];
             foreach ($storedCompanies as $id => $company) {
                 if (!$companies[$id]["Consultada"]) {
                     $notViewedCompanies[] = $storedCompanies[$id];
                 }
             }
-            $balance = $this->charge($notViewedCompanies, $customer, $balance);
+            $balance = $this->charge($customer, $balance);
             $result["items"] = $storedCompanies;
             $result["balance"] = $balance->getBalance();
         }

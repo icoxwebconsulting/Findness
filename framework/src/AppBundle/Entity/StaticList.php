@@ -34,7 +34,7 @@ class StaticList extends StaticListBase
      */
     protected $shareds;
 
-    public function __construct(CustomerInterface $customer, $name, $id)
+    public function __construct(CustomerInterface $customer, $name, $id = null)
     {
         parent::__construct($customer, $name, $id);
 

@@ -67,53 +67,52 @@ class RegistrationHandler
         }
     }
 
+    public function computeBalance($itemsCount,
+                                   $fee,
+                                   $min,
+                                   $extraFee,
+                                   $extraFeeThreshold,
+                                   $ivaFee,
+                                   $currentBalance)
+    {
+        if ($itemsCount) {
+            $balance = $itemsCount * $fee;
+
+            // validate business restriction of minimum fee
+            if ((float)$balance < (float)$min) {
+                throw new \Exception('Minimum fee not reached.');
+            }
+
+            // apply extra fee if needed
+            if ((float)$balance < (float)$extraFeeThreshold) {
+                $balance = $balance + $extraFee;
+            }
+
+            // apply iva
+            $balance = (float)number_format($balance + ($balance * ($ivaFee / 100)), 2);
+
+            if ((float)$balance > (float)$currentBalance) {
+                throw new \Exception('Balance not enough.');
+            }
+
+            // set to negative
+            return -1 * $balance;
+        }
+    }
+
     /**
      * Charge Customer for search
      *
      * @param CustomerInterface $customer
-     * @param $itemsCount
-     * @param $fee
-     * @param $min
-     * @param $extraFee
-     * @param $extraFeeThreshold
-     * @param $ivaFee
-     * @param $currentBalance
+     * @param $balance
      * @param array $apisConf
      * @return TransactionInterface
      * @throws \Exception
      */
     public function charge(CustomerInterface $customer,
-                           $itemsCount,
-                           $fee,
-                           $min,
-                           $extraFee,
-                           $extraFeeThreshold,
-                           $ivaFee,
-                           $currentBalance,
+                           $balance,
                            array $apisConf)
     {
-        $balance = $itemsCount * $fee;
-
-        // validate business restriction of minimum fee
-        if ((float)$balance < (float)$min) {
-            throw new \Exception('Minimum fee not reached.');
-        }
-
-        // apply extra fee if needed
-        if ((float)$balance < (float)$extraFeeThreshold) {
-            $balance = $balance + $extraFee;
-        }
-
-        // apply iva
-        $balance = (float)number_format($balance + ($balance * ($ivaFee / 100)), 2);
-
-        if ((float)$balance > (float)$currentBalance) {
-            throw new \Exception('Balance not enough.');
-        }
-
-        // set to negative
-        $balance = -1 * $balance;
-
         $transaction = new Transaction($customer);
         return $this->register($transaction, $balance, (new FindnessOperator())->getId(), uniqid(),
             $customer->getId(), $apisConf);
