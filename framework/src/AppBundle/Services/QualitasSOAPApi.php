@@ -95,14 +95,14 @@ class QualitasSOAPApi extends SOAPApi
                 $ormCompany->setLongitude($company["Direccion"]["Longitud"]);
                 $ormCompany->setCIF($company["CIF"]);
                 $ormCompany->setPhoneNumber($company["Telefono"]);
-                $ormCompany->setAddress(sprintf("%s %s %s %s %s %s %s",
+
+                $ormCompany->setAddress(sprintf("%s %s, %s, %s, %s, %s",
                     $company["Direccion"]["TipoVia"],
                     $company["Direccion"]["Via"],
+                    $company["Direccion"]["NumeroVia"],
+                    $company["Direccion"]["CodigoPostal"],
                     $company["Direccion"]["Poblacion"],
-                    $company["Direccion"]["Municipio"],
-                    $company["Direccion"]["ComunidadAutonoma"],
-                    $company["Direccion"]["Provincia"],
-                    $company["Direccion"]["Pais"]));
+                    $company["Direccion"]["Provincia"]));
                 $this->em->persist($ormCompany);
                 $ormCompanies[$id] = $ormCompany;
             }
@@ -222,6 +222,15 @@ class QualitasSOAPApi extends SOAPApi
     }
 
     /**
+     * @param $cnae
+     * @return string
+     */
+    private function makeName($cnae)
+    {
+        return sprintf('%s_%s', $cnae, date("Y-m-d_H:i:s"));
+    }
+
+    /**
      * @param CustomerInterface $customer
      * @param array $cnaes
      * @param array $states
@@ -243,7 +252,7 @@ class QualitasSOAPApi extends SOAPApi
             'postalCodes' => $postalCodes,
             'geoLocation' => $geoLocation
         );
-        $name = sprintf('%s#%s', $cnaes[0], date("Y-m-d@H:i:s"));
+        $name = $this->makeName($cnaes[0]);
         $search = new Search();
         $search->setName($name);
         $search->setFilters($filters);
@@ -261,7 +270,7 @@ class QualitasSOAPApi extends SOAPApi
                               array $cnaes = [],
                               array $companies = [])
     {
-        $name = sprintf('%s#%s', $cnaes[0], date("Y-m-d@H:i:s"));
+        $name = $this->makeName($cnaes[0]);
         $staticList = new StaticList($customer, $name);
         $staticList->setCompanies($companies);
         $this->em->persist($staticList);

@@ -345,9 +345,14 @@ abstract class SOAPApi
                     $notViewedCompanies[] = $storedCompanies[$id];
                 }
             }
-            $balance = $this->charge($customer, $balance);
+
+            if (count($notViewedCompanies)) {
+                $balance = $this->computeBalance(count($notViewedCompanies), $balance);
+                $balance = $this->charge($customer, $balance);
+            }
+
             $result["items"] = $storedCompanies;
-            $result["balance"] = $balance->getBalance();
+            $result["balance"] = $balance;
         }
 
         return $result;
