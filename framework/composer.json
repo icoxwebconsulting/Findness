@@ -37,7 +37,9 @@
     "besimple/soap": "^0.2.6",
     "doctrine/doctrine-fixtures-bundle": "^2.3",
     "stripe/stripe-php": "^3.13",
-    "paypal/rest-api-sdk-php": "^1.7"
+    "paypal/rest-api-sdk-php": "^1.7",
+    "zendframework/zendservice-google-gcm": "^1.0",
+    "zendframework/zendservice-apple-apns": "^1.2"
   },
   "require-dev": {
     "sensio/generator-bundle": "~3.0",

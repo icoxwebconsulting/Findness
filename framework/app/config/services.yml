@@ -34,6 +34,14 @@ services:
             - "@security.authentication.manager"
         public: false
 
+    findness.push_notification.gcm:
+        class: AppBundle\Services\GCM
+        arguments: [%gcm_token%, %gcm_package_name%]
+
+    findness.push_notification.apn:
+        class: AppBundle\Services\APN
+        arguments: [%apn_app_id%, %apn_pem_path%, %apn_sandbox%, %apn_pass_phrase%]
+
     findness.customer.registration:
         class: AppBundle\Services\CustomerRegistration
         arguments:
@@ -88,3 +96,6 @@ services:
         class: AppBundle\Services\Search
         arguments:
             "em": "@doctrine.orm.entity_manager"
+            "pushNotificationServices":
+                "Android": "@findness.push_notification.gcm"
+                "IOS": "@findness.push_notification.apn"

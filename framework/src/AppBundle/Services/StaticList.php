@@ -18,20 +18,26 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class StaticList
 {
-
     /**
      * @var EntityManager
      */
     private $em;
 
     /**
+     * @var array
+     */
+    private $pushNotificationServices = array();
+
+    /**
      * Company constructor.
      *
      * @param EntityManager $em
+     * @param array $pushNotificationServices
      */
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, array $pushNotificationServices)
     {
         $this->em = $em;
+        $this->pushNotificationServices = $pushNotificationServices;
     }
 
     /**
@@ -130,6 +136,37 @@ class StaticList
         try {
             $this->em->persist($sharedStaticList);
             $this->em->flush();
+
+            $devices = $this->em->getRepository('AppBundle:Device')->getByCustomer($shared);
+            if (count($devices)) {
+                foreach ($devices as $device) {
+                    if ($device && array_key_exists($device->getOS(), $this->pushNotificationServices)) {
+                        $extra = ['type' => 2];
+                        $extra['staticListId'] = $staticList;
+                        $title = 'Nueva Lista compartida';
+                        $body = sprintf('%s le ha compartido la lista %s', $owner->getUsername(), $staticList->getName());
+
+                        switch ($device->getOS()) {
+                            case 'Android': {
+                                $this->pushNotificationServices[$device->getOS()]->sendNotification(
+                                    [$device->getId()],
+                                    $title,
+                                    $body,
+                                    $extra,
+                                    null);
+                                break;
+                            }
+                            case 'IOS': {
+                                $this->pushNotificationServices[$device->getOS()]->sendNotification(
+                                    [$device->getId()],
+                                    $title,
+                                    'com.thinkandcloud.findness',
+                                    'bingbong.aiff');
+                            }
+                        }
+                    }
+                }
+            }
         } catch (UniqueConstraintViolationException $exception) {
             throw new HttpException(500, 'Static list already shared with this customer.');
         }

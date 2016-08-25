@@ -18,6 +18,7 @@ parameters:
     # A secret key that's used to generate certain security-related tokens
     secret:                 ThisTokenIsNotSoSecretChangeIt
 
+    # search
     qualitas_username: alvaro535
     qualitas_password: qkxb4huv
     qualitas_geo_radio: 500
@@ -28,8 +29,18 @@ parameters:
     findness_search_extra_fee: 0.25
     findness_search_extra_fee_threshold: 5
 
+    # financial
     stripe_key: pk_test_8haj2zz4mgXuDF9vTvQ5AH3m
     stripe_secret: sk_test_2GZfoWNzoHdevzlMlGSPya26
 
     paypal_client_id: AXRnIdF6qTgK9DENZUfL98ERf7M8ZnJx-Ds62nqE3oq7EY5yDwMDynRPAXkK56u4bqA7twj9UJYqdZ8G
     paypal_secret: EK9Ir00gOzF1KKgAOa9BZ3ecZvtszgHVjmBEQMaPZ5GLXYOjFnZE-QEVBgeTfQoGcNGPkpyM-3hwjWGt
+
+    # push notifications
+    gcm_token: AIzaSyBBe7s5PuEbdCzDIZgIHGyAE5Cab6Li13A
+    gcm_package_name: com.thinkandcloud.findness
+
+    apn_app_id: com.thinkandcloud.findness
+    apn_pem_path: app/config/push-certificate.pem
+    apn_sandbox: 0
+    apn_pass_phrase: findness
