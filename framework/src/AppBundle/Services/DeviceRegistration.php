@@ -2,7 +2,6 @@
 
 namespace AppBundle\Services;
 
-use AppBundle\Entity\Customer;
 use AppBundle\Entity\Device;
 use Customer\Customer\CustomerInterface;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -35,18 +34,32 @@ class DeviceRegistration
      *
      * @param Device $device
      * @param CustomerInterface $customer
-     * @return Customer
+     * @return array
      */
     public function register(Device $device, CustomerInterface $customer)
     {
-        $device->setCustomer($customer);
-        $this->em->persist($device);
+        $this->em->getFilters()->disable('softdeleteable');
+
+        $existingDevice = $this->em->getRepository('AppBundle:Device')->findOneBy(array(
+            'customer' => $customer->getId(),
+            'id' => $device->getId()
+        ));
+
+        if ($existingDevice) {
+            $existingDevice->setDeletedAt(null);
+            $device = $existingDevice;
+        } else {
+            $device->setCustomer($customer);
+            $this->em->persist($device);
+        }
 
         try {
             $this->em->flush();
         } catch (UniqueConstraintViolationException $e) {
             return null;
         }
+
+        $this->em->getFilters()->enable('softdeleteable');
 
         return [
             'customer' => $customer,
