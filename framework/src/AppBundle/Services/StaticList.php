@@ -29,15 +29,28 @@ class StaticList
     private $pushNotificationServices = array();
 
     /**
+     * @var \Swift_Mailer
+     */
+    private $mailer;
+
+    /**
+     * @var \Twig_Environment
+     */
+    private $twig;
+
+    /**
      * Company constructor.
      *
      * @param EntityManager $em
      * @param array $pushNotificationServices
      */
-    public function __construct(EntityManager $em, array $pushNotificationServices)
+    public function __construct(EntityManager $em, array $pushNotificationServices, \Swift_Mailer $mailer,
+                                \Twig_Environment $twig)
     {
         $this->em = $em;
         $this->pushNotificationServices = $pushNotificationServices;
+        $this->mailer = $mailer;
+        $this->twig = $twig;
     }
 
     /**
@@ -105,6 +118,92 @@ class StaticList
     }
 
     /**
+     * @param CustomerInterface $receiver
+     * @param $senderName
+     * @param $staticListId
+     * @param $staticListName
+     */
+    private function sendPushNotifications(CustomerInterface $receiver, $senderName, $staticListId, $staticListName)
+    {
+        $devices = $this->em->getRepository('AppBundle:Device')->getByCustomer($receiver);
+        if (count($devices)) {
+            foreach ($devices as $device) {
+                if ($device && array_key_exists($device->getOS(), $this->pushNotificationServices)) {
+                    $extra = ['type' => 2];
+                    $extra['staticListId'] = $staticListId;
+                    $title = 'Nueva Lista compartida';
+                    $body = sprintf('%s le ha compartido la lista %s', $senderName, $staticListName);
+
+                    switch ($device->getOS()) {
+                        case 'Android': {
+                            $this->pushNotificationServices[$device->getOS()]->sendNotification(
+                                [$device->getId()],
+                                $title,
+                                $body,
+                                $extra,
+                                null);
+                            break;
+                        }
+                        case 'IOS': {
+                            $this->pushNotificationServices[$device->getOS()]->sendNotification(
+                                [$device->getId()],
+                                $title,
+                                'com.thinkandcloud.findness',
+                                'bingbong.aiff');
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param CustomerInterface $receiver
+     * @param $senderName
+     * @param $staticListName
+     */
+    private function sendEmail(CustomerInterface $receiver, $senderName, $staticListName)
+    {
+        $templateParameters = array(
+            'receiverName' => $receiver->getFullName(),
+            'senderName' => $senderName,
+            'staticListName' => $staticListName
+        );
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Nueva Lista compartida')
+            ->setFrom('info@findness.com')
+            ->setTo($receiver->getEmail())
+            ->setBody(
+                $this->twig->render(
+                    'shared_list.html.twig',
+                    $templateParameters
+                ),
+                'text/html'
+            )
+            ->addPart(
+                $this->twig->render(
+                    'shared_list.txt.twig',
+                    $templateParameters
+                ),
+                'text/plain'
+            );
+        $this->mailer->send($message);
+    }
+
+    /**
+     * @param CustomerInterface $receiver
+     * @param $senderName
+     * @param $staticListId
+     * @param $staticListName
+     */
+    private function notify(CustomerInterface $receiver, $senderName, $staticListId, $staticListName)
+    {
+        $this->sendPushNotifications($receiver, $senderName, $staticListId, $staticListName);
+        $this->sendEmail($receiver, $senderName, $staticListName);
+    }
+
+    /**
      * Share static list
      *
      * @param string $staticListId
@@ -137,36 +236,8 @@ class StaticList
             $this->em->persist($sharedStaticList);
             $this->em->flush();
 
-            $devices = $this->em->getRepository('AppBundle:Device')->getByCustomer($shared);
-            if (count($devices)) {
-                foreach ($devices as $device) {
-                    if ($device && array_key_exists($device->getOS(), $this->pushNotificationServices)) {
-                        $extra = ['type' => 2];
-                        $extra['staticListId'] = $staticList;
-                        $title = 'Nueva Lista compartida';
-                        $body = sprintf('%s le ha compartido la lista %s', $owner->getUsername(), $staticList->getName());
+            $this->notify($shared, $owner->getUsername(), $staticListId, $staticList->getName());
 
-                        switch ($device->getOS()) {
-                            case 'Android': {
-                                $this->pushNotificationServices[$device->getOS()]->sendNotification(
-                                    [$device->getId()],
-                                    $title,
-                                    $body,
-                                    $extra,
-                                    null);
-                                break;
-                            }
-                            case 'IOS': {
-                                $this->pushNotificationServices[$device->getOS()]->sendNotification(
-                                    [$device->getId()],
-                                    $title,
-                                    'com.thinkandcloud.findness',
-                                    'bingbong.aiff');
-                            }
-                        }
-                    }
-                }
-            }
         } catch (UniqueConstraintViolationException $exception) {
             throw new HttpException(500, 'Static list already shared with this customer.');
         }

@@ -91,11 +91,13 @@ services:
         class: AppBundle\Services\StaticList
         arguments:
             "em": "@doctrine.orm.entity_manager"
+            "pushNotificationServices":
+                "Android": "@findness.push_notification.gcm"
+#                "IOS": "@findness.push_notification.apn"
+            "mailer": "@mailer"
+            "twig": "@twig"
 
     findness.search:
         class: AppBundle\Services\Search
         arguments:
             "em": "@doctrine.orm.entity_manager"
-            "pushNotificationServices":
-                "Android": "@findness.push_notification.gcm"
-                "IOS": "@findness.push_notification.apn"

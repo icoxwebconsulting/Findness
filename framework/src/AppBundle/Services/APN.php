@@ -1,6 +1,6 @@
 <?php
 
-namespace Quikcu\App\AppBundle\Services;
+namespace AppBundle\Services;
 
 use ZendService\Apple\Apns\Client\Message as Client;
 use ZendService\Apple\Apns\Message;
