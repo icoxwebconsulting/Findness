@@ -221,7 +221,7 @@ class StaticList
                     "customer" => $owner->getId()
                 ]);
         } catch (NoResultException $exception) {
-            throw new HttpException(500, 'Static list not found.');
+            throw new HttpException(500, 'La lista no existe.');
         }
 
         try {
@@ -239,7 +239,7 @@ class StaticList
             $this->notify($shared, $owner->getUsername(), $staticListId, $staticList->getName());
 
         } catch (UniqueConstraintViolationException $exception) {
-            throw new HttpException(500, 'Static list already shared with this customer.');
+            throw new HttpException(500, 'La lista ya esta compartida con este usuario.');
         }
 
         return true;
