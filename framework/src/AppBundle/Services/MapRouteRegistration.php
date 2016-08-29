@@ -127,19 +127,17 @@ class MapRouteRegistration
      */
     public function get(MapRouteInterface $mapRoute)
     {
-        $expr = $this->em->createQueryBuilder()->expr();
-
-        $companies = $this->em->createQueryBuilder()
-            ->select('c')
-            ->from('AppBundle:Company', 'c')
-            ->where($expr->in('c.id', ':ids'))
-            ->setParameter('ids', $mapRoute->getPath())
-            ->getQuery()
-            ->getResult();
-
         $points = [];
-        foreach ($companies as $company) {
-            $points[$company->getId()] = [
+        foreach ($mapRoute->getPath() as $companyId) {
+            $company = $this->em->createQueryBuilder()
+                ->select('c')
+                ->from('AppBundle:Company', 'c')
+                ->where('c.id = :id')
+                ->setParameter('id', $companyId)
+                ->getQuery()
+                ->getSingleResult();
+
+            $points[] = [
                 "id" => $company->getId(),
                 "externalId" => $company->getExternalId(),
                 "socialReason" => $company->getSocialReason(),
