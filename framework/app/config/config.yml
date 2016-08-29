@@ -94,6 +94,10 @@ fos_rest:
         validate: true
     exception:
         enabled: true
+        codes:
+            'Symfony\Component\HttpKernel\Exception\HttpException': 500
+        messages:
+            'Symfony\Component\HttpKernel\Exception\HttpException': true
 
 fos_user:
     db_driver: orm
