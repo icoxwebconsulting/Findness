@@ -1,7 +1,7 @@
 AppBundle\Entity\Search:
     type: entity
     table: search
-    repositoryClass: AppBundle\EntityRepository\CompanyRepository
+    repositoryClass: AppBundle\EntityRepository\SearchRepository
     id:
         id:
             id: true

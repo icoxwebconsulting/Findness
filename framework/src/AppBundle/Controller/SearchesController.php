@@ -42,9 +42,7 @@ class SearchesController extends FOSRestController implements ClassResourceInter
     {
         $searchesEntity = $this->getDoctrine()
             ->getRepository('AppBundle:Search')
-            ->findBy(array(
-                'customer' => $this->getUser()->getId()
-            ));
+            ->getOrderedByCreatedDesc($this->getUser());
 
         $searches = array();
         foreach ($searchesEntity as $entity) {
