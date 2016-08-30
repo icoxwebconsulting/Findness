@@ -123,7 +123,7 @@ class StaticList
             $response[] = [
                 "id" => $list->getId(),
                 "name" => $list->getName(),
-                "customer" => $list->getCustomer()->getEmail(),
+                "customer" => $list->getCustomer()->getId(),
             ];
         }
 
@@ -238,21 +238,16 @@ class StaticList
      */
     public function share($staticListId, CustomerInterface $owner, CustomerInterface $shared)
     {
-        try {
-            $staticList = $this->em
-                ->getRepository('AppBundle:StaticList')
-                ->findOneBy(
-                    [
-                        "id" => $staticListId,
-                        "customer" => $owner->getId(),
-                    ]
-                );
-        } catch (NoResultException $exception) {
-            throw new HttpException(500, 'La lista no existe.');
-        }
+        $staticList = $this->em
+            ->getRepository('AppBundle:StaticList')
+            ->find($staticListId);
 
         if (!$staticList) {
             throw new HttpException(500, 'La lista no existe.');
+        }
+
+        if ($staticList->getCustomer()->getId() !== $owner->getId()) {
+            throw new HttpException(500, 'Usted no es el dueño.');
         }
 
         try {
