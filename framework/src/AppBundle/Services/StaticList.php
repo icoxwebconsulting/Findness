@@ -138,8 +138,11 @@ class StaticList
      */
     private function sendPushNotifications(CustomerInterface $receiver, $senderName, $staticListId, $staticListName)
     {
+        $this->logger->info('Sending notifications');
+
         $devices = $this->em->getRepository('AppBundle:Device')->getByCustomer($receiver);
         if (count($devices)) {
+            $this->logger->info(sprintf('%i devices for customer %s', count($devices), $receiver->getId()));
             foreach ($devices as $device) {
                 if ($device && array_key_exists($device->getOS(), $this->pushNotificationServices)) {
                     $extra = ['type' => 2];
@@ -176,7 +179,7 @@ class StaticList
                         $device->getId(),
                         $delivered ? "true" : "false"
                     );
-                    $this->logger->debug($logMessage);
+                    $this->logger->info($logMessage);
                 }
             }
         }
