@@ -7,6 +7,7 @@ use Customer\Customer\CustomerInterface;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
+use Monolog\Logger;
 use StaticList\Registration\RegistrationHandler;
 use StaticList\StaticList\StaticListInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -39,18 +40,28 @@ class StaticList
     private $twig;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * Company constructor.
      *
      * @param EntityManager $em
      * @param array $pushNotificationServices
      */
-    public function __construct(EntityManager $em, array $pushNotificationServices, \Swift_Mailer $mailer,
-                                \Twig_Environment $twig)
-    {
+    public function __construct(
+        EntityManager $em,
+        array $pushNotificationServices,
+        \Swift_Mailer $mailer,
+        \Twig_Environment $twig,
+        Logger $logger
+    ) {
         $this->em = $em;
         $this->pushNotificationServices = $pushNotificationServices;
         $this->mailer = $mailer;
         $this->twig = $twig;
+        $this->logger = $logger;
     }
 
     /**
@@ -90,6 +101,7 @@ class StaticList
         } catch (UniqueConstraintViolationException $exception) {
             throw new HttpException(500, 'Not unique list name.');
         }
+
         return $staticList;
     }
 
@@ -110,7 +122,7 @@ class StaticList
         foreach ($staticLists as $list) {
             $response[] = [
                 "id" => $list->getId(),
-                "name" => $list->getName()
+                "name" => $list->getName(),
             ];
         }
 
@@ -134,24 +146,36 @@ class StaticList
                     $title = 'Nueva Lista compartida';
                     $body = sprintf('%s le ha compartido la lista %s', $senderName, $staticListName);
 
+                    $stats = null;
+
                     switch ($device->getOS()) {
                         case 'Android': {
-                            $this->pushNotificationServices[$device->getOS()]->sendNotification(
+                            $stats = $this->pushNotificationServices[$device->getOS()]->sendNotification(
                                 [$device->getId()],
                                 $title,
                                 $body,
                                 $extra,
-                                null);
+                                null
+                            );
                             break;
                         }
                         case 'IOS': {
-                            $this->pushNotificationServices[$device->getOS()]->sendNotification(
+                            $stats = $this->pushNotificationServices[$device->getOS()]->sendNotification(
                                 [$device->getId()],
                                 $title,
                                 'com.thinkandcloud.findness',
-                                'bingbong.aiff');
+                                'bingbong.aiff'
+                            );
                         }
                     }
+
+                    $delivered = $stats && !($stats['successful'] <= 0);
+                    $logMessage = sprintf(
+                        "Notification sent to %s: delivered = %s",
+                        $device->getId(),
+                        $delivered ? "true" : "false"
+                    );
+                    $this->logger->debug($logMessage);
                 }
             }
         }
@@ -167,7 +191,7 @@ class StaticList
         $templateParameters = array(
             'receiverName' => $receiver->getFullName(),
             'senderName' => $senderName,
-            'staticListName' => $staticListName
+            'staticListName' => $staticListName,
         );
 
         $message = \Swift_Message::newInstance()
@@ -216,11 +240,17 @@ class StaticList
         try {
             $staticList = $this->em
                 ->getRepository('AppBundle:StaticList')
-                ->findOneBy([
-                    "id" => $staticListId,
-                    "customer" => $owner->getId()
-                ]);
+                ->findOneBy(
+                    [
+                        "id" => $staticListId,
+                        "customer" => $owner->getId(),
+                    ]
+                );
         } catch (NoResultException $exception) {
+            throw new HttpException(500, 'La lista no existe.');
+        }
+
+        if (!$staticList) {
             throw new HttpException(500, 'La lista no existe.');
         }
 

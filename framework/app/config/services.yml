@@ -96,6 +96,7 @@ services:
 #                "IOS": "@findness.push_notification.apn"
             "mailer": "@mailer"
             "twig": "@twig"
+            "logger": "@logger"
 
     findness.search:
         class: AppBundle\Services\Search
