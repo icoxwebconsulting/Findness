@@ -147,6 +147,7 @@ class StaticList
                 if ($device && array_key_exists($device->getOS(), $this->pushNotificationServices)) {
                     $extra = ['type' => 2];
                     $extra['staticListId'] = $staticListId;
+                    $extra['staticListName'] = $staticListName;
                     $title = 'Nueva Lista compartida';
                     $body = sprintf('%s le ha compartido la lista %s', $senderName, $staticListName);
 
