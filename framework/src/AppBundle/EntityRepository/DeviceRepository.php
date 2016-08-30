@@ -24,7 +24,7 @@ class DeviceRepository extends EntityRepository
         $qb->select('d')
             ->from('AppBundle:Device', 'd')
             ->innerJoin('d.customer', 'c')
-            ->where('c.username = :customer')
+            ->where('c.id = :customer')
             ->setParameter(':customer', $customer);
 
         return $qb->getQuery()->getResult();
