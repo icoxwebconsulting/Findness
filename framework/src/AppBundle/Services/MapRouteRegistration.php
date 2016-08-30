@@ -44,19 +44,41 @@ class MapRouteRegistration
     {
         $expr = $this->em->createQueryBuilder()->expr();
 
+        $ownedCompanyEXPR = $expr->andX('c.id = cvc.company', 'cvc.customer = :customer');
+        $sharedCompanyEXPR = $expr->andX(
+            'ssl.customer = :customer',
+            'ssl.staticList = sl.id',
+            'slc.id = c.id'
+        );
+
+        $allowedEXPR = $expr->orX($ownedCompanyEXPR, $sharedCompanyEXPR);
+
         $companies = $this->em->createQueryBuilder()
             ->select('c')
+            ->distinct()
             ->from('AppBundle:Company', 'c')
             ->from('AppBundle:CustomerViewCompany', 'cvc')
+            ->from('AppBundle:SharedStaticList', 'ssl')
+            ->from('AppBundle:StaticList', 'sl')
+            ->innerJoin('sl.companies', 'slc')
             ->where($expr->in('c.id', ':ids'))
-            ->andWhere('c.id = cvc.company')
-            ->andWhere('cvc.customer = :customer')
+            ->andWhere($allowedEXPR)
             ->setParameter('ids', $points)
             ->setParameter('customer', $customer->getId())
             ->getQuery()
             ->getArrayResult();
 
-        if (count($companies) !== count($points)) {
+        $ids = array_reduce(
+            $companies,
+            function ($carry, $current) {
+                $carry[] = $current['id'];
+
+                return $carry;
+            },
+            []
+        );
+
+        if (count($companies) !== count($points) && $points != $ids) {
             throw new HttpException(500, 'Route points are not valid.');
         }
 
@@ -73,22 +95,26 @@ class MapRouteRegistration
      * @param array $points
      * @return MapRoute
      */
-    public function register(MapRouteInterface $mapRoute,
-                             $name,
-                             $transport,
-                             CustomerInterface $customer,
-                             array $points)
-    {
+    public function register(
+        MapRouteInterface $mapRoute,
+        $name,
+        $transport,
+        CustomerInterface $customer,
+        array $points
+    ) {
         $this->validatePoints($customer, $points);
 
         $handler = new RegistrationHandler();
-        $mapRoute = $handler->registerMapRoute($mapRoute,
+        $mapRoute = $handler->registerMapRoute(
+            $mapRoute,
             $name,
             $transport,
             $customer,
-            $points);
+            $points
+        );
         $this->em->persist($mapRoute);
         $this->em->flush();
+
         return $mapRoute;
     }
 
@@ -102,20 +128,24 @@ class MapRouteRegistration
      * @param array $points
      * @return MapRoute
      */
-    public function update(CustomerInterface $customer,
-                           MapRouteInterface $mapRoute,
-                           $name,
-                           $transport,
-                           array $points)
-    {
+    public function update(
+        CustomerInterface $customer,
+        MapRouteInterface $mapRoute,
+        $name,
+        $transport,
+        array $points
+    ) {
         $this->validatePoints($customer, $points);
 
         $handler = new RegistrationHandler();
-        $mapRoute = $handler->updateMapRoute($mapRoute,
+        $mapRoute = $handler->updateMapRoute(
+            $mapRoute,
             $name,
             $transport,
-            $points);
+            $points
+        );
         $this->em->flush();
+
         return $mapRoute;
     }
 
@@ -146,7 +176,7 @@ class MapRouteRegistration
                 "longitude" => $company->getLongitude(),
                 "cif" => $company->getCif(),
                 "address" => $company->getAddress(),
-                "phoneNumber" => $company->getPhoneNumber()
+                "phoneNumber" => $company->getPhoneNumber(),
             ];
         }
 
@@ -154,7 +184,7 @@ class MapRouteRegistration
             "id" => $mapRoute->getId(),
             "name" => $mapRoute->getName(),
             "transport" => $mapRoute->getTransport(),
-            "points" => $points
+            "points" => $points,
         ];
     }
 }
