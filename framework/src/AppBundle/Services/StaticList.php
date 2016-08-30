@@ -123,6 +123,7 @@ class StaticList
             $response[] = [
                 "id" => $list->getId(),
                 "name" => $list->getName(),
+                "customer" => $list->getCustomer()->getEmail(),
             ];
         }
 
