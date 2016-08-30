@@ -24,8 +24,8 @@ class SearchRepository extends EntityRepository
 
         $qb->select('s')
             ->from('AppBundle:Search', 's')
-            ->where('s.customer', ':customer')
-            ->orderBy('s.created DESC')
+            ->where('s.customer = :customer')
+            ->orderBy('s.created', 'DESC')
             ->setParameter(':customer', $customer->getId());
 
         return $qb->getQuery()->getResult();
