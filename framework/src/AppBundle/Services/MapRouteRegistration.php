@@ -44,24 +44,23 @@ class MapRouteRegistration
     {
         $expr = $this->em->createQueryBuilder()->expr();
 
-        $ownedCompanyEXPR = $expr->andX('c.id = cvc.company', 'cvc.customer = :customer');
+        $ownedCompanyEXPR = $expr->andX('cvc.customer = :customer');
         $sharedCompanyEXPR = $expr->andX(
             'ssl.customer = :customer',
             'ssl.staticList = sl.id',
-            'slc.id = c.id'
+            'slc.id = cvc.company'
         );
 
         $allowedEXPR = $expr->orX($ownedCompanyEXPR, $sharedCompanyEXPR);
 
         $companies = $this->em->createQueryBuilder()
-            ->select('c')
+            ->select('cvc')
             ->distinct()
-            ->from('AppBundle:Company', 'c')
             ->from('AppBundle:CustomerViewCompany', 'cvc')
             ->from('AppBundle:SharedStaticList', 'ssl')
             ->from('AppBundle:StaticList', 'sl')
             ->innerJoin('sl.companies', 'slc')
-            ->where($expr->in('c.id', ':ids'))
+            ->where($expr->in('cvc.company', ':ids'))
             ->andWhere($allowedEXPR)
             ->setParameter('ids', $points)
             ->setParameter('customer', $customer->getId())
@@ -71,7 +70,7 @@ class MapRouteRegistration
         $ids = array_reduce(
             $companies,
             function ($carry, $current) {
-                $carry[] = $current['id'];
+                $carry[] = $current['company'];
 
                 return $carry;
             },
