@@ -55,8 +55,8 @@ class CustomerRegistration
         $confirmationToken = $customer->getConfirmationToken();
 
         $message = \Swift_Message::newInstance()
-            ->setSubject('Confirm your email')
-            ->setFrom('info@findness.com')
+            ->setSubject('¡Te damos la bienvenida a Findness!')
+            ->setFrom('info@findness.com', 'Findness Team')
             ->setTo($customer->getEmail())
             ->setBody(
                 $this->templateEngine->render(
