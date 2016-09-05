@@ -92,7 +92,7 @@ class RegistrationHandler
             $balance = (float)number_format($balance + ($balance * ($ivaFee / 100)), 2);
 
             if ((float)$balance > (float)$currentBalance) {
-                throw new \Exception('Balance not enough.');
+                throw new \Exception('Saldo insuficiente.');
             }
 
             // set to negative
