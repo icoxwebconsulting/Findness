@@ -42,42 +42,7 @@ class MapRouteRegistration
      */
     private function validatePoints(CustomerInterface $customer, array $points)
     {
-        $expr = $this->em->createQueryBuilder()->expr();
-
-        $ownedCompanyEXPR = $expr->andX('cvc.customer = :customer');
-        $sharedCompanyEXPR = $expr->andX(
-            'ssl.customer = :customer',
-            'ssl.staticList = sl.id',
-            'slc.id = cvc.company'
-        );
-
-        $allowedEXPR = $expr->orX($ownedCompanyEXPR, $sharedCompanyEXPR);
-
-        $companies = $this->em->createQueryBuilder()
-            ->select('cvc')
-            ->distinct()
-            ->from('AppBundle:CustomerViewCompany', 'cvc')
-            ->from('AppBundle:SharedStaticList', 'ssl')
-            ->from('AppBundle:StaticList', 'sl')
-            ->innerJoin('sl.companies', 'slc')
-            ->where($expr->in('cvc.company', ':ids'))
-            ->andWhere($allowedEXPR)
-            ->setParameter('ids', $points)
-            ->setParameter('customer', $customer->getId())
-            ->getQuery()
-            ->getArrayResult();
-
-        $ids = array_reduce(
-            $companies,
-            function ($carry, $current) {
-                $carry[] = $current['company'];
-
-                return $carry;
-            },
-            []
-        );
-
-        if (count($companies) !== count($points) && $points != $ids) {
+        if ($this->em->getRepository('AppBundle:Company')->areOwnedOrShared($customer, $points)) {
             throw new HttpException(500, 'Route points are not valid.');
         }
 
@@ -100,7 +65,8 @@ class MapRouteRegistration
         $transport,
         CustomerInterface $customer,
         array $points
-    ) {
+    )
+    {
         $this->validatePoints($customer, $points);
 
         $handler = new RegistrationHandler();
@@ -133,7 +99,8 @@ class MapRouteRegistration
         $name,
         $transport,
         array $points
-    ) {
+    )
+    {
         $this->validatePoints($customer, $points);
 
         $handler = new RegistrationHandler();
