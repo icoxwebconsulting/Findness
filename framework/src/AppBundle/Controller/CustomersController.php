@@ -111,7 +111,7 @@ class CustomersController extends FOSRestController implements ClassResourceInte
     public function postConfirmAction(Customer $customer = null, Request $request)
     {
         if (!$customer) {
-            throw new HttpException(500, 'Customer not found');
+            throw new HttpException(500, 'No se ha encontrado el cliente.');
         }
 
         $customerConfirmationForm = $this->createForm(new CustomerConfirmationType());
@@ -164,7 +164,7 @@ class CustomersController extends FOSRestController implements ClassResourceInte
     public function putResetPasswordAction(Customer $customer = null)
     {
         if (!$customer) {
-            throw new HttpException(500, 'Customer not found');
+            throw new HttpException(500, 'No se ha encontrado el cliente.');
         }
 
         $registrationHandler = $this->get('findness.customer.registration');
@@ -325,7 +325,7 @@ class CustomersController extends FOSRestController implements ClassResourceInte
     public function getSaltAction(Customer $customer = null)
     {
         if (!$customer) {
-            throw new HttpException(500, 'Customer not found');
+            throw new HttpException(500, 'No se ha encontrado el cliente.');
         }
 
         return [
@@ -366,7 +366,7 @@ class CustomersController extends FOSRestController implements ClassResourceInte
     public function postResendConfirmationEmailAction(Customer $customer = null)
     {
         if (!$customer) {
-            throw new HttpException(500, 'Customer not found');
+            throw new HttpException(500, 'No se ha encontrado el cliente.');
         }
 
         $registrationHandler = $this->get('findness.customer.registration');

@@ -87,7 +87,7 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
      *  },
      *  statusCodes={
      *         200="Returned when successful",
-     *         500="Customer not found.",
+     *         500="No se ha encontrado el cliente.",
      *         500="Cant share with static list owner."
      *  },
      *  tags={
@@ -99,7 +99,7 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
     public function postShareAction($staticList, Customer $customer = null)
     {
         if (!$customer) {
-            throw new HttpException(500, 'Customer not found.');
+            throw new HttpException(500, 'No se ha encontrado el cliente.');
         }
 
         $registrationHandler = $this->get('findness.staticlist');
