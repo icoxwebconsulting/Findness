@@ -25,7 +25,7 @@ parameters:
 
     findness_search_fee: 0.10
     findness_search_iva_fee: 21
-    findness_search_min: 1
+    findness_search_min: 0
     findness_search_extra_fee: 0.25
     findness_search_extra_fee_threshold: 5
 
