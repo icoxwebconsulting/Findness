@@ -51,14 +51,12 @@ class RestProvider implements AuthenticationProviderInterface
             return $authenticatedToken;
         }
 
-        $message = 'The REST authentication failed.';
+        $message = 'Usuario y/o contraseña incorrectos.';
 
         if (!$user->isConfirmed()) {
-            $message = 'Unconfirmed Customer.';
-        }
-
-        if (!$user->isEnabled()) {
-            $message = 'Disabled Customer.';
+            $message = 'Usuario no confirmado.';
+        } else if (!$user->isEnabled()) {
+            $message = 'Usuario deshabilitado.';
         }
 
         throw new AuthenticationException($message);

@@ -80,7 +80,7 @@ class RegistrationHandler
 
             // validate business restriction of minimum fee
             if ((float)$balance < (float)$min) {
-                throw new \Exception('Minimum fee not reached.');
+                throw new \Exception('No se ha alcanzado tarifa mínima.');
             }
 
             // apply extra fee if needed

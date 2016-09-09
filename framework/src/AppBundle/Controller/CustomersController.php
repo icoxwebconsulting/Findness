@@ -70,7 +70,7 @@ class CustomersController extends FOSRestController implements ClassResourceInte
             if ($response) {
                 return new CustomerResponse($response);
             } else {
-                throw new HttpException(409, "Customer already registered");
+                throw new HttpException(409, "El correo ya se encuentra registrado.");
             }
         }
 
