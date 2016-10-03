@@ -40,7 +40,7 @@ parameters:
     gcm_token: AIzaSyBBe7s5PuEbdCzDIZgIHGyAE5Cab6Li13A
     gcm_package_name: com.thinkandcloud.findness
 
-    apn_app_id: com.thinkandcloud.findness
+    apn_app_id: com.findnessapp.findness
     apn_pem_path: app/config/push-certificate.pem
     apn_sandbox: 0
-    apn_pass_phrase: findness
+    apn_pass_phrase: Findness147
