@@ -111,7 +111,7 @@ class CustomerRegistration
             $this->em->persist($customer);
             $this->em->flush();
             $balance = new Balance($customer);
-            $balance->setBalance(0);
+            $balance->setBalance(10);
             $this->em->persist($balance);
             $this->em->flush();
             $this->sendRegistrationEmail($customer);
