@@ -81,10 +81,9 @@ class RegistrationHandlerSpec extends ObjectBehavior
         ];
 
         $customer = new Customer();
-        $fee = 0.15;
-        $itemsCount = 10;
-        $transaction = $this->charge($customer, $itemsCount, $fee, $apiConfig);
-        $transaction->getBalance()->shouldBe(-1 * ($itemsCount * $fee));
+        $balance = 10;
+        $transaction = $this->charge($customer, $balance, $apiConfig);
+        $transaction->getBalance()->shouldBe($balance);
         $transaction->getOperator()->getId()->shouldBe((new FindnessOperator())->getId());
     }
 }
