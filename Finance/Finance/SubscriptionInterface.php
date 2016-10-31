@@ -13,9 +13,11 @@ interface SubscriptionInterface extends CustomerDependantInterface
 {
     const SIX_MONTHS = 6;
     const ONE_YEAR = 12;
+
+    // TODO: update with real fees
     const LAPSES = array(
-        self::SIX_MONTHS,
-        self::ONE_YEAR,
+        self::SIX_MONTHS => "20",
+        self::ONE_YEAR => "12",
     );
 
     /**
@@ -24,6 +26,13 @@ interface SubscriptionInterface extends CustomerDependantInterface
      * @throws \Exception
      */
     static public function validateLapse($lapse);
+
+    /**
+     * Get Customer id
+     *
+     * @return string
+     */
+    public function getId();
 
     /**
      * @return int
@@ -39,4 +48,9 @@ interface SubscriptionInterface extends CustomerDependantInterface
      * @return \DateTime
      */
     public function getEndDate();
+
+    /**
+     * @return TransactionInterface
+     */
+    public function getTransaction();
 }

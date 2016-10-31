@@ -1,0 +1,49 @@
+AppBundle\Entity\Subscription:
+    type: entity
+    table: subscription
+    repositoryClass: AppBundle\EntityRepository\SubscriptionRepository
+    id:
+        id:
+            id: true
+            type: string
+            length: 255
+        customer:
+            associationKey: true
+    fields:
+        lapse:
+            type: string
+        startDate:
+            type: datetime
+        endDate:
+            type: datetime
+        created:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: create
+        updated:
+            type: datetime
+            gedmo:
+                timestampable:
+                    on: update
+        deletedAt:
+            type: datetime
+            nullable: true
+    manyToOne:
+        customer:
+            targetEntity: Customer
+            joinColumn:
+                name: customer
+                referencedColumnName: id
+            cascade: ["persist", "merge"]
+    oneToOne:
+        transaction:
+            targetEntity: Transaction
+            joinColumn:
+                name: transaction
+                referencedColumnName: id
+            cascade: ["persist", "merge"]
+    gedmo:
+        soft_deleteable:
+          field_name: deletedAt
+          time_aware: false

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\Subscription;
 use AppBundle\Entity\Transaction;
 use Customer\Customer\CustomerInterface;
 use Doctrine\ORM\EntityManager;
@@ -40,17 +41,86 @@ class TransactionRegistration
         $this->apiConfig = [
             "stripe" => [
                 "key" => $stripeKey,
-                "secret" => $stripeSecret
+                "secret" => $stripeSecret,
             ],
             "paypal" => [
                 "id" => $paypalClientId,
-                "secret" => $paypalSecret
+                "secret" => $paypalSecret,
             ],
             "findness" => [
 
-            ]
+            ],
         ];
         $this->em = $em;
+    }
+
+    /**
+     * Register new transaction
+     *
+     * @param CustomerInterface $customer
+     * @param float $balance
+     * @param int $operator
+     * @param string $transactionId
+     * @param string $cardId
+     * @return Transaction
+     * @throws \Exception
+     */
+    public function register(
+        CustomerInterface $customer,
+        $balance,
+        $operator,
+        $transactionId,
+        $cardId
+    ) {
+        $transaction = $this->em->getRepository("AppBundle:Transaction")
+            ->findOneBy(
+                [
+                    "transactionId" => $transactionId,
+                ]
+            );
+
+        if ($transaction) {
+            throw new \Exception("Transaction already exist");
+        }
+
+        return $this->create($customer, $balance, $operator, $transactionId, $cardId);
+    }
+
+    /**
+     * Create transaction
+     *
+     * @param CustomerInterface $customer
+     * @param $balance
+     * @param $operator
+     * @param $transactionId
+     * @param $cardId
+     * @return Transaction|\Finance\Finance\TransactionInterface
+     */
+    private function create(
+        CustomerInterface $customer,
+        $balance,
+        $operator,
+        $transactionId,
+        $cardId
+    ) {
+        $handler = new RegistrationHandler();
+        $transaction = new Transaction($customer);
+        $transaction = $handler->register(
+            $transaction,
+            $balance,
+            $operator,
+            $transactionId,
+            $cardId,
+            $this->apiConfig
+        );
+        $this->em->persist($transaction);
+        $this->em->flush();
+
+        $balanceEntity = $this->getBalance($customer);
+        $balanceEntity->setBalance($balanceEntity->getBalance() + $transaction->getBalance());
+        $this->em->flush();
+
+        return $transaction;
     }
 
     /**
@@ -65,66 +135,74 @@ class TransactionRegistration
     }
 
     /**
-     * Create transaction
-     *
-     * @param CustomerInterface $customer
-     * @param $balance
-     * @param $operator
-     * @param $transactionId
-     * @param $cardId
-     * @return Transaction|\Finance\Finance\TransactionInterface
-     */
-    private function create(CustomerInterface $customer,
-                            $balance,
-                            $operator,
-                            $transactionId,
-                            $cardId)
-    {
-        $handler = new RegistrationHandler();
-        $transaction = new Transaction($customer);
-        $transaction = $handler->register($transaction,
-            $balance,
-            $operator,
-            $transactionId,
-            $cardId,
-            $this->apiConfig);
-        $this->em->persist($transaction);
-        $this->em->flush();
-
-        $balanceEntity = $this->getBalance($customer);
-        $balanceEntity->setBalance($balanceEntity->getBalance() + $transaction->getBalance());
-        $this->em->flush();
-
-        return $transaction;
-    }
-
-    /**
-     * Register new Map Route
+     * Subscribe
      *
      * @param CustomerInterface $customer
      * @param float $balance
      * @param int $operator
      * @param string $transactionId
      * @param string $cardId
-     * @return Transaction
+     * @param string $lapse
+     * @param \DateTime $startDate
+     * @return Subscription
      * @throws \Exception
      */
-    public function register(CustomerInterface $customer,
-                             $balance,
-                             $operator,
-                             $transactionId,
-                             $cardId)
-    {
-        $transaction = $this->em->getRepository("AppBundle:Transaction")
-            ->findOneBy([
-                "customer" => $customer,
-                "transactionId" => $transactionId
-            ]);
-
-        if ($transaction) {
+    public function subscribe(
+        CustomerInterface $customer,
+        $balance,
+        $operator,
+        $transactionId,
+        $cardId,
+        $lapse,
+        $startDate
+    ) {
+        if ($this->em->getRepository("AppBundle:Transaction")
+            ->findOneBy(
+                [
+                    "transactionId" => $transactionId,
+                ]
+            )
+        ) {
             throw new \Exception("Transaction already exist");
         }
 
-        return $this->create($customer, $balance, $operator, $transactionId, $cardId);
+        if ($this->em->getRepository("AppBundle:Subscription")
+            ->findOneBy(
+                [
+                    "startDate" => $startDate,
+                ]
+            )
+        ) {
+            throw new \Exception("Subscription for this period already enabled");
+        }
+
+        $handler = new RegistrationHandler();
+
+        $transaction = new Transaction($customer);
+        $transaction = $handler->register(
+            $transaction,
+            $balance,
+            $operator,
+            $transactionId,
+            $cardId,
+            $this->apiConfig
+        );
+
+        $subscription = $handler->subscribe(
+            $transaction,
+            $balance,
+            $operator,
+            $transactionId,
+            $cardId,
+            $this->apiConfig,
+            $lapse,
+            $startDate
+        );
+
+        $this->em->persist($transaction);
+        $this->em->persist($subscription);
+        $this->em->flush();
+
+        return $subscription;
     }
 }

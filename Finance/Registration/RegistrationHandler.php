@@ -2,6 +2,7 @@
 
 namespace Finance\Registration;
 
+use AppBundle\Entity\Subscription;
 use Customer\Customer\CustomerInterface;
 use Finance\Finance\FindnessOperator;
 use Finance\Finance\PaypalOperator;
@@ -18,63 +19,25 @@ class RegistrationHandler
 {
 
     /**
-     * Get operator
-     *
-     * @param $operator
-     * @return FindnessOperator|PaypalOperator|StripeOperator
-     */
-    private function getOperator($operator)
-    {
-        switch ($operator) {
-            case 1: {
-                return new FindnessOperator();
-            }
-            case 2: {
-                return new PaypalOperator();
-            }
-            case 3: {
-                return new StripeOperator();
-            }
-        }
-    }
-
-    /**
-     * Handle customer registration logic
-     *
-     * @param TransactionInterface $transaction
-     * @param float $balance
-     * @param int $operator
-     * @param string|null $transactionId
-     * @param string|null $cardId
-     * @param array|null $apisConf
-     * @return TransactionInterface
+     * @param $itemsCount
+     * @param $fee
+     * @param $min
+     * @param $extraFee
+     * @param $extraFeeThreshold
+     * @param $ivaFee
+     * @param $currentBalance
+     * @return int
      * @throws \Exception
      */
-    public function register(TransactionInterface $transaction,
-                             $balance,
-                             $operator,
-                             $transactionId = null,
-                             $cardId = null,
-                             array $apisConf)
-    {
-        $operator = $this->getOperator($operator);
-        if ($operator->validateTransaction($transactionId, $balance, $apisConf[$operator->getName()])) {
-            $transaction->setBalance($balance);
-            $transaction->setOperator($operator);
-            $transaction->setTransactionId($transactionId);
-            $transaction->setCardId($cardId);
-            return $transaction;
-        }
-    }
-
-    public function computeBalance($itemsCount,
-                                   $fee,
-                                   $min,
-                                   $extraFee,
-                                   $extraFeeThreshold,
-                                   $ivaFee,
-                                   $currentBalance)
-    {
+    public function computeBalance(
+        $itemsCount,
+        $fee,
+        $min,
+        $extraFee,
+        $extraFeeThreshold,
+        $ivaFee,
+        $currentBalance
+    ) {
         if ($itemsCount) {
             $balance = $itemsCount * $fee;
 
@@ -109,12 +72,103 @@ class RegistrationHandler
      * @return TransactionInterface
      * @throws \Exception
      */
-    public function charge(CustomerInterface $customer,
-                           $balance,
-                           array $apisConf)
-    {
+    public function charge(
+        CustomerInterface $customer,
+        $balance,
+        array $apisConf
+    ) {
         $transaction = new Transaction($customer);
-        return $this->register($transaction, $balance, (new FindnessOperator())->getId(), uniqid(),
-            $customer->getId(), $apisConf);
+
+        return $this->register(
+            $transaction,
+            $balance,
+            (new FindnessOperator())->getId(),
+            uniqid(),
+            $customer->getId(),
+            $apisConf
+        );
+    }
+
+    /**
+     * Handle customer registration logic
+     *
+     * @param TransactionInterface $transaction
+     * @param float $balance
+     * @param int $operator
+     * @param string|null $transactionId
+     * @param string|null $cardId
+     * @param array|null $apisConf
+     * @return TransactionInterface
+     * @throws \Exception
+     */
+    public function register(
+        TransactionInterface $transaction,
+        $balance,
+        $operator,
+        $transactionId = null,
+        $cardId = null,
+        array $apisConf
+    ) {
+        $operator = $this->getOperator($operator);
+        if ($operator->validateTransaction($transactionId, $balance, $apisConf[$operator->getName()])) {
+            $transaction->setBalance($balance);
+            $transaction->setOperator($operator);
+            $transaction->setTransactionId($transactionId);
+            $transaction->setCardId($cardId);
+
+            return $transaction;
+        }
+    }
+
+    /**
+     * Get operator
+     *
+     * @param $operator
+     * @return FindnessOperator|PaypalOperator|StripeOperator
+     */
+    private function getOperator($operator)
+    {
+        switch ($operator) {
+            case 1: {
+                return new FindnessOperator();
+            }
+            case 2: {
+                return new PaypalOperator();
+            }
+            case 3: {
+                return new StripeOperator();
+            }
+        }
+    }
+
+    /**
+     * @param TransactionInterface $transaction
+     * @param $balance
+     * @param $operator
+     * @param $transactionId
+     * @param $cardId
+     * @param array $apisConf
+     * @param $lapse
+     * @param $startDate
+     * @return Subscription
+     * @throws \Exception
+     */
+    public function subscribe(
+        TransactionInterface $transaction,
+        $balance,
+        $operator,
+        $transactionId,
+        $cardId,
+        array $apisConf,
+        $lapse,
+        $startDate
+    ) {
+        if ((float)$balance !== (float)Subscription::LAPSES[$lapse]) {
+            throw new \Exception('Lapse fee is not valid');
+        }
+
+        $transaction = $this->register($transaction, $balance, $operator, $transactionId, $cardId, $apisConf);
+
+        return new Subscription($transaction->getCustomer(), $transaction, $lapse, $startDate);
     }
 }
