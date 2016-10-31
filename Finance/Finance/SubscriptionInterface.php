@@ -14,10 +14,9 @@ interface SubscriptionInterface extends CustomerDependantInterface
     const SIX_MONTHS = 6;
     const ONE_YEAR = 12;
 
-    // TODO: update with real fees
     const LAPSES = array(
-        self::SIX_MONTHS => "20",
-        self::ONE_YEAR => "12",
+        self::SIX_MONTHS => "12",
+        self::ONE_YEAR => "22",
     );
 
     /**
