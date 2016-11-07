@@ -102,3 +102,12 @@ services:
         class: AppBundle\Services\Search
         arguments:
             "em": "@doctrine.orm.entity_manager"
+
+    findness.customer_subscription_voter:
+        class: AppBundle\Security\Voter\SubscriptionVoter
+        arguments:
+            "em": "@doctrine.orm.entity_manager"
+        tags:
+            - { name: security.voter }
+        # small performance boost
+        public: false

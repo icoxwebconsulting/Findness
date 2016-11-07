@@ -47,6 +47,8 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
      */
     public function postAction(Request $request)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         $staticListForm = $this->createForm(new StaticListType());
 
         $staticListForm->handleRequest($request);
@@ -98,6 +100,8 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
      */
     public function postShareAction($staticList, Customer $customer = null)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         if (!$customer) {
             throw new HttpException(500, 'No se ha encontrado el cliente.');
         }
@@ -188,6 +192,8 @@ class StaticListsController extends FOSRestController implements ClassResourceIn
      */
     public function deleteListAction($staticList)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         $registrationHandler = $this->get('findness.staticlist');
         $deleted = $registrationHandler->deleteStaticList($this->getUser(), $staticList);
         return [

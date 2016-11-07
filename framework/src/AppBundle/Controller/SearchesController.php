@@ -85,6 +85,8 @@ class SearchesController extends FOSRestController implements ClassResourceInter
      */
     public function putAction(Request $request, Search $search = null)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         if (!$search) {
             throw new HttpException(500, 'Search not found');
         }
@@ -128,6 +130,8 @@ class SearchesController extends FOSRestController implements ClassResourceInter
      */
     public function deleteAction(Search $search = null)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         if (!$search) {
             throw new HttpException(500, 'Search not found');
         }

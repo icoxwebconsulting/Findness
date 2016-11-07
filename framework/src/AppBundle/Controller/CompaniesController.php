@@ -46,20 +46,24 @@ class CompaniesController extends FOSRestController implements ClassResourceInte
      */
     public function getAction(Company $company = null)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         if (!$company) {
             throw new HttpException(500, 'Company not found.');
         }
 
         $style = $this->getDoctrine()
             ->getRepository('AppBundle:StyledCompany')
-            ->findOneBy([
-                "company" => $company->getId(),
-                "customer" => $this->getUser()->getId()
-            ]);
+            ->findOneBy(
+                [
+                    "company" => $company->getId(),
+                    "customer" => $this->getUser()->getId(),
+                ]
+            );
 
         return [
             "company" => $company,
-            "style" => $style
+            "style" => $style,
         ];
     }
 
@@ -90,6 +94,8 @@ class CompaniesController extends FOSRestController implements ClassResourceInte
      */
     public function putAction($company, Request $request)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         $companyStyleForm = $this->createForm(new CompanyStyleType(), null, array('method' => 'PUT'));
 
         $companyStyleForm->handleRequest($request);
@@ -98,8 +104,9 @@ class CompaniesController extends FOSRestController implements ClassResourceInte
             $style = $companyStyleForm->get('style')->getData();
             $registrationHandler = $this->get('findness.company');
             $updated = $registrationHandler->updateStyle($this->getUser(), $company, $style);
+
             return array(
-                'updated' => $updated
+                'updated' => $updated,
             );
         }
 

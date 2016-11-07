@@ -31,6 +31,8 @@ class SubscriptionRepository extends EntityRepository
             ->setParameter(':customer', $customer->getId())
             ->setParameter(':date', new \DateTime());
 
-        return $qb->getQuery()->getArrayResult()[0];
+        $results = $qb->getQuery()->getArrayResult();
+
+        return !empty($results) ? $results[0] : null;
     }
 }

@@ -47,6 +47,8 @@ class MapRoutesController extends FOSRestController implements ClassResourceInte
      */
     public function postAction(Request $request)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         $mapRouteForm = $this->createForm(new MapRouteType());
 
         $mapRouteForm->handleRequest($request);
@@ -168,6 +170,8 @@ class MapRoutesController extends FOSRestController implements ClassResourceInte
      */
     public function putAction(Request $request, MapRoute $mapRoute = null)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         if (!$mapRoute) {
             throw new HttpException(500, 'Map Route not found');
         }
@@ -222,6 +226,8 @@ class MapRoutesController extends FOSRestController implements ClassResourceInte
      */
     public function deleteAction(MapRoute $mapRoute = null)
     {
+        $this->denyAccessUnlessGranted('active', $this->getUser(), 'Subscription expired.');
+
         if (!$mapRoute) {
             throw new HttpException(500, 'Map Route not found');
         }
