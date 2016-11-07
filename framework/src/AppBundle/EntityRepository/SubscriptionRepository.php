@@ -4,6 +4,7 @@ namespace AppBundle\EntityRepository;
 
 use Customer\Customer\CustomerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr;
 
 /**
  * Class SubscriptionRepository
@@ -23,10 +24,13 @@ class SubscriptionRepository extends EntityRepository
         $qb->select('s')
             ->from('AppBundle:Subscription', 's')
             ->innerJoin('s.customer', 'c')
-            ->where('s.id = :customer')
+            ->innerJoin('s.transaction', 't', Expr\Join::WITH, 's.transaction = t.id AND s.customer = t.customer')
+            ->where('c.id = :customer')
+            ->andWhere($qb->expr()->between(':date', 's.startDate', 's.endDate'))
             ->orderBy('s.created', 'DESC')
-            ->setParameter(':customer', $customer->getId());
+            ->setParameter(':customer', $customer->getId())
+            ->setParameter(':date', new \DateTime());
 
-        return $qb->getQuery()->getResult();
+        return $qb->getQuery()->getArrayResult()[0];
     }
 }

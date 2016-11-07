@@ -58,11 +58,14 @@ class FinancesController extends FOSRestController implements ClassResourceInter
             $transactionId = $mapRouteForm->get('transactionId')->getData();
             $cardId = $mapRouteForm->get('cardId')->getData();
             $registrationHandler = $this->get('findness.transaction.registration');
-            $response = $registrationHandler->register($customer,
+            $response = $registrationHandler->register(
+                $customer,
                 $balance,
                 $operator,
                 $transactionId,
-                $cardId);
+                $cardId
+            );
+
             return new TransactionResponse($response);
         }
 
@@ -147,10 +150,11 @@ class FinancesController extends FOSRestController implements ClassResourceInter
     public function getBalanceAction()
     {
         $em = $this->getDoctrine()->getManager();
+
         return [
             "balance" => $em->getRepository("AppBundle:Balance")
                 ->findOneByCustomer($this->getUser())
-                ->getBalance()
+                ->getBalance(),
         ];
     }
 
@@ -178,9 +182,41 @@ class FinancesController extends FOSRestController implements ClassResourceInter
     public function getTransactionsAction()
     {
         $em = $this->getDoctrine()->getManager();
+
         return [
             "transactions" => $em->getRepository("AppBundle:Transaction")
-                ->findByCustomer($this->getUser())
+                ->findByCustomer($this->getUser()),
+        ];
+    }
+
+    /**
+     * Get subscription
+     *
+     * @return array
+     *
+     * @FOSRestBundleAnnotations\Route("/subscription")
+     *
+     * @Security("has_role('ROLE_USER')")
+     *
+     * @ApiDoc(
+     *  section="Finance",
+     *  description="Get subscription",
+     *  statusCodes={
+     *         200="Returned when successful"
+     *  },
+     *  tags={
+     *   "stable" = "#4A7023",
+     *   "v1" = "#ff0000"
+     *  }
+     * )
+     */
+    public function getSubscriptionAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        return [
+            "subscription" => $em->getRepository("AppBundle:Subscription")
+                ->findByCustomer($this->getUser()),
         ];
     }
 }
