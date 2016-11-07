@@ -11,10 +11,12 @@ use Customer\Customer\CustomerDependantInterface;
  */
 interface SubscriptionInterface extends CustomerDependantInterface
 {
+    const ONE_MONTH = 1;
     const SIX_MONTHS = 6;
     const ONE_YEAR = 12;
 
     const LAPSES = array(
+        self::ONE_MONTH => "-1000",
         self::SIX_MONTHS => "12",
         self::ONE_YEAR => "22",
     );

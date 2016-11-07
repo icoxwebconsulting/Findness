@@ -3,9 +3,12 @@
 namespace AppBundle\Services;
 
 use AppBundle\Entity\Balance;
+use AppBundle\Entity\Subscription;
+use AppBundle\Entity\Transaction;
 use Customer\Customer\CustomerInterface;
 use Customer\Registration\RegistrationHandler;
 use Doctrine\ORM\EntityManager;
+use Finance\Finance\FindnessOperator;
 
 /**
  * Class CustomerRegistration
@@ -45,13 +48,59 @@ class CustomerRegistration
     }
 
     /**
+     * Register new customer
+     *
+     * @param CustomerInterface $customer
+     * @param string $username
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $salt
+     * @param string $password
+     * @return CustomerInterface|null
+     */
+    public function registerWithBalance(
+        CustomerInterface $customer,
+        $username,
+        $firstName,
+        $lastName,
+        $salt,
+        $password
+    ) {
+        try {
+            $handler = new RegistrationHandler();
+            $customer = $handler->register(
+                $customer,
+                $username,
+                $firstName,
+                $lastName,
+                $salt,
+                $password
+            );
+            $this->em->persist($customer);
+            $this->em->flush();
+            $balance = new Balance($customer);
+            $balance->setBalance(10);
+            $this->em->persist($balance);
+            $this->em->flush();
+            $this->sendRegistrationEmail($customer);
+
+            return $customer;
+        } catch (\Exception $exception) {
+            return null;
+        }
+
+    }
+
+    /**
      * @param CustomerInterface $customer
      */
     private function sendRegistrationEmail(CustomerInterface $customer)
     {
-        $name = sprintf("%s %s",
+        $name = sprintf(
+            "%s %s",
             $customer->getFirstName(),
-            $customer->getLastName());
+            $customer->getLastName()
+        );
         $confirmationToken = $customer->getConfirmationToken();
 
         $message = \Swift_Message::newInstance()
@@ -63,7 +112,7 @@ class CustomerRegistration
                     'registration_email.html.twig',
                     array(
                         'name' => $name,
-                        'confirmationToken' => $confirmationToken
+                        'confirmationToken' => $confirmationToken,
                     )
                 ),
                 'text/html'
@@ -73,7 +122,7 @@ class CustomerRegistration
                     'registration_email.txt.twig',
                     array(
                         'name' => $name,
-                        'confirmationToken' => $confirmationToken
+                        'confirmationToken' => $confirmationToken,
                     )
                 ),
                 'text/plain'
@@ -93,28 +142,41 @@ class CustomerRegistration
      * @param string $password
      * @return CustomerInterface|null
      */
-    public function register(CustomerInterface $customer,
-                             $username,
-                             $firstName,
-                             $lastName,
-                             $salt,
-                             $password)
-    {
+    public function register(
+        CustomerInterface $customer,
+        $username,
+        $firstName,
+        $lastName,
+        $salt,
+        $password
+    ) {
         try {
             $handler = new RegistrationHandler();
-            $customer = $handler->register($customer,
+            $customer = $handler->register(
+                $customer,
                 $username,
                 $firstName,
                 $lastName,
                 $salt,
-                $password);
+                $password
+            );
             $this->em->persist($customer);
             $this->em->flush();
-            $balance = new Balance($customer);
-            $balance->setBalance(10);
-            $this->em->persist($balance);
+
+            $transaction = new Transaction($customer);
+            $transaction->setBalance(0);
+            $transaction->setOperator(new FindnessOperator());
+            $transaction->setCardId('registration');
+            $transaction->setTransactionId('registration');
+            $this->em->persist($transaction);
             $this->em->flush();
+
+            $subscription = new Subscription($customer, $transaction, Subscription::ONE_MONTH, new \DateTime());
+            $this->em->persist($subscription);
+            $this->em->flush();
+
             $this->sendRegistrationEmail($customer);
+
             return $customer;
         } catch (\Exception $exception) {
             return null;
@@ -134,6 +196,31 @@ class CustomerRegistration
             $customer->setEnabled(true);
             $customer->setConfirmationToken(null);
             $this->em->flush();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Register new password customer
+     *
+     * @param CustomerInterface $customer
+     * @param string $code
+     * @param string $password
+     * @param string $salt
+     * @return mixed
+     */
+    public function changeNewPassword(
+        CustomerInterface $customer,
+        $code,
+        $password,
+        $salt
+    ) {
+        if ($customer->getSecurityCode() == $code) {
+            $this->changePassword($customer, $salt, $password);
+
             return true;
         }
 
@@ -148,53 +235,17 @@ class CustomerRegistration
      * @param string $password
      * @return mixed
      */
-    public function changePassword(CustomerInterface $customer,
-                                   $salt,
-                                   $password)
-    {
+    public function changePassword(
+        CustomerInterface $customer,
+        $salt,
+        $password
+    ) {
         $customer->setSalt($salt);
         $customer->setPassword($password);
         $customer->setSecurityCode(null);
         $this->em->flush();
+
         return $customer;
-    }
-
-
-    /**
-     * Register new password customer
-     *
-     * @param CustomerInterface $customer
-     * @param string $code
-     * @param string $password
-     * @param string $salt
-     * @return mixed
-     */
-    public function changeNewPassword(CustomerInterface $customer,
-                                      $code,
-                                      $password,
-                                      $salt)
-    {
-        if ($customer->getSecurityCode() == $code) {
-            $this->changePassword($customer, $salt, $password);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param int $length
-     * @return string
-     */
-    private function generateSecurityCode($length = 6)
-    {
-        $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        $string = '';
-        for ($i = 0; $i < $length; $i++) {
-            $string .= $characters[rand(0, strlen($characters) - 1)];
-        }
-
-        return $string;
     }
 
     /**
@@ -214,13 +265,28 @@ class CustomerRegistration
             ->setFrom('info@findness.com')
             ->setTo($customer->getEmail())
             ->setBody(
-                'Su código de seguridad de Findness es: ' . $code,
+                'Su código de seguridad de Findness es: '.$code,
                 'text/html'
             );
 
         $response = $this->mailer->send($message);
 
         return $response !== 0;
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    private function generateSecurityCode($length = 6)
+    {
+        $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        $string = '';
+        for ($i = 0; $i < $length; $i++) {
+            $string .= $characters[rand(0, strlen($characters) - 1)];
+        }
+
+        return $string;
     }
 
     /**
