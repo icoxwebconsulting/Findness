@@ -71,13 +71,6 @@ class QualitasController extends FOSRestController implements ClassResourceInter
      *          "requirement"="*",
      *          "required"=false,
      *          "description"="json string of geo locations array"
-     *      },
-     *     {
-     *          "name"="nonViewedCompanies",
-     *          "dataType"="integer",
-     *          "requirement"="*",
-     *          "required"=false,
-     *          "description"="integer for how many not viewed companies will be requested. If used with dryRun on true will be ignored"
      *      }
      *  },
      *  statusCodes={
@@ -101,10 +94,9 @@ class QualitasController extends FOSRestController implements ClassResourceInter
         }
         $postalCodes = json_decode($request->get("postalCodes", json_encode([])));
         $geoLocations = json_decode($request->get("geoLocations", json_encode([])), true);
-        $notViewedAllowedAmount = $request->get("nonViewedCompanies", 0);
         $qualitas = $this->container->get('findness.qualitas');
-        return $qualitas->query($page, $notViewedAllowedAmount, $cnaes, $states, $cities, $postalCodes, $geoLocations,
-            $this->getUser());
+
+        return $qualitas->query($page, $cnaes, $states, $cities, $postalCodes, $geoLocations, $this->getUser());
     }
 
     /**
@@ -128,17 +120,20 @@ class QualitasController extends FOSRestController implements ClassResourceInter
      */
     public function getPostalCodesAction()
     {
-        return array_reduce($this->getDoctrine()
-            ->getRepository("AppBundle:PostalCode")
-            ->createQueryBuilder('pc')
-            ->select('pc.id')
-            ->getQuery()
-            ->getArrayResult(),
+        return array_reduce(
+            $this->getDoctrine()
+                ->getRepository("AppBundle:PostalCode")
+                ->createQueryBuilder('pc')
+                ->select('pc.id')
+                ->getQuery()
+                ->getArrayResult(),
             function ($carry, $item) {
                 $carry[] = $item["id"];
+
                 return $carry;
             },
-            []);
+            []
+        );
     }
 
     /**

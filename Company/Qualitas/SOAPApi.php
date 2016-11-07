@@ -72,10 +72,17 @@ abstract class SOAPApi
      * @param $findnessSearchIvaFee
      * @param SoapClient $client
      */
-    public function __construct($username, $password, $geoRadio, $findnessSearchFee, $findnessSearchMin,
-                                $findnessSearchExtraFee, $findnessSearchExtraFeeThreshold, $findnessSearchIvaFee,
-                                SoapClient $client)
-    {
+    public function __construct(
+        $username,
+        $password,
+        $geoRadio,
+        $findnessSearchFee,
+        $findnessSearchMin,
+        $findnessSearchExtraFee,
+        $findnessSearchExtraFeeThreshold,
+        $findnessSearchIvaFee,
+        SoapClient $client
+    ) {
         $this->username = $username;
         $this->password = $password;
         $this->geoRadio = $geoRadio;
@@ -85,6 +92,161 @@ abstract class SOAPApi
         $this->findnessSearchExtraFeeThreshold = $findnessSearchExtraFeeThreshold;
         $this->findnessSearchIvaFee = $findnessSearchIvaFee;
         $this->soapClient = $client;
+    }
+
+    /**
+     * Query API by Balance
+     *
+     * @param int $page
+     * @param int $notViewedAllowedAmount
+     * @param array $cnaes
+     * @param array $states
+     * @param array $cities
+     * @param array $postalCodes
+     * @param array $geoLocation
+     * @param CustomerInterface $customer
+     * @param $balance
+     * @return array
+     */
+    public function queryByBalance(
+        $page = 1,
+        $notViewedAllowedAmount = 0,
+        array $cnaes = [],
+        array $states = [],
+        array $cities = [],
+        array $postalCodes = [],
+        array $geoLocation = [],
+        CustomerInterface $customer,
+        $balance = 0
+    ) {
+        $this->computeBalance((int)$notViewedAllowedAmount, $balance);
+
+        $xmlRequest = $this->buildQueryXML(
+            $customer,
+            $page,
+            $notViewedAllowedAmount,
+            $cnaes,
+            $states,
+            $cities,
+            $postalCodes,
+            $geoLocation
+        );
+
+        $request = [
+            "nombreUsuario" => $this->username,
+            "pwd" => $this->password,
+            "peticionXml" => $xmlRequest,
+        ];
+
+        $client = $this->soapClient;
+        $response = $client->AtenderPeticion($request);
+        $result = $response->getAtenderPeticionResult();
+        $companies = $result["items"];
+
+        if ($companies) {
+            $storedCompanies = $this->store($companies, $customer);
+            $notViewedCompanies = [];
+            foreach ($storedCompanies as $id => $company) {
+                if (!$companies[$id]["Consultada"]) {
+                    $notViewedCompanies[] = $storedCompanies[$id];
+                }
+            }
+
+            if (count($notViewedCompanies)) {
+                $balance = $this->computeBalance(count($notViewedCompanies), $balance);
+                $balance = $this->charge($customer, $balance);
+            }
+
+            $result["items"] = $storedCompanies;
+            $result["balance"] = $balance;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int $notViewedCompanies
+     * @param $balance
+     * @return int
+     */
+    protected function computeBalance($notViewedCompanies, $balance)
+    {
+        $transactionRegistration = new RegistrationHandler();
+
+        return $transactionRegistration->computeBalance(
+            $notViewedCompanies,
+            $this->findnessSearchFee,
+            $this->findnessSearchMin,
+            $this->findnessSearchExtraFee,
+            $this->findnessSearchExtraFeeThreshold,
+            $this->findnessSearchIvaFee,
+            $balance
+        );
+    }
+
+    /**
+     * Build query XML
+     *
+     * @param CustomerInterface $customer
+     * @param int $page
+     * @param int $notViewedAllowedAmount
+     * @param array $cnaes
+     * @param array $states
+     * @param array $cities
+     * @param array $postalCodes
+     * @param array $geoLocations
+     * @return string
+     */
+    protected function buildQueryXML(
+        CustomerInterface $customer,
+        $page = 1,
+        $notViewedAllowedAmount = 0,
+        array $cnaes = [],
+        array $states = [],
+        array $cities = [],
+        array $postalCodes = [],
+        array $geoLocations = []
+    ) {
+        $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>%s</Producto><ComentarioLibre>%s</ComentarioLibre><MaximoElementosNoDevueltos>%s</MaximoElementosNoDevueltos>%s</SolicitudSegmentacion>';
+
+        $filters = $this->getFilters($cnaes, $states, $cities, $postalCodes, $geoLocations);
+        $xmlRequest = sprintf(
+            $xmlRequest,
+            $page,
+            "SegmentacionListadoThinkandCloud",
+            $customer->getId(),
+            $notViewedAllowedAmount,
+            $filters
+        );
+
+        return $xmlRequest;
+    }
+
+    /**
+     * Get XML filters
+     *
+     * @param array $cnaes
+     * @param array $states
+     * @param array $cities
+     * @param array $postalCodes
+     * @param array $geoLocations
+     * @return string
+     */
+    protected function getFilters(
+        array $cnaes = [],
+        array $states = [],
+        array $cities = [],
+        array $postalCodes = [],
+        array $geoLocations = []
+    ) {
+        $filters = "";
+        $filters .= $this->getCnaeFilter($cnaes);
+        $filters .= $this->getStateFilter($states);
+        $filters .= $this->getCityFilter($cities);
+        $filters .= $this->getPostalCodeFilter($postalCodes);
+        $filters .= $this->getGeoFilter($geoLocations);
+
+        return $filters;
     }
 
     /**
@@ -194,67 +356,14 @@ abstract class SOAPApi
         }
 
         $filter = "<Geografia><Coordenadas><Latitud>%s</Latitud><Longitud>%s</Longitud></Coordenadas><Radio>%s</Radio></Geografia>";
-        $filter = sprintf($filter, $geoLocation["latitude"],
+        $filter = sprintf(
+            $filter,
+            $geoLocation["latitude"],
             $geoLocation["longitude"],
-            $geoLocation["radio"]);
+            $geoLocation["radio"]
+        );
 
         return $filter;
-    }
-
-    /**
-     * Get XML filters
-     *
-     * @param array $cnaes
-     * @param array $states
-     * @param array $cities
-     * @param array $postalCodes
-     * @param array $geoLocations
-     * @return string
-     */
-    protected function getFilters(array $cnaes = [],
-                                  array $states = [],
-                                  array $cities = [],
-                                  array $postalCodes = [],
-                                  array $geoLocations = [])
-    {
-        $filters = "";
-        $filters .= $this->getCnaeFilter($cnaes);
-        $filters .= $this->getStateFilter($states);
-        $filters .= $this->getCityFilter($cities);
-        $filters .= $this->getPostalCodeFilter($postalCodes);
-        $filters .= $this->getGeoFilter($geoLocations);
-        return $filters;
-    }
-
-    /**
-     * Build query XML
-     *
-     * @param CustomerInterface $customer
-     * @param int $page
-     * @param int $notViewedAllowedAmount
-     * @param array $cnaes
-     * @param array $states
-     * @param array $cities
-     * @param array $postalCodes
-     * @param array $geoLocations
-     * @return string
-     */
-    protected function buildQueryXML(CustomerInterface $customer,
-                                     $page = 1,
-                                     $notViewedAllowedAmount = 0,
-                                     array $cnaes = [],
-                                     array $states = [],
-                                     array $cities = [],
-                                     array $postalCodes = [],
-                                     array $geoLocations = [])
-    {
-        $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>%s</Producto><ComentarioLibre>%s</ComentarioLibre><MaximoElementosNoDevueltos>%s</MaximoElementosNoDevueltos>%s</SolicitudSegmentacion>';
-
-        $filters = $this->getFilters($cnaes, $states, $cities, $postalCodes, $geoLocations);
-        $xmlRequest = sprintf($xmlRequest, $page, "SegmentacionListadoThinkandCloud", $customer->getId(),
-            $notViewedAllowedAmount, $filters);
-
-        return $xmlRequest;
     }
 
     /**
@@ -277,59 +386,46 @@ abstract class SOAPApi
     {
         $apisConf = ["findness" => []];
         $transactionRegistration = new RegistrationHandler();
-        return $transactionRegistration->charge($customer, $balance, $apisConf);
-    }
 
-    /**
-     * @param int $notViewedCompanies
-     * @param $balance
-     * @return int
-     */
-    protected function computeBalance($notViewedCompanies, $balance)
-    {
-        $transactionRegistration = new RegistrationHandler();
-        return $transactionRegistration->computeBalance($notViewedCompanies,
-            $this->findnessSearchFee,
-            $this->findnessSearchMin,
-            $this->findnessSearchExtraFee,
-            $this->findnessSearchExtraFeeThreshold,
-            $this->findnessSearchIvaFee,
-            $balance);
+        return $transactionRegistration->charge($customer, $balance, $apisConf);
     }
 
     /**
      * Query API
      *
      * @param int $page
-     * @param int $notViewedAllowedAmount
      * @param array $cnaes
      * @param array $states
      * @param array $cities
      * @param array $postalCodes
      * @param array $geoLocation
      * @param CustomerInterface $customer
-     * @param $balance
      * @return array
      */
-    public function query($page = 1,
-                          $notViewedAllowedAmount = 0,
-                          array $cnaes = [],
-                          array $states = [],
-                          array $cities = [],
-                          array $postalCodes = [],
-                          array $geoLocation = [],
-                          CustomerInterface $customer,
-                          $balance = 0)
-    {
-        $this->computeBalance((int)$notViewedAllowedAmount, $balance);
-
-        $xmlRequest = $this->buildQueryXML($customer, $page, $notViewedAllowedAmount, $cnaes, $states, $cities,
-            $postalCodes, $geoLocation);
+    public function query(
+        $page = 1,
+        array $cnaes = [],
+        array $states = [],
+        array $cities = [],
+        array $postalCodes = [],
+        array $geoLocation = [],
+        CustomerInterface $customer
+    ) {
+        $xmlRequest = $this->buildQueryXML(
+            $customer,
+            $page,
+            100000,
+            $cnaes,
+            $states,
+            $cities,
+            $postalCodes,
+            $geoLocation
+        );
 
         $request = [
             "nombreUsuario" => $this->username,
             "pwd" => $this->password,
-            "peticionXml" => $xmlRequest
+            "peticionXml" => $xmlRequest,
         ];
 
         $client = $this->soapClient;
@@ -338,21 +434,7 @@ abstract class SOAPApi
         $companies = $result["items"];
 
         if ($companies) {
-            $storedCompanies = $this->store($companies, $customer);
-            $notViewedCompanies = [];
-            foreach ($storedCompanies as $id => $company) {
-                if (!$companies[$id]["Consultada"]) {
-                    $notViewedCompanies[] = $storedCompanies[$id];
-                }
-            }
-
-            if (count($notViewedCompanies)) {
-                $balance = $this->computeBalance(count($notViewedCompanies), $balance);
-                $balance = $this->charge($customer, $balance);
-            }
-
-            $result["items"] = $storedCompanies;
-            $result["balance"] = $balance;
+            $result["items"] = $this->store($companies, $customer);
         }
 
         return $result;
