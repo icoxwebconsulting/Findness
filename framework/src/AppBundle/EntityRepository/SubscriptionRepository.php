@@ -17,7 +17,7 @@ class SubscriptionRepository extends EntityRepository
      * @param CustomerInterface $customer
      * @return array
      */
-    public function findByCustomer(CustomerInterface $customer)
+    public function findByCustomer(CustomerInterface $customer, $onlyActive = true)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
 
@@ -25,11 +25,14 @@ class SubscriptionRepository extends EntityRepository
             ->from('AppBundle:Subscription', 's')
             ->innerJoin('s.customer', 'c')
             ->innerJoin('s.transaction', 't', Expr\Join::WITH, 's.transaction = t.id AND s.customer = t.customer')
-            ->where('c.id = :customer')
-            ->andWhere($qb->expr()->between(':date', 's.startDate', 's.endDate'))
-            ->orderBy('s.created', 'DESC')
-            ->setParameter(':customer', $customer->getId())
-            ->setParameter(':date', new \DateTime());
+            ->where('c.id = :customer');
+        if($onlyActive)
+            $qb->andWhere($qb->expr()->between(':date', 's.startDate', 's.endDate'));
+
+        $qb->orderBy('s.created', 'DESC')
+            ->setParameter(':customer', $customer->getId());
+        if($onlyActive)
+            $qb->setParameter(':date', new \DateTime());
 
         $results = $qb->getQuery()->getArrayResult();
 

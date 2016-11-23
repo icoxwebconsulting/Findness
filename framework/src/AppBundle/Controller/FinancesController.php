@@ -216,7 +216,7 @@ class FinancesController extends FOSRestController implements ClassResourceInter
 
         return [
             "subscription" => $em->getRepository("AppBundle:Subscription")
-                ->findByCustomer($this->getUser()),
+                ->findByCustomer($this->getUser(), false),
         ];
     }
 }

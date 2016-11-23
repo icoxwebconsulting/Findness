@@ -277,8 +277,13 @@ class QualitasSOAPApi extends SOAPApi
                 $customer
             );
 
-            $this->saveSearch($customer, $cnaes, $states, $cities, $postalCodes, $geoLocation);
-            $this->saveList($customer, $cnaes, $response["items"]);
+            $subscription = $this->getSubscription($customer, false);
+            $dateNow = new \DateTime();
+
+            if ($subscription['endDate'] > $dateNow) {
+                $this->saveSearch($customer, $cnaes, $states, $cities, $postalCodes, $geoLocation);
+                $this->saveList($customer, $cnaes, $response["items"]);
+            }
 
             return $this->applyStyles($response);
         } catch (\Exception $exception) {
@@ -373,7 +378,13 @@ class QualitasSOAPApi extends SOAPApi
             }
         }
 
-        $this->em->flush();
+        $subscription = $this->getSubscription($customer, false);
+        $dateNow = new \DateTime();
+
+        if ($subscription['endDate'] > $dateNow) {
+            $this->em->flush();
+
+        }
 
         return $ormCompanies;
     }
@@ -407,5 +418,12 @@ class QualitasSOAPApi extends SOAPApi
         return $this->em
             ->getRepository("AppBundle:Balance")
             ->findOneByCustomer($customer);
+    }
+
+    private function getSubscription(CustomerInterface $customer)
+    {
+        return $this->em
+            ->getRepository("AppBundle:Subscription")
+            ->findByCustomer($customer, false);
     }
 }
