@@ -163,9 +163,9 @@ class RegistrationHandler
         $lapse,
         $startDate
     ) {
-        if ((float)$balance !== (float)Subscription::LAPSES[$lapse]) {
-            throw new \Exception('Lapse fee is not valid');
-        }
+//        if ((float)$balance !== (float)Subscription::LAPSES[$lapse]) {
+//            throw new \Exception('Lapse fee is not valid');
+//        }
 
         $transaction = $this->register($transaction, $balance, $operator, $transactionId, $cardId, $apisConf);
 
