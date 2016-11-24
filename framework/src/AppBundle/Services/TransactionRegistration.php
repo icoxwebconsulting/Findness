@@ -170,6 +170,7 @@ class TransactionRegistration
             ->findOneBy(
                 [
                     "startDate" => $startDate,
+                    "customer" => $customer
                 ]
             )
         ) {
