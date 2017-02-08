@@ -65,7 +65,13 @@ class Subscription implements SubscriptionInterface
         }
 
         $this->endDate = clone $this->startDate;
-        $this->endDate->add(new \DateInterval(sprintf("P%dM", $this->lapse)));
+        if ($this->lapse == 1){
+            $this->endDate->add(new \DateInterval('P7D'));
+
+        }else{
+
+            $this->endDate->add(new \DateInterval(sprintf("P%dM", $this->lapse)));
+        }
 
         $this->customer = $customer;
         $this->transaction = $transaction;
