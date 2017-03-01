@@ -117,7 +117,7 @@ class CustomerRegistration
                 ),
                 'text/html'
             )
-            ->addPart(
+            /*->addPart(
                 $this->templateEngine->render(
                     'registration_email.txt.twig',
                     array(
@@ -126,7 +126,7 @@ class CustomerRegistration
                     )
                 ),
                 'text/plain'
-            );
+            )*/;
 
         $this->mailer->send($message);
     }
