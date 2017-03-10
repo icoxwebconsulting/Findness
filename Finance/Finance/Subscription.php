@@ -65,7 +65,7 @@ class Subscription implements SubscriptionInterface
         }
 
         $this->endDate = clone $this->startDate;
-        if ($this->lapse == 1){
+        if ($this->lapse == 0){
             $this->endDate->add(new \DateInterval('P7D'));
 
         }else{

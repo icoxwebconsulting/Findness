@@ -171,7 +171,7 @@ class CustomerRegistration
             $this->em->persist($transaction);
             $this->em->flush();
 
-            $subscription = new Subscription($customer, $transaction, Subscription::ONE_MONTH, new \DateTime());
+            $subscription = new Subscription($customer, $transaction, Subscription::FREE_DAYS, new \DateTime());
             $this->em->persist($subscription);
             $this->em->flush();
 
