@@ -56,6 +56,19 @@ class Company implements CompanyInterface
     protected $phoneNumber;
 
     /**
+     * @var string
+     */
+    protected $employees;
+
+    /**
+     * @var string
+     */
+    protected $billing;
+
+
+
+
+    /**
      * Balance constructor.
      *
      * @param string|null $id
@@ -202,5 +215,37 @@ class Company implements CompanyInterface
     public function setPhoneNumber($phoneNumber)
     {
         $this->phoneNumber = $phoneNumber;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEmployees()
+    {
+        return $this->employees;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setEmployees($employees)
+    {
+        $this->employees = $employees;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBilling()
+    {
+        return $this->billing;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setBilling($billing)
+    {
+        $this->billing = $billing;
     }
 }

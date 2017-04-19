@@ -28,6 +28,13 @@ AppBundle\Entity\Company:
         phoneNumber:
             type: string
             length: 255
+        employees:
+            type: string
+            length: 255
+        billing:
+            type: string
+            length: 255
+
         created:
             type: datetime
             gedmo:

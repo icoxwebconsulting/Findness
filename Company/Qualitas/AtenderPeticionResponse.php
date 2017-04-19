@@ -83,6 +83,8 @@ class AtenderPeticionResponse
                     "ObjetoSocial" => $empresa->ObjetoSocial->__toString(),
                     "Direccion" => $direccion,
                     "Telefono" => $empresa->Telefono->__toString(),
+                    "TotalEmpleados" => $empresa->TotalEmpleados->__toString(),
+                    "Facturacion" => $empresa->Facturacion->__toString(),
                 ];
             }
         }

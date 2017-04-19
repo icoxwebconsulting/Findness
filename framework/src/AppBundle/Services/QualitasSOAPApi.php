@@ -193,6 +193,8 @@ class QualitasSOAPApi extends SOAPApi
                     "cif" => $current->getCIF(),
                     "address" => $current->getAddress(),
                     "phoneNumber" => $current->getPhoneNumber(),
+                    "employees" => $current->getEmployees(),
+                    "billing" => $current->getBilling(),
                 );
 
                 return $carry;
@@ -331,6 +333,8 @@ class QualitasSOAPApi extends SOAPApi
                 $ormCompany->setLongitude($company["Direccion"]["Longitud"]);
                 $ormCompany->setCIF($company["CIF"]);
                 $ormCompany->setPhoneNumber($company["Telefono"]);
+                $ormCompany->setEmployees($company["TotalEmpleados"]);
+                $ormCompany->setBilling($company["Facturacion"]);
 
                 $ormCompany->setAddress(
                     sprintf(
