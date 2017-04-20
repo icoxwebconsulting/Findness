@@ -83,8 +83,8 @@ class AtenderPeticionResponse
                     "ObjetoSocial" => $empresa->ObjetoSocial->__toString(),
                     "Direccion" => $direccion,
                     "Telefono" => $empresa->Telefono->__toString(),
-                    "TotalEmpleados" => $empresa->TotalEmpleados->__toString(),
-                    "Facturacion" => $empresa->Facturacion->__toString(),
+                    "TotalEmpleados" => $empresa->Empleados->__toString(),
+                    "Facturacion" => $empresa->Ventas->__toString(),
                 ];
             }
         }
@@ -105,6 +105,10 @@ class AtenderPeticionResponse
         $result = $this->parseXML($this->AtenderPeticionResult);
 
         if ($result && !$result->CodigoError) {
+            echo "<pre>";
+            print_r($this->parseData($result));
+            echo "</pre>";
+            die('resultados');
             return $this->parseData($result);
         } else {
             throw new \Exception('Error on request');
