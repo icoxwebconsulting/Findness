@@ -364,7 +364,7 @@ abstract class SOAPApi
      */
     protected function getBillingFilter($min, $max)
     {
-        if ($min && $max) {
+        if ($min == false || $max == false) {
             return "";
         }
 
@@ -388,7 +388,8 @@ abstract class SOAPApi
      */
     protected function getEmployeesFilter($min, $max)
     {
-        if ($min && $max) {
+
+        if ($min == false || $max == false) {
             return "";
         }
 
