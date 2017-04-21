@@ -371,11 +371,10 @@ abstract class SOAPApi
         $filter = "<Facturacion>%s</Facturacion>";
 
         $filter = sprintf($filter, sprintf('<Minimo>%s</Minimo>%%s', $min));
-        $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
-
         $filter = sprintf($filter, sprintf('<Maximo>%s</Maximo>%%s', $max));
-        $filter = str_replace("</Maximo>%s", "</Maximo>", $filter);
 
+        $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
+        $filter = str_replace("</Maximo>%s", "</Maximo>", $filter);
 
         return $filter;
     }
@@ -396,9 +395,9 @@ abstract class SOAPApi
         $filter = "<TotalEmpleados>%s</TotalEmpleados>";
 
         $filter = sprintf($filter, sprintf('<Minimo>%s</Minimo>%%s', $min));
-        $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
-
         $filter = sprintf($filter, sprintf('<Maximo>%s</Maximo>%%s', $max));
+
+        $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
         $filter = str_replace("</Maximo>%s", "</Maximo>", $filter);
 
 
