@@ -258,7 +258,11 @@ class QualitasSOAPApi extends SOAPApi
         array $postalCodes = [],
         array $geoLocation = [],
         CustomerInterface $customer,
-        $balance = 0
+        $balance = 0,
+        $billingMin = false,
+        $billingMax = false,
+        $employeesMin = false,
+        $employeesMax = false
     ) {
         if (empty($cnaes)) {
             return [
@@ -276,7 +280,11 @@ class QualitasSOAPApi extends SOAPApi
                 $cities,
                 $postalCodes,
                 $geoLocation,
-                $customer
+                $customer,
+                $billingMin,
+                $billingMax,
+                $employeesMin,
+                $employeesMax
             );
 
             $subscription = $this->getSubscription($customer, false);

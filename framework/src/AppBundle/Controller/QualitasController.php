@@ -71,6 +71,34 @@ class QualitasController extends FOSRestController implements ClassResourceInter
      *          "requirement"="*",
      *          "required"=false,
      *          "description"="json string of geo locations array"
+     *      },
+     *       {
+     *          "name"="billing_min",
+     *          "dataType"="string",
+     *          "requirement"="*",
+     *          "required"=false,
+     *          "description"="json string of states array"
+     *      },
+     *     {
+     *          "name"="billing_max",
+     *          "dataType"="string",
+     *          "requirement"="*",
+     *          "required"=false,
+     *          "description"="json string of states array"
+     *      },
+     *      {
+     *          "name"="employees_min",
+     *          "dataType"="string",
+     *          "requirement"="*",
+     *          "required"=false,
+     *          "description"="json string of states array"
+     *      },
+     *     {
+     *          "name"="employees_max",
+     *          "dataType"="string",
+     *          "requirement"="*",
+     *          "required"=false,
+     *          "description"="json string of states array"
      *      }
      *  },
      *  statusCodes={
@@ -88,6 +116,10 @@ class QualitasController extends FOSRestController implements ClassResourceInter
         $cnaes = json_decode($request->get("cnaes", json_encode([])));
         $states = json_decode($request->get("states", json_encode([])));
         $citiesObj = json_decode($request->get("cities", json_encode([])));
+        $billingMin = $request->get("billing_min");
+        $billingMax = $request->get("billing_max");
+        $employeesMin = $request->get("employees_min");
+        $employeesMax = $request->get("employees_max");
         $cities = [];
         if (is_object($citiesObj) && property_exists($citiesObj, "state") && property_exists($citiesObj, "cities")) {
             $cities = ["state" => $citiesObj->state, "cities" => $citiesObj->cities];
@@ -96,7 +128,7 @@ class QualitasController extends FOSRestController implements ClassResourceInter
         $geoLocations = json_decode($request->get("geoLocations", json_encode([])), true);
         $qualitas = $this->container->get('findness.qualitas');
 
-        return $qualitas->query($page, $cnaes, $states, $cities, $postalCodes, $geoLocations, $this->getUser());
+        return $qualitas->query($page, $cnaes, $states, $cities, $postalCodes, $geoLocations, $this->getUser(), null, $billingMin, $billingMax, $employeesMin, $employeesMax);
     }
 
     /**

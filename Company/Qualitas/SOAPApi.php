@@ -185,8 +185,6 @@ abstract class SOAPApi
     }
 
     /**
-     * Build query XML
-     *
      * @param CustomerInterface $customer
      * @param int $page
      * @param int $notViewedAllowedAmount
@@ -195,6 +193,10 @@ abstract class SOAPApi
      * @param array $cities
      * @param array $postalCodes
      * @param array $geoLocations
+     * @param bool $billingMin
+     * @param bool $billingMax
+     * @param bool $employeesMin
+     * @param bool $employeesMax
      * @return string
      */
     protected function buildQueryXML(
@@ -205,11 +207,15 @@ abstract class SOAPApi
         array $states = [],
         array $cities = [],
         array $postalCodes = [],
-        array $geoLocations = []
+        array $geoLocations = [],
+        $billingMin = false,
+        $billingMax = false,
+        $employeesMin = false,
+        $employeesMax = false
     ) {
         $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>%s</Producto><ComentarioLibre>%s</ComentarioLibre><MaximoElementosNoDevueltos>%s</MaximoElementosNoDevueltos>%s</SolicitudSegmentacion>';
 
-        $filters = $this->getFilters($cnaes, $states, $cities, $postalCodes, $geoLocations);
+        $filters = $this->getFilters($cnaes, $states, $cities, $postalCodes, $geoLocations,$billingMin, $billingMax, $employeesMin, $employeesMax);
         $xmlRequest = sprintf(
             $xmlRequest,
             $page,
@@ -223,13 +229,15 @@ abstract class SOAPApi
     }
 
     /**
-     * Get XML filters
-     *
      * @param array $cnaes
      * @param array $states
      * @param array $cities
      * @param array $postalCodes
      * @param array $geoLocations
+     * @param bool $billingMin
+     * @param bool $billingMax
+     * @param bool $employeesMin
+     * @param bool $employeesMax
      * @return string
      */
     protected function getFilters(
@@ -237,7 +245,11 @@ abstract class SOAPApi
         array $states = [],
         array $cities = [],
         array $postalCodes = [],
-        array $geoLocations = []
+        array $geoLocations = [],
+        $billingMin = false,
+        $billingMax = false,
+        $employeesMin = false,
+        $employeesMax = false
     ) {
         $filters = "";
         $filters .= $this->getCnaeFilter($cnaes);
@@ -245,6 +257,8 @@ abstract class SOAPApi
         $filters .= $this->getCityFilter($cities);
         $filters .= $this->getPostalCodeFilter($postalCodes);
         $filters .= $this->getGeoFilter($geoLocations);
+        $filters .= $this->getBillingFilter($billingMin, $billingMax);
+        $filters .= $this->getEmployeesFilter($employeesMin,$employeesMax);
 
         return $filters;
     }
@@ -344,6 +358,54 @@ abstract class SOAPApi
     }
 
     /**
+     * @param $min
+     * @param $max
+     * @return mixed|string
+     */
+    protected function getBillingFilter($min, $max)
+    {
+        if ($min && $max) {
+            return "";
+        }
+
+        $filter = "<Facturacion>%s</Facturacion>";
+
+        $filter = sprintf($filter, sprintf('<Minimo>%s</Minimo>%%s', $min));
+        $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
+
+        $filter = sprintf($filter, sprintf('<Maximo>%s</Maximo>%%s', $max));
+        $filter = str_replace("</Maximo>%s", "</Maximo>", $filter);
+
+
+        return $filter;
+    }
+
+
+    /**
+     * @param $min
+     * @param $max
+     * @return mixed|string
+     */
+    protected function getEmployeesFilter($min, $max)
+    {
+        if ($min && $max) {
+            return "";
+        }
+
+        $filter = "<TotalEmpleados>%s</TotalEmpleados>";
+
+        $filter = sprintf($filter, sprintf('<Minimo>%s</Minimo>%%s', $min));
+        $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
+
+        $filter = sprintf($filter, sprintf('<Maximo>%s</Maximo>%%s', $max));
+        $filter = str_replace("</Maximo>%s", "</Maximo>", $filter);
+
+
+        return $filter;
+
+    }
+
+    /**
      * Get Geo filter
      *
      * @param array $geoLocation
@@ -391,8 +453,6 @@ abstract class SOAPApi
     }
 
     /**
-     * Query API
-     *
      * @param int $page
      * @param array $cnaes
      * @param array $states
@@ -400,7 +460,11 @@ abstract class SOAPApi
      * @param array $postalCodes
      * @param array $geoLocation
      * @param CustomerInterface $customer
-     * @return array
+     * @param bool $billingMin
+     * @param bool $billingMax
+     * @param bool $employeesMin
+     * @param bool $employeesMax
+     * @return mixed
      */
     public function query(
         $page = 1,
@@ -409,7 +473,11 @@ abstract class SOAPApi
         array $cities = [],
         array $postalCodes = [],
         array $geoLocation = [],
-        CustomerInterface $customer
+        CustomerInterface $customer,
+        $billingMin = false,
+        $billingMax = false,
+        $employeesMin = false,
+        $employeesMax = false
     ) {
         $xmlRequest = $this->buildQueryXML(
             $customer,
@@ -419,7 +487,11 @@ abstract class SOAPApi
             $states,
             $cities,
             $postalCodes,
-            $geoLocation
+            $geoLocation,
+            $billingMin,
+            $billingMax,
+            $employeesMin,
+            $employeesMax
         );
 
         $request = [
