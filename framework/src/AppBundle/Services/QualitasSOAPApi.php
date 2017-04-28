@@ -259,10 +259,10 @@ class QualitasSOAPApi extends SOAPApi
         array $geoLocation = [],
         CustomerInterface $customer,
         $balance = 0,
-        $billingMin = false,
-        $billingMax = false,
-        $employeesMin = false,
-        $employeesMax = false
+        $billingMin = null,
+        $billingMax = null,
+        $employeesMin = null,
+        $employeesMax = null
     ) {
         if (empty($cnaes)) {
             return [

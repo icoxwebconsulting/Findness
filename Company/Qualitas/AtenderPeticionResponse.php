@@ -105,10 +105,10 @@ class AtenderPeticionResponse
         $result = $this->parseXML($this->AtenderPeticionResult);
 
         if ($result && !$result->CodigoError) {
-            echo "<pre>";
+            /*echo "<pre>";
             print_r($this->parseData($result));
             echo "</pre>";
-            die('resultados');
+            die('resultados');*/
             return $this->parseData($result);
         } else {
             throw new \Exception('Error on request');
