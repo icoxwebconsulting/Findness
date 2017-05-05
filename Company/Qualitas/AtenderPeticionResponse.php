@@ -85,6 +85,8 @@ class AtenderPeticionResponse
                     "Telefono" => $empresa->Telefono->__toString(),
                     "TotalEmpleados" => $empresa->Empleados->__toString(),
                     "Facturacion" => $empresa->Ventas->__toString(),
+                    "EsAutonomo" => $empresa->EsAutonomo->__toString(),
+                    "LetraSector" => $empresa->LetraSector->__toString(),
                 ];
             }
         }

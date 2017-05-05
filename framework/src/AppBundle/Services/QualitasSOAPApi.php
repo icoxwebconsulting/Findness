@@ -195,6 +195,8 @@ class QualitasSOAPApi extends SOAPApi
                     "phoneNumber" => $current->getPhoneNumber(),
                     "employees" => $current->getEmployees(),
                     "billing" => $current->getBilling(),
+                    "sector" => $current->getSector(),
+                    "freelance" => $current->getFreelance(),
                 );
 
                 return $carry;
@@ -343,6 +345,8 @@ class QualitasSOAPApi extends SOAPApi
                 $ormCompany->setPhoneNumber($company["Telefono"]);
                 $ormCompany->setEmployees($company["TotalEmpleados"]);
                 $ormCompany->setBilling($company["Facturacion"]);
+                $ormCompany->setSector($company["LetraSector"]);
+                $ormCompany->setFreelance($company["EsAutonomo"]);
 
                 $ormCompany->setAddress(
                     sprintf(

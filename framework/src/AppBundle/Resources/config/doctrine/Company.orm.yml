@@ -34,6 +34,12 @@ AppBundle\Entity\Company:
         billing:
             type: string
             length: 255
+        sector:
+            type: string
+            length: 255
+        freelance:
+            type: string
+            length: 255
 
         created:
             type: datetime

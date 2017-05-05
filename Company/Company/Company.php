@@ -65,6 +65,15 @@ class Company implements CompanyInterface
      */
     protected $billing;
 
+    /**
+     * @var string
+     */
+    protected $sector;
+
+    /**
+     * @var string
+     */
+    protected $freelance;
 
 
 
@@ -247,5 +256,37 @@ class Company implements CompanyInterface
     public function setBilling($billing)
     {
         $this->billing = $billing;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSector()
+    {
+        return $this->sector;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSector($sector)
+    {
+        $this->sector = $sector;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFreelance()
+    {
+        return $this->freelance;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setFreelance($freelance)
+    {
+        $this->freelance = $freelance;
     }
 }
