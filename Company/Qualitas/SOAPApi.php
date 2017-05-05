@@ -208,10 +208,10 @@ abstract class SOAPApi
         array $cities = [],
         array $postalCodes = [],
         array $geoLocations = [],
-        $billingMin = null,
-        $billingMax = null,
-        $employeesMin = null,
-        $employeesMax = null
+        $billingMin = false,
+        $billingMax = false,
+        $employeesMin = false,
+        $employeesMax = false
     ) {
         $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>%s</Producto><ComentarioLibre>%s</ComentarioLibre><MaximoElementosNoDevueltos>%s</MaximoElementosNoDevueltos>%s</SolicitudSegmentacion>';
 
@@ -224,11 +224,6 @@ abstract class SOAPApi
             $notViewedAllowedAmount,
             $filters
         );
-
-        /*echo "<pre>";
-            print_r($xmlRequest);
-            echo "</pre>";
-            die('resultados');*/
 
         return $xmlRequest;
     }
@@ -251,24 +246,19 @@ abstract class SOAPApi
         array $cities = [],
         array $postalCodes = [],
         array $geoLocations = [],
-        $billingMin = null,
-        $billingMax = null,
-        $employeesMin = null,
-        $employeesMax = null
+        $billingMin = false,
+        $billingMax = false,
+        $employeesMin = false,
+        $employeesMax = false
     ) {
         $filters = "";
         $filters .= $this->getCnaeFilter($cnaes);
-        $filters .= $this->getBillingFilter($billingMin, $billingMax);
-        $filters .= $this->getEmployeesFilter($employeesMin,$employeesMax);
         $filters .= $this->getStateFilter($states);
         $filters .= $this->getCityFilter($cities);
         $filters .= $this->getPostalCodeFilter($postalCodes);
         $filters .= $this->getGeoFilter($geoLocations);
-
-        /*echo "<pre>";
-            print_r($filters);
-            echo "</pre>";
-            die('resultados');*/
+        $filters .= $this->getBillingFilter($billingMin, $billingMax);
+        $filters .= $this->getEmployeesFilter($employeesMin,$employeesMax);
 
         return $filters;
     }
@@ -374,34 +364,30 @@ abstract class SOAPApi
      */
     protected function getBillingFilter($min, $max)
     {
-        if (!$max && !$min){
+        if(!$max && !$min )
+        {
             return '';
         }
 
-
         $filter = "<Facturacion>%s</Facturacion>";
 
-        if ($min){
+
+        if ($min) {
             $filter = sprintf($filter, sprintf('<Minimo>%s</Minimo>%%s', $min));
         }
 
-        if ($max){
+        if ($min) {
             $filter = sprintf($filter, sprintf('<Maximo>%s</Maximo>%%s', $max));
         }
 
-        if ($min){
+        if ($min) {
             $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
         }
 
-        if ($max){
+        if($max)
+        {
             $filter = str_replace("</Maximo>%s", "</Maximo>", $filter);
         }
-
-        /*$filter = sprintf($filter, sprintf('<Minimo>%s</Minimo>%%s', $min));
-        $filter = sprintf($filter, sprintf('<Maximo>%s</Maximo>%%s', $max));
-
-        $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
-        $filter = str_replace("</Maximo>%s", "</Maximo>", $filter);*/
 
         return $filter;
     }
@@ -415,28 +401,18 @@ abstract class SOAPApi
     protected function getEmployeesFilter($min, $max)
     {
 
-        if (!$max && !$min){
-            return '';
+        if ($min == false || $max == false) {
+            return "";
         }
-
 
         $filter = "<TotalEmpleados>%s</TotalEmpleados>";
 
-        if ($min){
-            $filter = sprintf($filter, sprintf('<Minimo>%s</Minimo>%%s', $min));
-        }
+        $filter = sprintf($filter, sprintf('<Minimo>%s</Minimo>%%s', $min));
+        $filter = sprintf($filter, sprintf('<Maximo>%s</Maximo>%%s', $max));
 
-        if ($max){
-            $filter = sprintf($filter, sprintf('<Maximo>%s</Maximo>%%s', $max));
-        }
+        $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
+        $filter = str_replace("</Maximo>%s", "</Maximo>", $filter);
 
-        if ($min){
-            $filter = str_replace("</Minimo>%s", "</Minimo>", $filter);
-        }
-
-        if ($max){
-            $filter = str_replace("</Maximo>%s", "</Maximo>", $filter);
-        }
 
         return $filter;
 
@@ -511,10 +487,10 @@ abstract class SOAPApi
         array $postalCodes = [],
         array $geoLocation = [],
         CustomerInterface $customer,
-        $billingMin = null,
-        $billingMax = null,
-        $employeesMin = null,
-        $employeesMax = null
+        $billingMin = false,
+        $billingMax = false,
+        $employeesMin = false,
+        $employeesMax = false
     ) {
         $xmlRequest = $this->buildQueryXML(
             $customer,
