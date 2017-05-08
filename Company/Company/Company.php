@@ -75,6 +75,11 @@ class Company implements CompanyInterface
      */
     protected $freelance;
 
+    /**
+     * @var string
+     */
+    protected $cnae;
+
 
 
     /**
@@ -288,5 +293,21 @@ class Company implements CompanyInterface
     public function setFreelance($freelance)
     {
         $this->freelance = $freelance;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCnae()
+    {
+        return $this->cnae;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCnae($cnae)
+    {
+        $this->cnae = $cnae;
     }
 }

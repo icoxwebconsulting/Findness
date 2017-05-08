@@ -197,6 +197,7 @@ class QualitasSOAPApi extends SOAPApi
                     "billing" => $current->getBilling(),
                     "sector" => $current->getSector(),
                     "freelance" => $current->getFreelance(),
+                    "cnae" => $current->getCnae(),
                 );
 
                 return $carry;
@@ -347,6 +348,7 @@ class QualitasSOAPApi extends SOAPApi
                 $ormCompany->setBilling($company["Facturacion"]);
                 $ormCompany->setSector($company["LetraSector"]);
                 $ormCompany->setFreelance($company["EsAutonomo"]);
+                $ormCompany->setCnae($company["Cnae"]);
 
                 $ormCompany->setAddress(
                     sprintf(

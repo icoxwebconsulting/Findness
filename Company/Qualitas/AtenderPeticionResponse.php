@@ -87,6 +87,7 @@ class AtenderPeticionResponse
                     "Facturacion" => $empresa->Ventas->__toString(),
                     "EsAutonomo" => $empresa->EsAutonomo->__toString(),
                     "LetraSector" => $empresa->LetraSector->__toString(),
+                    "Cnae" => $empresa->Cnae->__toString(),
                 ];
             }
         }

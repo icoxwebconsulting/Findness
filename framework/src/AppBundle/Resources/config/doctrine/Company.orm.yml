@@ -40,6 +40,9 @@ AppBundle\Entity\Company:
         freelance:
             type: string
             length: 255
+        cnae:
+            type: string
+            length: 255
 
         created:
             type: datetime
