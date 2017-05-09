@@ -226,9 +226,9 @@ abstract class SOAPApi
         );
 
         /*echo "<pre>";
-            print_r($xmlRequest);
-            echo "</pre>";
-            die('resultados');*/
+        print_r($xmlRequest);
+        echo "</pre>";
+        die('resultados');*/
 
         return $xmlRequest;
     }
