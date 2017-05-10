@@ -5,8 +5,6 @@ namespace AppBundle\Controller;
 use FOS\RestBundle\Controller\Annotations as FOSRestBundleAnnotations;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -77,28 +75,35 @@ class QualitasController extends FOSRestController implements ClassResourceInter
      *          "dataType"="string",
      *          "requirement"="*",
      *          "required"=false,
-     *          "description"="json string of states array"
+     *          "description"="json string of billing"
      *      },
      *     {
      *          "name"="billing_max",
      *          "dataType"="string",
      *          "requirement"="*",
      *          "required"=false,
-     *          "description"="json string of states array"
+     *          "description"="json string of billing"
      *      },
      *      {
      *          "name"="employees_min",
      *          "dataType"="string",
      *          "requirement"="*",
      *          "required"=false,
-     *          "description"="json string of states array"
+     *          "description"="json string of employees"
      *      },
      *     {
      *          "name"="employees_max",
      *          "dataType"="string",
      *          "requirement"="*",
      *          "required"=false,
-     *          "description"="json string of states array"
+     *          "description"="json string of employees"
+     *      },
+     *      {
+     *          "name"="sector",
+     *          "dataType"="string",
+     *          "requirement"="*",
+     *          "required"=false,
+     *          "description"="json string of sector"
      *      }
      *  },
      *  statusCodes={
@@ -120,6 +125,7 @@ class QualitasController extends FOSRestController implements ClassResourceInter
         $billingMax = $request->get("billing_max");
         $employeesMin = $request->get("employees_min");
         $employeesMax = $request->get("employees_max");
+        $sector = $request->get("sector");
         $cities = [];
         if (is_object($citiesObj) && property_exists($citiesObj, "state") && property_exists($citiesObj, "cities")) {
             $cities = ["state" => $citiesObj->state, "cities" => $citiesObj->cities];
@@ -128,7 +134,7 @@ class QualitasController extends FOSRestController implements ClassResourceInter
         $geoLocations = json_decode($request->get("geoLocations", json_encode([])), true);
         $qualitas = $this->container->get('findness.qualitas');
 
-        return $qualitas->query($page, $cnaes, $states, $cities, $postalCodes, $geoLocations, $this->getUser(), null, $billingMin, $billingMax, $employeesMin, $employeesMax);
+        return $qualitas->query($page, $cnaes, $states, $cities, $postalCodes, $geoLocations, $this->getUser(), null, $billingMin, $billingMax, $employeesMin, $employeesMax, $sector);
     }
 
     /**

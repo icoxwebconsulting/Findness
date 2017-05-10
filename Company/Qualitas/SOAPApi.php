@@ -197,6 +197,7 @@ abstract class SOAPApi
      * @param bool $billingMax
      * @param bool $employeesMin
      * @param bool $employeesMax
+     * @param string $sector
      * @return string
      */
     protected function buildQueryXML(
@@ -211,11 +212,12 @@ abstract class SOAPApi
         $billingMin = false,
         $billingMax = false,
         $employeesMin = false,
-        $employeesMax = false
+        $employeesMax = false,
+        $sector = ''
     ) {
         $xmlRequest = '<SolicitudSegmentacion Pagina="%s"><Producto>%s</Producto><ComentarioLibre>%s</ComentarioLibre><MaximoElementosNoDevueltos>%s</MaximoElementosNoDevueltos>%s</SolicitudSegmentacion>';
 
-        $filters = $this->getFilters($cnaes, $states, $cities, $postalCodes, $geoLocations,$billingMin, $billingMax, $employeesMin, $employeesMax);
+        $filters = $this->getFilters($cnaes, $states, $cities, $postalCodes, $geoLocations,$billingMin, $billingMax, $employeesMin, $employeesMax, $sector);
         $xmlRequest = sprintf(
             $xmlRequest,
             $page,
@@ -243,6 +245,7 @@ abstract class SOAPApi
      * @param bool $billingMax
      * @param bool $employeesMin
      * @param bool $employeesMax
+     * @param string $sector
      * @return string
      */
     protected function getFilters(
@@ -254,12 +257,14 @@ abstract class SOAPApi
         $billingMin = false,
         $billingMax = false,
         $employeesMin = false,
-        $employeesMax = false
+        $employeesMax = false,
+        $sector = ''
     ) {
         $filters = "";
         $filters .= $this->getCnaeFilter($cnaes);
         $filters .= $this->getBillingFilter($billingMin, $billingMax);
         $filters .= $this->getEmployeesFilter($employeesMin,$employeesMax);
+        $filters .= $this->getSectorFilter($sector);
         $filters .= $this->getStateFilter($states);
         $filters .= $this->getCityFilter($cities);
         $filters .= $this->getPostalCodeFilter($postalCodes);
@@ -433,6 +438,26 @@ abstract class SOAPApi
     }
 
     /**
+     * @param $sector
+     * @return string
+     */
+    protected function getSectorFilter($sector)
+    {
+
+        if (empty($sector)) {
+            return "";
+        }
+
+        $filter = "<ListaSector>%s</ListaSector>";
+        $filter = sprintf($filter, sprintf('<Sector>%s</Sector>%%s', $sector));
+        $filter = str_replace("</Sector>%s", "</Sector>", $filter);
+
+
+        return $filter;
+
+    }
+
+    /**
      * Get Geo filter
      *
      * @param array $geoLocation
@@ -487,10 +512,11 @@ abstract class SOAPApi
      * @param array $postalCodes
      * @param array $geoLocation
      * @param CustomerInterface $customer
-     * @param bool $billingMin
-     * @param bool $billingMax
-     * @param bool $employeesMin
-     * @param bool $employeesMax
+     * @param int $billingMin
+     * @param int $billingMax
+     * @param int $employeesMin
+     * @param int $employeesMax
+     * @param string $sector
      * @return mixed
      */
     public function query(
@@ -504,7 +530,8 @@ abstract class SOAPApi
         $billingMin = null,
         $billingMax = null,
         $employeesMin = null,
-        $employeesMax = null
+        $employeesMax = null,
+        $sector = ''
     ) {
         $xmlRequest = $this->buildQueryXML(
             $customer,
@@ -518,7 +545,8 @@ abstract class SOAPApi
             $billingMin,
             $billingMax,
             $employeesMin,
-            $employeesMax
+            $employeesMax,
+            $sector
         );
 
         $request = [

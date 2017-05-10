@@ -265,11 +265,12 @@ class QualitasSOAPApi extends SOAPApi
         $billingMin = null,
         $billingMax = null,
         $employeesMin = null,
-        $employeesMax = null
+        $employeesMax = null,
+        $sector = ''
     ) {
-        if (empty($cnaes)) {
+        if (empty($cnaes) && empty($sector)) {
             return [
-                "error" => "You need to specify a CNAE",
+                "error" => "You need to specify a CNAE or Sector",
             ];
         }
 
@@ -287,7 +288,8 @@ class QualitasSOAPApi extends SOAPApi
                 $billingMin,
                 $billingMax,
                 $employeesMin,
-                $employeesMax
+                $employeesMax,
+                $sector
             );
 
             $subscription = $this->getSubscription($customer, false);
