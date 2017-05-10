@@ -104,7 +104,7 @@ class QualitasSOAPApi extends SOAPApi
             );
 
             if ($notViewedAllowedAmount) {
-                $this->saveSearch($customer, $cnaes, $states, $cities, $postalCodes, $geoLocation);
+                $this->saveSearch($customer, $cnaes, $states, $cities, $postalCodes, $geoLocation, $sector);
                 $this->saveList($customer, $cnaes, $response["items"]);
             }
 
@@ -139,7 +139,7 @@ class QualitasSOAPApi extends SOAPApi
             'postalCodes' => $postalCodes,
             'geoLocation' => $geoLocation,
         );
-        $name = $this->makeName($cnaes[0]);
+        $name = isset($cnaes[0]) ? $this->makeName($cnaes[0]) : $this->makeName('n/a');
         $search = new Search();
         $search->setName($name);
         $search->setFilters($filters);
@@ -167,7 +167,7 @@ class QualitasSOAPApi extends SOAPApi
         array $cnaes = [],
         array $companies = []
     ) {
-        $name = $this->makeName($cnaes[0]);
+        $name = isset($cnaes[0]) ? $this->makeName($cnaes[0]) : $this->makeName('n/a');
         $staticList = new StaticList($customer, $name);
         $staticList->setCompanies($companies);
         $this->em->persist($staticList);
