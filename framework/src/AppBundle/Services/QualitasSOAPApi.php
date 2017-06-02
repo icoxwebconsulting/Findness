@@ -78,11 +78,12 @@ class QualitasSOAPApi extends SOAPApi
         array $postalCodes = [],
         array $geoLocation = [],
         CustomerInterface $customer,
-        $balance = 0
+        $balance = 0,
+        $sector = ''
     ) {
-        if (empty($cnaes)) {
+        if (empty($cnaes) && empty($sector)) {
             return [
-                "error" => "You need to specify a CNAE",
+                "error" => "You need to specify a CNAE or Sector",
             ];
         }
 
@@ -100,7 +101,8 @@ class QualitasSOAPApi extends SOAPApi
                 $postalCodes,
                 $geoLocation,
                 $customer,
-                $balance
+                $balance,
+                $sector
             );
 
             if ($notViewedAllowedAmount) {
@@ -123,6 +125,7 @@ class QualitasSOAPApi extends SOAPApi
      * @param array $cities
      * @param array $postalCodes
      * @param array $geoLocation
+     * @param $sector
      */
     private function saveSearch(
         CustomerInterface $customer,
@@ -130,7 +133,8 @@ class QualitasSOAPApi extends SOAPApi
         array $states = [],
         array $cities = [],
         array $postalCodes = [],
-        array $geoLocation = []
+        array $geoLocation = [],
+        $sector = ''
     ) {
         $filters = array(
             'cnaes' => $cnaes,
@@ -138,6 +142,7 @@ class QualitasSOAPApi extends SOAPApi
             'cities' => $cities,
             'postalCodes' => $postalCodes,
             'geoLocation' => $geoLocation,
+            'sector' => $sector,
         );
         $name = isset($cnaes[0]) ? $this->makeName($cnaes[0]) : $this->makeName('n/a');
         $search = new Search();

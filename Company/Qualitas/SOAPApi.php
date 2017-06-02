@@ -106,6 +106,7 @@ abstract class SOAPApi
      * @param array $geoLocation
      * @param CustomerInterface $customer
      * @param $balance
+     * @param $sector
      * @return array
      */
     public function queryByBalance(
@@ -117,7 +118,8 @@ abstract class SOAPApi
         array $postalCodes = [],
         array $geoLocation = [],
         CustomerInterface $customer,
-        $balance = 0
+        $balance = 0,
+        $sector = ''
     ) {
         $this->computeBalance((int)$notViewedAllowedAmount, $balance);
 
@@ -129,7 +131,8 @@ abstract class SOAPApi
             $states,
             $cities,
             $postalCodes,
-            $geoLocation
+            $geoLocation,
+            $sector
         );
 
         $request = [
