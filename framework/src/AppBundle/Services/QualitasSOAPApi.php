@@ -51,7 +51,8 @@ class QualitasSOAPApi extends SOAPApi
         $findnessSearchIvaFee,
         SoapClient $client,
         EntityManager $em
-    ) {
+    )
+    {
         parent::__construct(
             $username,
             $password,
@@ -80,10 +81,11 @@ class QualitasSOAPApi extends SOAPApi
         CustomerInterface $customer,
         $balance = 0,
         $sector = ''
-    ) {
+    )
+    {
         if (empty($cnaes) && empty($sector)) {
             return [
-                "error" => "You need to specify a CNAE or Sector",
+                "error" => "Debes seleccionar un CNAE o Sector",
             ];
         }
 
@@ -135,7 +137,8 @@ class QualitasSOAPApi extends SOAPApi
         array $postalCodes = [],
         array $geoLocation = [],
         $sector = ''
-    ) {
+    )
+    {
         $filters = array(
             'cnaes' => $cnaes,
             'states' => $states,
@@ -171,7 +174,8 @@ class QualitasSOAPApi extends SOAPApi
         CustomerInterface $customer,
         array $cnaes = [],
         array $companies = []
-    ) {
+    )
+    {
         $name = isset($cnaes[0]) ? $this->makeName($cnaes[0]) : $this->makeName('n/a');
         $staticList = new StaticList($customer, $name);
         $staticList->setCompanies($companies);
@@ -272,10 +276,11 @@ class QualitasSOAPApi extends SOAPApi
         $employeesMin = null,
         $employeesMax = null,
         $sector = ''
-    ) {
+    )
+    {
         if (empty($cnaes) && empty($sector)) {
             return [
-                "error" => "You need to specify a CNAE or Sector",
+                "error" => "Debes seleccionar un CNAE o Sector",
             ];
         }
 
