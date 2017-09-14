@@ -36,9 +36,9 @@ class RegistrationHandler
         $customer->setFirstName($firstName);
         $customer->setLastName($lastName);
         $customer->setRoles(array('ROLE_USER'));
-        $customer->setEnabled(false);
-        $customer->setConfirmationToken(mt_rand(100000, 999999));
-        $customer->setConfirmed(false);
+        $customer->setEnabled(true);
+        $customer->setConfirmationToken(null);
+        $customer->setConfirmed(true);
         return $customer;
     }
 }

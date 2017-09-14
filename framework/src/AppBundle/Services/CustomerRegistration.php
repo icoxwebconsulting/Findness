@@ -128,7 +128,7 @@ class CustomerRegistration
                 'text/plain'
             )*/;
 
-        $this->mailer->send($message);
+       // $this->mailer->send($message);
     }
 
     /**
@@ -175,7 +175,7 @@ class CustomerRegistration
             $this->em->persist($subscription);
             $this->em->flush();
 
-            $this->sendRegistrationEmail($customer);
+            //$this->sendRegistrationEmail($customer);
 
             return $customer;
         } catch (\Exception $exception) {
